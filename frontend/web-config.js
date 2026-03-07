@@ -1,10 +1,10 @@
 const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 window.MONARCH_CONFIG = window.MONARCH_CONFIG || {
-  // Change this to your Render URL after deploy.
-  // Example: https://solo-leveling-api.onrender.com/api/v1
+  // Change this to your Vercel API URL after deploy.
+  // Example: https://solo-leveling-api.vercel.app/api/v1
   backendBaseUrl: isLocalHost
     ? "http://127.0.0.1:8000/api/v1"
-    : "https://monarch-mode.vercel.app/api",
+    : "https://monarch-mode.vercel.app/api/v1",
   firebase: {
     apiKey: "AIzaSyBDeKJtu2WtSy0ezyYIbHM7V7FQ9BZocXg",
     authDomain: "solo-leveling-c38fb.firebaseapp.com",

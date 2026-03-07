@@ -144,7 +144,7 @@ body {
   isolation: isolate;
   background: linear-gradient(to bottom, rgba(2, 6, 23, 0.36), rgba(2, 6, 23, 0.72)),
     radial-gradient(ellipse at center 35%, rgba(0, 151, 255, 0.2), rgba(2, 6, 23, 0.08) 45%, transparent 72%),
-    url('./download.gif')
+    url('./assets/media/download.gif')
       calc(50% + var(--hero-parallax-x, 0px))
       calc(50% + var(--hero-parallax-y, 0px) + var(--hero-depth, 0px)) / 115% auto no-repeat;
   border-bottom: 1px solid rgba(56, 189, 248, 0.2);
@@ -855,7 +855,7 @@ body {
     min-height: 100vh;
     background: linear-gradient(to bottom, rgba(2, 6, 23, 0.34), rgba(2, 6, 23, 0.74)),
       radial-gradient(ellipse at center 35%, rgba(0, 151, 255, 0.18), rgba(2, 6, 23, 0.1) 45%, transparent 72%),
-      url('./mobile.gif')
+      url('./assets/media/mobile.gif')
         center center / cover no-repeat;
     background-attachment: scroll;
     will-change: auto;

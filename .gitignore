@@ -1,5 +1,7 @@
 backend/firebase-service-account.json
 backend/.env
+.vercel/
+backend/.vercel/
 **/__pycache__/
 *.pyc
 *.log
