@@ -13,7 +13,15 @@ import os
 
 from flask import Flask
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://sparkingjan.github.io"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app = Flask(__name__)
 
 @app.route("/")
