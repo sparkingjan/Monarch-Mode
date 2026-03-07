@@ -9,28 +9,6 @@ from app.routers.images import router as images_router
 from app.routers.leaderboard import router as leaderboard_router
 from app.routers.payments import router as payments_router
 from app.routers.users import router as users_router
-import os
-
-from flask import Flask
-import os
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://sparkingjan.github.io"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return "Solo Leveling Backend Running"
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
 settings = get_settings()
 app = FastAPI(title=settings.app_name)
 
