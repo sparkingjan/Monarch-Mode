@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monarch Mode - Progress</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-abyss text-slate-100 min-h-screen">
+  <div class="bg-grid"></div>
+  <a class="profile-link" href="login.html" aria-label="Open login">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 21a8 8 0 0 0-16 0"></path>
+      <circle cx="12" cy="8" r="4"></circle>
+    </svg>
+  </a>
+  <main x-data="soloLevelingApp()" x-init="init()" class="relative z-10">
+    <div x-show="showResetProgressModal" x-transition.opacity.duration.200ms class="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center px-4">
+      <div class="w-full max-w-md rounded-xl border border-blood/60 bg-slate-900 p-5 shadow-[0_0_30px_rgba(239,68,68,0.25)]">
+        <p class="text-sm uppercase tracking-[0.16em] text-blood">Warning</p>
+        <h3 class="mt-2 title-font text-2xl text-slate-100">Reset all progress?</h3>
+        <p class="mt-2 text-sm text-slate-300">This will reset XP, level, rank, all stats, streaks, diet progress, and related progression data.</p>
+        <div class="mt-5 flex justify-end gap-2">
+          <button @click="cancelResetProgress()" class="px-4 py-2 rounded-lg border border-slate-600 text-slate-200 hover:bg-slate-800 transition">
+            Cancel
+          </button>
+          <button @click="confirmResetProgress()" class="px-4 py-2 rounded-lg bg-blood/90 text-slate-100 hover:bg-blood transition font-semibold">
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="nav-shell">
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav id="primary-nav" class="top-nav">
+        <a href="index.html">Main</a>
+        <a href="quests.html">Quests</a>
+        <a href="diet.html">Diet</a>
+        <a href="fitness.html">Looksmaxxing</a>
+        <a href="progress.html" class="active">Progress</a>
+        <a href="leaderboard.html">Leaderboard</a>
+      </nav>
+    </div>
+
+    <section class="w-[92%] lg:w-[70%] max-w-none mx-auto px-4 md:px-8 mt-8">
+      <div class="panel p-6 md:p-8 rounded-2xl border border-cyan-400/30">
+        <h1 class="title-font text-3xl md:text-4xl">Hunter Progress</h1>
+        <p class="text-slate-300 mt-2">Track your growth with the same live combat profile used in Quests.</p>
+
+        <div class="hunter-card mt-7">
+          <div class="hunter-card-inner">
+            <div class="hunter-id">
+              <div class="hunter-avatar">
+                <span x-text="profile.name.charAt(0).toUpperCase()"></span>
+              </div>
+              <div>
+                <p class="hunter-label">Hunter License</p>
+                <div class="flex items-start justify-between gap-3">
+                  <h2 class="hunter-name" x-text="profile.name"></h2>
+                  <p class="text-xs text-warning whitespace-nowrap mt-1">
+                    &#128293; Survival Streak: <span class="font-bold" x-text="meta.survivalStreak || 0"></span>
+                  </p>
+                </div>
+                <p class="hunter-rank-pill" :class="rankPillClass(profile.rank)" x-text="profile.rank"></p>
+              </div>
+            </div>
+
+            <div class="hunter-metrics">
+              <div class="metric-tile">
+                <p class="metric-label">Level</p>
+                <p class="metric-value" x-text="profile.level"></p>
+              </div>
+              <div class="metric-tile">
+                <p class="metric-label">Quests Cleared</p>
+                <p class="metric-value" x-text="quests.filter((quest) => quest.done).length"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="hunter-progress-wrap">
+            <div class="hunter-progress-head">
+              <span>XP Progress</span>
+              <span><span x-text="profile.xp"></span> / <span x-text="profile.nextLevelXp"></span></span>
+            </div>
+            <div class="hunter-progress-track">
+              <div class="hunter-progress-fill" :style="`width: ${xpPercent()}%`"></div>
+            </div>
+          </div>
+
+          <div class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+            <div class="metric-tile relative overflow-hidden">
+              <p class="metric-label">Strength</p>
+              <p class="metric-value" x-text="profile.stats.strength"></p>
+              <p x-show="isDietUnlocked()" class="mt-1 text-[11px] text-cyan-300" x-text="`Diet XP: ${meta.dietStatXp?.strength || 0} (${dietStatProgress('strength')})`"></p>
+              <span x-show="statGainFx.visible" x-transition.opacity.duration.120ms class="stat-gain-fx" x-text="statGainFx.text"></span>
+            </div>
+            <div class="metric-tile">
+              <p class="metric-label">Endurance</p>
+              <p class="metric-value" x-text="profile.stats.endurance"></p>
+              <p x-show="isDietUnlocked()" class="mt-1 text-[11px] text-cyan-300" x-text="`Diet XP: ${meta.dietStatXp?.endurance || 0} (${dietStatProgress('endurance')})`"></p>
+            </div>
+            <div class="metric-tile">
+              <p class="metric-label">Agility</p>
+              <p class="metric-value" x-text="profile.stats.agility"></p>
+            </div>
+            <div class="metric-tile">
+              <p class="metric-label">Discipline</p>
+              <p class="metric-value" x-text="profile.stats.discipline"></p>
+            </div>
+            <div class="metric-tile">
+              <p class="metric-label">Aura</p>
+              <p class="metric-value" x-text="profile.stats.aura"></p>
+            </div>
+            <div class="metric-tile">
+              <p class="metric-label">Recovery</p>
+              <p class="metric-value" x-text="profile.stats.recovery"></p>
+              <p x-show="isDietUnlocked()" class="mt-1 text-[11px] text-cyan-300" x-text="`Diet XP: ${meta.dietStatXp?.recovery || 0} (${dietStatProgress('recovery')})`"></p>
+              <p x-show="isDietUnlocked()" class="text-[11px] text-sky-300" x-text="`Water: ${meta.dietWaterLiters || 0}L / ${waterGoalLiters || 3}L`"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="w-[92%] lg:w-[70%] max-w-none mx-auto px-4 md:px-8 mt-6">
+      <article x-show="isDietUnlocked()" class="panel rounded-2xl p-6 border border-cyan-400/30" x-data="{ weekly: weeklyNutritionSummary() }" x-effect="weekly = weeklyNutritionSummary()">
+        <h2 class="title-font text-2xl">Weekly Nutrition Intelligence</h2>
+        <p class="mt-1 text-xs text-slate-400">
+          Week: <span class="text-cyan-300 font-semibold" x-text="weekly.weekKey"></span>
+          <span class="text-slate-500">|</span>
+          Tracked Days: <span class="text-cyan-300 font-semibold" x-text="weekly.trackedDays"></span>/7
+        </p>
+
+        <div class="mt-4 grid gap-3 md:grid-cols-3">
+          <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3">
+            <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Protein Target</p>
+            <p class="mt-1 text-lg font-semibold text-rank"><span x-text="weekly.proteinPercent"></span>% achieved</p>
+          </div>
+          <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3">
+            <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Hydration</p>
+            <p class="mt-1 text-lg font-semibold text-rank"><span x-text="weekly.hydrationPercent"></span>%</p>
+          </div>
+          <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3">
+            <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Consistency</p>
+            <p class="mt-1 text-lg font-semibold text-rank" x-text="weekly.consistencyLabel"></p>
+          </div>
+        </div>
+
+        <div class="mt-4 rounded-xl border border-cyan-400/35 bg-cyan-500/10 px-4 py-3">
+          <p class="text-xs uppercase tracking-[0.16em] text-cyan-300">System Recommendation</p>
+          <p class="mt-1 text-sm text-slate-100" x-text="`\"${weekly.recommendation}\"`"></p>
+        </div>
+      </article>
+      <article x-show="!isDietUnlocked()" class="panel rounded-2xl p-6 border border-warning/60 bg-warning/10">
+        <h2 class="title-font text-2xl">Weekly Nutrition Intelligence</h2>
+        <p class="mt-2 text-sm text-slate-200">Diet analytics are locked. Select a Build Focus first to enable nutrition tracking and calorie intelligence.</p>
+      </article>
+    </section>
+
+    <section class="w-[92%] lg:w-[70%] max-w-none mx-auto px-4 md:px-8 mt-6 pb-16">
+      <article class="panel rounded-2xl p-6 border border-slate-700">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <h2 class="title-font text-2xl">System Log</h2>
+          <button @click="requestResetProgress()" class="text-sm px-4 py-2 rounded-lg border border-blood/60 text-blood hover:bg-blood/10 transition">Reset Progress</button>
+        </div>
+        <div class="mt-4 max-h-64 overflow-auto space-y-2 pr-2">
+          <template x-for="(log, idx) in logs" :key="idx">
+            <p class="text-sm border-l-2 border-cyan-500 pl-3 text-slate-300" x-text="log"></p>
+          </template>
+          <p x-show="logs.length === 0" class="text-sm text-slate-500">No logs yet. Complete a quest to start.</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="web-config.js"></script>
+  <script src="auth-guard.js"></script>
+  <script src="app.js"></script>
+  <script src="nav.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="lenis-init.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

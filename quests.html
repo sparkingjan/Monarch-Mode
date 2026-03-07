@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monarch Mode - Quests</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-abyss text-slate-100 min-h-screen">
+  <div class="bg-grid"></div>
+  <a class="profile-link" href="login.html" aria-label="Open login">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 21a8 8 0 0 0-16 0"></path>
+      <circle cx="12" cy="8" r="4"></circle>
+    </svg>
+  </a>
+  <main x-data="soloLevelingApp()" x-init="init()" class="relative z-10">
+    <div x-show="activeSystemNotification" x-transition.opacity.duration.250ms
+      class="fixed top-24 right-4 z-50 w-[min(380px,calc(100%-2rem))] rounded-xl border border-cyan-400/40 bg-slate-900/95 p-4 shadow-[0_0_25px_rgba(34,211,238,0.25)]">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-sm font-bold text-cyan-300" x-text="activeSystemNotification?.title"></p>
+          <p class="text-sm text-slate-100 mt-1" x-text="activeSystemNotification?.message"></p>
+        </div>
+        <button @click="dismissSystemNotification()" class="text-slate-400 hover:text-slate-200 text-lg leading-none" aria-label="Dismiss system notice">�</button>
+      </div>
+    </div>
+
+    <div x-show="showAbandonModal" x-transition.opacity.duration.200ms class="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center px-4">
+      <div class="w-full max-w-md rounded-xl border border-blood/60 bg-slate-900 p-5 shadow-[0_0_30px_rgba(239,68,68,0.25)]">
+        <p class="text-sm uppercase tracking-[0.16em] text-blood">System Prompt</p>
+        <h3 class="mt-2 title-font text-2xl text-slate-100">Abandon mission?</h3>
+        <p class="mt-2 text-sm text-slate-300">If you quit now, all XP gained today will be removed and an extra 500 XP penalty will be applied.</p>
+        <div class="mt-5 flex justify-end gap-2">
+          <button @click="cancelAbandonMission()" class="px-4 py-2 rounded-lg border border-slate-600 text-slate-200 hover:bg-slate-800 transition">
+            No
+          </button>
+          <button @click="confirmAbandonMission()" class="px-4 py-2 rounded-lg bg-blood/90 text-slate-100 hover:bg-blood transition font-semibold">
+            Yes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-shell">
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav id="primary-nav" class="top-nav">
+        <a href="index.html">Main</a>
+        <a href="quests.html" class="active">Quests</a>
+        <a href="diet.html">Diet</a>
+        <a href="fitness.html">Looksmaxxing</a>
+        <a href="progress.html">Progress</a>
+        <a href="leaderboard.html">Leaderboard</a>
+      </nav>
+    </div>
+
+    <section class="max-w-6xl mx-auto px-4 md:px-8 mt-8">
+      <div class="panel p-6 md:p-8 rounded-2xl border border-cyan-400/30">
+        <h1 class="title-font text-3xl md:text-4xl">Quest Board</h1>
+        <p class="text-slate-300 mt-2">Complete your daily missions to gain XP and rank up.</p>
+
+        <div class="hunter-card mt-7">
+          <div class="hunter-card-inner">
+            <div class="hunter-id">
+              <div class="hunter-avatar">
+                <span x-text="profile.name.charAt(0).toUpperCase()"></span>
+              </div>
+              <div>
+                <p class="hunter-label">Hunter License</p>
+                <div class="flex items-start justify-between gap-3">
+                  <h2 class="hunter-name" x-text="profile.name"></h2>
+                  <p class="text-xs text-warning whitespace-nowrap mt-1">
+                    &#128293; Survival Streak: <span class="font-bold" x-text="meta.survivalStreak || 0"></span>
+                  </p>
+                </div>
+                <p class="hunter-rank-pill" :class="rankPillClass(profile.rank)" x-text="profile.rank"></p>
+              </div>
+            </div>
+
+            <div class="hunter-metrics">
+              <div class="metric-tile">
+                <p class="metric-label">Level</p>
+                <p class="metric-value" x-text="profile.level"></p>
+              </div>
+              <div class="metric-tile">
+                <p class="metric-label">Quests Cleared</p>
+                <p class="metric-value" x-text="quests.filter((quest) => quest.done).length"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="hunter-progress-wrap">
+            <div class="hunter-progress-head">
+              <span>XP Progress</span>
+              <span><span x-text="profile.xp"></span> / <span x-text="profile.nextLevelXp"></span></span>
+            </div>
+            <div class="hunter-progress-track">
+              <div class="hunter-progress-fill" :style="`width: ${xpPercent()}%`"></div>
+            </div>
+          </div>
+
+          <div class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+            <div class="metric-tile relative overflow-hidden">
+              <p class="metric-label">Strength</p>
+              <p class="metric-value" x-text="profile.stats.strength"></p>
+              <p class="mt-1 text-[11px] text-cyan-300" x-text="`Diet XP: ${meta.dietStatXp?.strength || 0} (${dietStatProgress('strength')})`"></p>
+              <span x-show="statGainFx.visible" x-transition.opacity.duration.120ms class="stat-gain-fx" x-text="statGainFx.text"></span>
+            </div>
+            <div class="metric-tile">
+              <p class="metric-label">Endurance</p>
+              <p class="metric-value" x-text="profile.stats.endurance"></p>
+              <p class="mt-1 text-[11px] text-cyan-300" x-text="`Diet XP: ${meta.dietStatXp?.endurance || 0} (${dietStatProgress('endurance')})`"></p>
+            </div>
+            <div class="metric-tile">
+              <p class="metric-label">Agility</p>
+              <p class="metric-value" x-text="profile.stats.agility"></p>
+            </div>
+            <div class="metric-tile">
+              <p class="metric-label">Discipline</p>
+              <p class="metric-value" x-text="profile.stats.discipline"></p>
+            </div>
+            <div class="metric-tile">
+              <p class="metric-label">Aura</p>
+              <p class="metric-value" x-text="profile.stats.aura"></p>
+            </div>
+            <div class="metric-tile">
+              <p class="metric-label">Recovery</p>
+              <p class="metric-value" x-text="profile.stats.recovery"></p>
+              <p x-show="isDietUnlocked()" class="mt-1 text-[11px] text-cyan-300" x-text="`Diet XP: ${meta.dietStatXp?.recovery || 0} (${dietStatProgress('recovery')})`"></p>
+              <p x-show="isDietUnlocked()" class="text-[11px] text-sky-300" x-text="`Water: ${meta.dietWaterLiters || 0}L / ${waterGoalLiters || 3}L`"></p>
+            </div>
+          </div>
+
+          <div x-show="isDietUnlocked()" class="mt-3 rounded-xl border border-cyan-400/30 bg-cyan-500/10 p-3">
+            <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">Diet Sync</p>
+            <p class="mt-1 text-[11px] text-slate-300">
+              Planner: <span class="text-cyan-300 font-semibold" x-text="nutritionGoalLabel()"></span>
+              <span class="text-slate-500">|</span>
+              Driver: <span class="text-cyan-300 font-semibold" x-text="nutritionDriverLabel()"></span>
+            </p>
+            <div class="mt-2 space-y-2">
+              <div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-slate-300">Protein</span>
+                  <span class="text-rank font-semibold"><span x-text="nutritionConsumed().protein"></span>g / <span x-text="nutritionPlanTotals().protein"></span>g</span>
+                </div>
+                <div class="mt-1 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-cyan-500 to-cyan-300 transition-all duration-500" :style="`width: ${nutritionPercent('protein')}%`"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-slate-300">Carbs</span>
+                  <span class="text-rank font-semibold"><span x-text="nutritionConsumed().carbs"></span>g / <span x-text="nutritionPlanTotals().carbs"></span>g</span>
+                </div>
+                <div class="mt-1 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-sky-500 to-teal-300 transition-all duration-500" :style="`width: ${nutritionPercent('carbs')}%`"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-slate-300">Calories</span>
+                  <span class="text-rank font-semibold"><span x-text="nutritionConsumed().calories"></span> / <span x-text="nutritionPlanTotals().calories"></span></span>
+                </div>
+                <div class="mt-1 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-emerald-500 to-lime-300 transition-all duration-500" :style="`width: ${nutritionPercent('calories')}%`"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div x-show="!isDietUnlocked()" class="mt-3 rounded-xl border border-warning/60 bg-warning/10 p-3">
+            <p class="text-xs uppercase tracking-[0.14em] text-warning">Diet Sync Locked</p>
+            <p class="mt-1 text-[11px] text-slate-300">Select your Build Focus first to unlock adaptive diet targets and calorie tracking.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-4 md:px-8 mt-6 grid lg:grid-cols-[1.35fr_1fr] gap-6 pb-16">
+      <article class="panel rounded-2xl p-6 border border-slate-700">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <h2 class="title-font text-2xl">Hunter Growth Assignments</h2>
+          <div class="flex items-center gap-2">
+            <p class="text-xs uppercase tracking-[0.2em] text-cyan-300">Complete quests to gain XP. Failure results in penalty.</p>
+            <button @click="requestAbandonMission()" class="text-xs px-3 py-1.5 rounded-lg border border-blood/60 text-blood hover:bg-blood/10 transition">
+              Quit Quest
+            </button>
+          </div>
+        </div>
+        <div class="mt-3 rounded-xl border border-cyan-400/35 bg-cyan-500/10 px-4 py-2">
+          <p class="text-sm font-semibold text-cyan-200" x-text="currentProtocol().banner"></p>
+          <p x-show="currentProtocol().primaryFocus" class="text-xs text-slate-200 mt-1">
+            Primary Focus: <span class="font-semibold" x-text="currentProtocol().primaryFocus"></span>
+          </p>
+          <p x-show="currentProtocol().targetMuscles" class="text-xs text-slate-300">
+            Target Muscles: <span class="font-semibold" x-text="currentProtocol().targetMuscles"></span>
+          </p>
+        </div>
+        <div class="mt-3 rounded-xl border px-4 py-2"
+          :class="isFinalHourBeforeReset() ? 'border-blood/70 bg-blood/15' : 'border-cyan-400/35 bg-cyan-500/10'">
+          <p class="text-xs uppercase tracking-[0.16em]"
+            :class="isFinalHourBeforeReset() ? 'text-rose-300' : 'text-cyan-300'">
+            Daily Reset In:
+            <span class="font-bold" x-text="resetCountdownText"></span>
+          </p>
+        </div>
+        <div x-show="!allDailyQuestsComplete()" class="mt-4 rounded-xl border border-blood/60 bg-blood/10 px-4 py-3">
+          <p class="text-sm font-bold text-blood">&#10060; System Notice</p>
+          <p class="text-sm text-rose-200 mt-1">Daily directive incomplete. Penalty will be applied at 23:59.</p>
+        </div>
+        <div class="mt-4 rounded-xl border border-cyan-400/40 bg-cyan-500/10 px-4 py-3">
+          <p class="text-sm font-bold text-cyan-300">Choose Build Focus</p>
+          <p class="mt-1 text-[11px] text-slate-300">
+            Diet adaptation:
+            <span class="text-cyan-300">Aesthetic = slight deficit</span> |
+            <span class="text-cyan-300">Strength = surplus</span> |
+            <span class="text-cyan-300">Athletic = balanced macros</span> |
+            <span class="text-cyan-300">Monarch = strict high protein</span>
+          </p>
+          <p class="mt-1 text-xs text-slate-300">
+            AI Recommendation:
+            <span class="font-semibold text-cyan-300" x-text="focusBuildLabel(aiBuildRecommendation().build)"></span>
+            <span class="text-slate-400"> - </span>
+            <span x-text="aiBuildRecommendation().reason"></span>
+          </p>
+          <div class="mt-2 grid sm:grid-cols-2 gap-2">
+            <button @click="selectFocusBuild('aesthetic')" :disabled="isFocusBuildSelected()"
+              class="px-4 py-2.5 rounded-lg text-sm md:text-base font-semibold transition duration-150 transform"
+              :class="meta.focusBuild === 'aesthetic' ? 'bg-cyan-400 text-abyss scale-95' : 'bg-slate-800 text-slate-200 hover:bg-slate-700 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100'">
+              &#10024; Aesthetic Build
+            </button>
+            <button @click="selectFocusBuild('strength')" :disabled="isFocusBuildSelected()"
+              class="px-4 py-2.5 rounded-lg text-sm md:text-base font-semibold transition duration-150 transform"
+              :class="meta.focusBuild === 'strength' ? 'bg-cyan-400 text-abyss scale-95' : 'bg-slate-800 text-slate-200 hover:bg-slate-700 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100'">
+              &#128170; Strength Build
+            </button>
+            <button @click="selectFocusBuild('athletic')" :disabled="isFocusBuildSelected()"
+              class="px-4 py-2.5 rounded-lg text-sm md:text-base font-semibold transition duration-150 transform"
+              :class="meta.focusBuild === 'athletic' ? 'bg-cyan-400 text-abyss scale-95' : 'bg-slate-800 text-slate-200 hover:bg-slate-700 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100'">
+              &#127939; Athletic Build
+            </button>
+            <button @click="selectFocusBuild('monarch')" :disabled="isFocusBuildSelected()"
+              class="px-4 py-2.5 rounded-lg text-sm md:text-base font-semibold transition duration-150 transform"
+              :class="meta.focusBuild === 'monarch' ? 'bg-cyan-400 text-abyss scale-95' : 'bg-slate-800 text-slate-200 hover:bg-slate-700 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100'">
+              &#128081; Monarch Mode
+            </button>
+          </div>
+          <p class="mt-2 text-xs" :class="isFocusBuildSelected() ? 'text-rank' : 'text-warning'">
+            <span x-show="!isFocusBuildSelected()">Build not selected. Daily mode lock is disabled.</span>
+            <span x-show="isFocusBuildSelected()">Active: <span class="font-bold" x-text="focusBuildLabel()"></span> - <span x-text="focusBuildSummary()"></span></span>
+          </p>
+        </div>
+        <div class="mt-4 rounded-xl border border-cyan-400/40 bg-cyan-500/10 px-4 py-3">
+          <p class="text-sm font-bold text-cyan-300">Choose Mode Before Daily Directives</p>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <button @click="selectDailyMode('normal')" :disabled="!isFocusBuildSelected() || isDailyModeSelected()"
+              class="px-5 py-2.5 rounded-lg text-sm md:text-base font-semibold transition duration-150 transform"
+              :class="meta.dailyMode === 'normal' ? 'bg-cyan-400 text-abyss scale-95' : 'bg-slate-800 text-slate-200 hover:bg-slate-700 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100'">
+              Normal Mode (1x XP)
+            </button>
+            <button @click="selectDailyMode('hard')" :disabled="!isFocusBuildSelected() || isDailyModeSelected()"
+              class="px-5 py-2.5 rounded-lg text-sm md:text-base font-semibold transition duration-150 transform"
+              :class="meta.dailyMode === 'hard' ? 'bg-cyan-400 text-abyss scale-95' : 'bg-slate-800 text-slate-200 hover:bg-slate-700 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100'">
+              Hard Mode (2x XP)
+            </button>
+            <button @click="selectDailyMode('extreme')" :disabled="!isFocusBuildSelected() || isDailyModeSelected()"
+              class="px-5 py-2.5 rounded-lg text-sm md:text-base font-semibold transition duration-150 transform"
+              :class="meta.dailyMode === 'extreme' ? 'bg-cyan-400 text-abyss scale-95' : 'bg-slate-800 text-slate-200 hover:bg-slate-700 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100'">
+              Extreme Mode (3x XP + penalty if failed)
+            </button>
+          </div>
+          <p class="mt-2 text-xs" :class="isDailyModeSelected() ? 'text-rank' : 'text-warning'">
+            <span x-show="!isDailyModeSelected()">Mode not selected. Quest clicks are locked.</span>
+            <span x-show="isDailyModeSelected()">Active: <span class="font-bold" x-text="modeLabel()"></span></span>
+          </p>
+          <p class="mt-2 text-xs text-slate-300">
+            Streak Bonus: <span class="font-bold text-cyan-300" x-text="`${streakMultiplier()}x`"></span>
+            <span class="mx-1">|</span>
+            Full Clear Bonus: <span class="font-bold text-warning">+50% XP</span>
+          </p>
+          <p class="mt-1 text-xs text-slate-400">Mind Discipline quests unlock only in Hard and Extreme mode.</p>
+        </div>
+        <div x-show="hiddenQuest.active" class="mt-4 rounded-xl border border-cyan-400/50 bg-cyan-500/10 px-4 py-3">
+          <p class="text-sm font-bold text-cyan-300" x-text="hiddenQuest.title"></p>
+          <p class="text-sm text-slate-100 mt-1" x-text="hiddenQuest.objective"></p>
+          <div class="mt-2 flex items-center justify-between gap-3 text-xs">
+            <p class="text-rank">Reward: +<span x-text="hiddenQuest.rewardXp"></span> XP</p>
+            <p class="text-blood">Failure: -<span x-text="hiddenQuest.penaltyXp"></span> XP</p>
+          </div>
+          <button x-show="!hiddenQuest.completed" @click="completeHiddenQuest()"
+            class="mt-3 rounded-lg bg-cyan-500 px-3 py-1.5 text-xs font-bold text-abyss hover:bg-cyan-400 transition">
+            Mark Hidden Quest Complete
+          </button>
+          <p x-show="hiddenQuest.completed" class="mt-2 text-xs text-rank">Hidden quest completed for today.</p>
+        </div>
+        <div x-show="!isFocusBuildSelected() || !isDailyModeSelected()" class="mt-5 rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3">
+          <p class="text-sm text-slate-300">Select build focus first, then choose `Normal`, `Hard`, or `Extreme` mode to reveal daily quests.</p>
+        </div>
+        <div x-show="isFocusBuildSelected() && isDailyModeSelected()" x-transition.opacity.duration.180ms class="mt-5 space-y-3">
+          <template x-for="quest in quests" :key="quest.id">
+            <button @click="completeQuest(quest.id)" class="w-full text-left p-4 rounded-xl border transition"
+              :class="quest.done ? 'border-rank/50 bg-rank/10 shadow-rank' : 'border-slate-700 hover:border-cyan-400/50 hover:bg-cyan-500/5'">
+              <div class="flex items-start gap-3">
+                <span class="mt-1 h-5 w-5 rounded-full border-2 flex items-center justify-center"
+                  :class="quest.done ? 'border-rank bg-rank' : 'border-slate-500'">
+                  <span x-show="quest.done" class="text-abyss text-xs font-bold">&#10003;</span>
+                </span>
+                <span class="flex-1">
+                  <span class="font-semibold" :class="quest.done ? 'text-rank' : ''" x-text="quest.title"></span>
+                  <span class="block text-sm text-slate-400" x-text="questNoteForDisplay(quest)"></span>
+                </span>
+                <span class="text-sm text-warning font-semibold" x-text="`+${questPreviewXp(quest)} XP`"></span>
+              </div>
+            </button>
+          </template>
+        </div>
+      </article>
+
+      <aside class="panel rounded-2xl p-6 border border-cyan-500/30">
+        <h2 class="title-font text-2xl whitespace-nowrap">&#9876;&#65039; Dungeon Mode</h2>
+        <p class="text-sm text-cyan-300 mt-1">
+          Arc: <span class="font-semibold" x-text="`Week ${meta.dungeonArcWeek || 1}`"></span>
+        </p>
+        <p class="text-sm text-slate-300 mt-1">
+          Current Dungeon: <span class="font-semibold text-slate-100" x-text="currentDungeon().name"></span>
+        </p>
+        <p class="text-sm text-slate-300 mt-1">Unlock condition: 75% daily directive tasks completed this week.</p>
+        <div class="mt-3 rounded-xl border border-slate-700 bg-slate-900/50 p-3 text-sm space-y-1">
+          <p class="text-slate-300">Dungeon Tier: <span class="text-warning font-semibold" x-text="currentDungeon().descriptor"></span></p>
+          <p class="text-slate-300">Dungeon Difficulty: <span class="text-warning font-semibold" x-text="dungeonDifficultyRank()"></span></p>
+          <p class="text-slate-300">Estimated Survival Rate: <span class="text-cyan-300 font-semibold" x-text="`${estimatedSurvivalRate()}%`"></span></p>
+        </div>
+        <p class="text-xs text-rose-300 mt-3">Entering dungeon without preparation may result in regression.</p>
+        <p class="text-xs mt-2 text-cyan-300">
+          Directive Progress: <span class="font-bold" x-text="`${directiveCompletionProgress()} (${directiveCompletionPercent()}%)`"></span>
+        </p>
+        <p class="text-xs mt-1" :class="canEnterDungeonRaid() ? 'text-rank' : 'text-warning'">
+          <span x-show="!canEnterDungeonRaid()">Locked: Reach 75% daily directive task completion this week.</span>
+          <span x-show="canEnterDungeonRaid() && !isRaidBonusClaimedThisWeek()">Unlocked: Weekly dungeon access granted.</span>
+          <span x-show="canEnterDungeonRaid() && isRaidBonusClaimedThisWeek()">Weekly dungeon cleared. Resets next week.</span>
+        </p>
+        <div class="mt-4 space-y-2 text-sm">
+          <template x-for="raid in raidTasks" :key="raid.id">
+            <label class="flex items-center justify-between gap-3" :class="canEnterDungeonRaid() ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'">
+              <span class="flex items-center gap-2">
+              <input type="checkbox" class="accent-cyan-400" :checked="raid.done" :disabled="!canEnterDungeonRaid() || isRaidBonusClaimedThisWeek()" @change="toggleRaid(raid.id)" />
+              <span :class="raid.done ? 'line-through text-slate-500' : 'text-slate-200'" x-text="raid.title"></span>
+              </span>
+              <span class="text-warning font-semibold" x-text="`+${raid.xp} XP`"></span>
+            </label>
+          </template>
+        </div>
+        <button @click="claimRaidBonus()" :disabled="!canEnterDungeonRaid() || isRaidBonusClaimedThisWeek()"
+          class="mt-5 w-full py-2.5 rounded-lg transition text-abyss font-bold"
+          :class="canEnterDungeonRaid() && !isRaidBonusClaimedThisWeek() ? 'bg-cyan-500 hover:bg-cyan-400' : 'bg-slate-700 text-slate-400 cursor-not-allowed'">
+          Claim Raid Bonus (+<span x-text="raidBonusXp"></span> XP)
+        </button>
+      </aside>
+    </section>
+  </main>
+
+  <script src="web-config.js"></script>
+  <script src="auth-guard.js"></script>
+  <script src="app.js"></script>
+  <script src="nav.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="lenis-init.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

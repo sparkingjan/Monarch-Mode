@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monarch Mode - Edit Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-abyss text-slate-100 min-h-screen">
+  <div class="bg-grid"></div>
+  <a class="profile-link" href="profile.html" aria-label="Back to profile">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 21a8 8 0 0 0-16 0"></path>
+      <circle cx="12" cy="8" r="4"></circle>
+    </svg>
+  </a>
+
+  <main x-data="soloLevelingApp()" x-init="init()" class="relative z-10 pb-12">
+    <div class="nav-shell">
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav id="primary-nav" class="top-nav">
+        <a href="index.html">Main</a>
+        <a href="quests.html">Quests</a>
+        <a href="diet.html">Diet</a>
+        <a href="fitness.html">Looksmaxxing</a>
+        <a href="progress.html">Progress</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <a href="profile.html">Profile</a>
+      </nav>
+    </div>
+
+    <section class="w-[92%] lg:w-[70%] max-w-none mx-auto px-4 md:px-8 mt-8">
+      <article class="panel rounded-2xl p-6 md:p-8 border border-cyan-400/30 space-y-6">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <h1 class="title-font text-3xl md:text-4xl">Edit Profile</h1>
+            <p class="text-slate-300 mt-2">All profile changes are managed here.</p>
+          </div>
+          <a href="profile.html" class="rounded-lg px-4 py-2 text-sm font-semibold border border-cyan-400/70 text-cyan-200 hover:bg-cyan-400/10 transition">Back</a>
+        </div>
+
+        <section class="rounded-2xl border border-cyan-400/35 bg-cyan-500/5 p-4">
+          <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">Name</p>
+          <p class="mt-1 text-sm text-slate-300">Current: <span class="font-semibold text-slate-100" x-text="profile.name"></span></p>
+          <div class="mt-3 flex flex-col md:flex-row gap-3 md:items-center">
+            <input x-model="profileNameDraft" maxlength="64" class="auth-input !mt-0 flex-1" type="text" placeholder="Enter hunter name" />
+            <button type="button" @click="submitProfileNameChange()" :disabled="nameChangeBusy" class="rounded-lg px-4 py-2 text-sm font-semibold border border-cyan-400/70 text-cyan-200 hover:bg-cyan-400/10 transition disabled:opacity-60 disabled:cursor-not-allowed">
+              Save Name
+            </button>
+            <button type="button" @click="startNameChangeCheckout()" class="rounded-lg px-4 py-2 text-sm font-semibold border border-amber-400/70 text-amber-200 hover:bg-amber-400/10 transition">
+              Unlock Change (Rs 100)
+            </button>
+          </div>
+          <p class="mt-2 text-xs text-slate-300">
+            First name change is free. After that each rename costs
+            <span class="text-amber-200 font-semibold">Rs <span x-text="nameChangePriceLabel()"></span></span>.
+          </p>
+          <p class="mt-1 text-xs text-cyan-300">
+            Free used:
+            <span class="font-semibold" x-text="meta.nameChangeFreeUsed ? 'Yes' : 'No'"></span>
+            |
+            Paid credits:
+            <span class="font-semibold" x-text="meta.nameChangePaidCredits || 0"></span>
+          </p>
+          <p x-show="nameChangeInfo" class="mt-2 text-xs text-emerald-300" x-text="nameChangeInfo"></p>
+          <p x-show="nameChangeError" class="mt-2 text-xs text-rose-300" x-text="nameChangeError"></p>
+        </section>
+
+        <section class="rounded-2xl border border-cyan-400/35 bg-cyan-500/5 p-4">
+          <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">Body Profile</p>
+          <div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <input x-model="editorHeightCm" class="auth-input !mt-0" type="number" min="120" max="230" step="1" placeholder="Height (cm)" />
+            <input x-model="editorWeightKg" class="auth-input !mt-0" type="number" min="35" max="250" step="1" placeholder="Weight (kg)" />
+            <select x-model="editorGoal" class="auth-input !mt-0">
+              <option value="maintain">Goal: Maintain / Recomp</option>
+              <option value="cut">Goal: Fat Loss</option>
+              <option value="bulk">Goal: Lean Bulk</option>
+            </select>
+          </div>
+          <div class="mt-3 flex justify-end">
+            <button type="button" @click="saveEditorBodyProfile()" :disabled="editorBusy" class="rounded-lg px-4 py-2 text-sm font-semibold border border-cyan-400/70 text-cyan-200 hover:bg-cyan-400/10 transition disabled:opacity-60 disabled:cursor-not-allowed">
+              Save Body Profile
+            </button>
+          </div>
+          <p x-show="editorInfo" class="mt-2 text-xs text-emerald-300" x-text="editorInfo"></p>
+          <p x-show="editorError" class="mt-2 text-xs text-rose-300" x-text="editorError"></p>
+        </section>
+
+        <section class="rounded-2xl border border-cyan-400/35 bg-cyan-500/5 p-4">
+          <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">PFP and Banner</p>
+          <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4 pointer-events-none select-none opacity-85">
+            <div class="rounded-xl border border-slate-700/70 p-3">
+              <p class="text-xs uppercase tracking-[0.12em] text-slate-300">PFP</p>
+              <div class="mt-2 h-20 flex items-center justify-center rounded-lg border border-cyan-300/35 bg-slate-900/70 overflow-hidden">
+                <span class="title-font text-xl text-cyan-100" x-text="profile.name.charAt(0).toUpperCase()"></span>
+              </div>
+              <button type="button" disabled class="mt-3 w-full rounded-lg border border-slate-500/60 bg-slate-900/60 px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 cursor-not-allowed">
+                PFP - Coming Soon
+              </button>
+            </div>
+            <div class="rounded-xl border border-slate-700/70 p-3">
+              <p class="text-xs uppercase tracking-[0.12em] text-slate-300">Banner</p>
+              <div class="mt-2 h-20 flex items-center justify-center rounded-lg border border-cyan-300/35 bg-slate-900/70 overflow-hidden">
+                <span class="text-xs tracking-[0.12em] uppercase text-slate-300">Banner Preview</span>
+              </div>
+              <button type="button" disabled class="mt-3 w-full rounded-lg border border-slate-500/60 bg-slate-900/60 px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 cursor-not-allowed">
+                Banner - Coming Soon
+              </button>
+            </div>
+          </div>
+        </section>
+      </article>
+    </section>
+  </main>
+
+  <script src="web-config.js"></script>
+  <script src="auth-guard.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="app.js"></script>
+  <script src="nav.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="lenis-init.js"></script>
+</body>
+</html>

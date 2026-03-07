@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monarch Mode - Leaderboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-abyss text-slate-100 min-h-screen">
+  <div class="bg-grid"></div>
+  <a class="profile-link" href="login.html" aria-label="Open login">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 21a8 8 0 0 0-16 0"></path>
+      <circle cx="12" cy="8" r="4"></circle>
+    </svg>
+  </a>
+  <main x-data="soloLevelingApp()" x-init="init()" class="relative z-10 pb-12">
+    <div class="nav-shell">
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav id="primary-nav" class="top-nav">
+        <a href="index.html">Main</a>
+        <a href="quests.html">Quests</a>
+        <a href="diet.html">Diet</a>
+        <a href="fitness.html">Looksmaxxing</a>
+        <a href="progress.html">Progress</a>
+        <a href="leaderboard.html" class="active">Leaderboard</a>
+      </nav>
+    </div>
+
+    <section class="w-[92%] lg:w-[70%] max-w-none mx-auto px-4 md:px-8 mt-8">
+      <header class="panel rounded-2xl border border-cyan-400/30 p-6">
+        <p class="text-cyan-300 tracking-[0.2em] uppercase text-xs">Global Hunters</p>
+        <h1 class="title-font text-3xl md:text-4xl mt-2">Rank Leaderboard</h1>
+      </header>
+
+      <div
+        class="mt-6"
+        x-init="init()"
+        x-data="{
+          apiEntries: [],
+          loadError: '',
+          currentUser: null,
+          async init() {
+            const baseUrl = window.MONARCH_CONFIG?.backendBaseUrl || 'http://127.0.0.1:8000/api/v1';
+            const token = localStorage.getItem('firebase-id-token');
+            const headers = token ? { Authorization: 'Bearer ' + token } : {};
+            try {
+              const [leaderboardResponse, meResponse] = await Promise.all([
+                fetch(baseUrl + '/leaderboard?limit=100', { headers }),
+                fetch(baseUrl + '/users/me', { headers })
+              ]);
+              if (!leaderboardResponse.ok) {
+                this.loadError = `Failed to load leaderboard (${leaderboardResponse.status}).`;
+                this.apiEntries = [];
+                return;
+              }
+              const payload = await leaderboardResponse.json();
+              this.apiEntries = Array.isArray(payload.entries) ? payload.entries : [];
+              if (meResponse.ok) {
+                this.currentUser = await meResponse.json();
+              } else {
+                this.currentUser = null;
+              }
+              this.loadError = '';
+            } catch (_) {
+              this.loadError = 'Could not connect to leaderboard service.';
+              this.apiEntries = [];
+              this.currentUser = null;
+            }
+          },
+          sortedUsers() {
+            return this.apiEntries.map((entry) => ({
+              uid: entry.uid || '',
+              id: entry.uid || String(entry.position),
+              name: entry.name || 'Player Hunter',
+              rank: entry.rank || 'E-Rank',
+              xp: Number(entry.xp) || 0,
+              isAdmin: Boolean(entry.is_admin || entry.isAdmin)
+            }));
+          },
+          formatXp(value) {
+            return Number(value || 0).toLocaleString();
+          },
+          profileHref(entry) {
+            if (!entry || !entry.uid) return '#';
+            return `hunter.html?uid=${encodeURIComponent(entry.uid)}`;
+          },
+          rankKey(rank = '') {
+            const value = String(rank || '').toLowerCase();
+            if (value.includes('s++')) return 'spp';
+            if (value.includes('s-rank') || value === 's') return 's';
+            if (value.includes('a-rank') || value === 'a') return 'a';
+            if (value.includes('b-rank') || value === 'b') return 'b';
+            if (value.includes('c-rank') || value === 'c') return 'c';
+            if (value.includes('d-rank') || value === 'd') return 'd';
+            return 'e';
+          },
+          rankPillClass(rank = '') {
+            return `rank-pill-${this.rankKey(rank)}`;
+          },
+          rankTextClass(rank = '') {
+            return `rank-text-${this.rankKey(rank)}`;
+          }
+        }"
+      >
+        <div x-show="sortedUsers().length === 0" class="panel rounded-xl border border-slate-700/85 p-4 text-slate-300">
+          No ranked users found in database yet.
+        </div>
+        <div x-show="loadError" class="mt-3 panel rounded-xl border border-red-500/50 p-4 text-red-200" x-text="loadError"></div>
+
+        <div class="mt-4 space-y-3 leaderboard-list">
+          <template x-for="(entry, idx) in sortedUsers()" :key="entry.id">
+            <article
+              class="relative overflow-hidden rounded-xl border border-slate-700/85 p-4 panel transition cursor-pointer leaderboard-row"
+              :class="idx === 0 ? 'desktop-top desktop-top-1' : (idx === 1 ? 'desktop-top desktop-top-2' : (idx === 2 ? 'desktop-top desktop-top-3' : 'desktop-regular'))"
+              @click="window.location.href = profileHref(entry)"
+              @keydown.enter.prevent="window.location.href = profileHref(entry)"
+              @keydown.space.prevent="window.location.href = profileHref(entry)"
+              role="link"
+              tabindex="0"
+            >
+              <div class="absolute left-4 top-1/2 z-20 h-12 w-12 -translate-y-1/2 overflow-hidden rounded-lg border border-cyan-200/60 bg-slate-900/85 shadow-[0_0_12px_rgba(56,189,248,0.18)] leaderboard-avatar-sm">
+                <span class="flex h-full w-full items-center justify-center title-font text-cyan-100" x-text="entry.name.charAt(0).toUpperCase()"></span>
+              </div>
+              <p
+                class="absolute inset-0 flex items-center justify-center pointer-events-none select-none title-font font-extrabold uppercase"
+                :class="`${idx === 0 ? 'text-[4rem]' : (idx === 1 ? 'text-[3.4rem]' : (idx === 2 ? 'text-[3rem]' : 'text-3xl'))} ${rankTextClass(entry.rank)}`"
+                x-text="entry.rank"></p>
+              <div class="relative z-10 pl-16 flex items-center justify-between gap-3">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.12em] text-slate-400" x-text="`Position #${idx + 1}`"></p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <p class="font-semibold text-slate-100" :class="idx <= 2 ? 'title-font text-lg' : ''" x-text="entry.name"></p>
+                    <span class="hunter-rank-pill text-[10px] px-2 py-0.5" :class="rankPillClass(entry.rank)" x-text="entry.rank"></span>
+                    <span x-show="entry.isAdmin" class="px-2 py-0.5 rounded-full border border-rose-300/70 bg-rose-500/20 text-rose-100 text-[10px] uppercase tracking-[0.1em]">Admin</span>
+                  </div>
+                </div>
+                <p class="relative z-10 font-semibold text-cyan-300 whitespace-nowrap" :class="idx === 0 ? 'title-font text-2xl text-amber-300' : (idx === 1 ? 'title-font text-xl text-slate-200' : (idx === 2 ? 'title-font text-lg text-cyan-200' : ''))" x-text="`${formatXp(entry.xp)} XP`"></p>
+              </div>
+            </article>
+          </template>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="web-config.js"></script>
+  <script src="auth-guard.js"></script>
+  <script src="app.js"></script>
+  <script src="nav.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="lenis-init.js"></script>
+</body>
+</html>
+
+
+
+
+
+

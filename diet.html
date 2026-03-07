@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monarch Mode - Diet</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-abyss text-slate-100 min-h-screen">
+  <div class="bg-grid"></div>
+  <a class="profile-link" href="login.html" aria-label="Open login">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 21a8 8 0 0 0-16 0"></path>
+      <circle cx="12" cy="8" r="4"></circle>
+    </svg>
+  </a>
+
+  <main x-data="soloLevelingApp()" x-init="init()" class="relative z-10">
+    <div class="nav-shell">
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav id="primary-nav" class="top-nav">
+        <a href="index.html">Main</a>
+        <a href="quests.html">Quests</a>
+        <a href="diet.html" class="active">Diet</a>
+        <a href="fitness.html">Looksmaxxing</a>
+        <a href="progress.html">Progress</a>
+        <a href="leaderboard.html">Leaderboard</a>
+      </nav>
+    </div>
+
+    <section class="max-w-4xl mx-auto px-4 md:px-8 mt-8 pb-16">
+      <article class="panel rounded-2xl p-6 border border-slate-700">
+        <h1 class="title-font text-3xl md:text-4xl">Monarch Fuel System</h1>
+        <p class="text-sm text-slate-400 mt-2">Diet system is active. Track your nutrition and hydration daily.</p>
+        <div x-show="!isDietUnlocked()" class="mt-4 rounded-xl border border-warning/60 bg-warning/10 p-4">
+          <p class="text-xs uppercase tracking-[0.14em] text-warning">Diet Locked</p>
+          <p class="mt-2 text-sm text-slate-200">Select your Build Focus from Quests first. Diet targets will unlock and adapt automatically to your build and profile.</p>
+          <a href="quests.html" class="inline-block mt-3 rounded-lg px-3 py-1.5 text-xs font-semibold border border-warning/70 text-warning hover:bg-warning/10 transition">Go To Quests</a>
+        </div>
+        <div x-show="isDietUnlocked()" class="mt-4 grid gap-3 md:grid-cols-3">
+          <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3">
+            <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Strength XP</p>
+            <p class="mt-1 text-lg font-semibold text-rank"><span x-text="meta.dietStatXp.strength"></span></p>
+            <p class="text-xs text-slate-400">Carry: <span x-text="dietStatProgress('strength')"></span></p>
+          </div>
+          <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3">
+            <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Endurance XP</p>
+            <p class="mt-1 text-lg font-semibold text-rank"><span x-text="meta.dietStatXp.endurance"></span></p>
+            <p class="text-xs text-slate-400">Carry: <span x-text="dietStatProgress('endurance')"></span></p>
+          </div>
+          <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3">
+            <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Recovery XP</p>
+            <p class="mt-1 text-lg font-semibold text-rank"><span x-text="meta.dietStatXp.recovery"></span></p>
+            <p class="text-xs text-slate-400">Carry: <span x-text="dietStatProgress('recovery')"></span></p>
+          </div>
+        </div>
+        <div x-show="isDietUnlocked() && hasFreshAiDietPlan()" class="mt-5 grid gap-4 md:grid-cols-2">
+          <div class="rounded-xl border border-cyan-400/30 bg-cyan-500/5 p-4">
+            <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">AI Nutrition Plan</p>
+            <p class="mt-1 text-xs text-slate-400">
+              Based on
+              <span x-text="hunterProfile.heightCm || '--'"></span> cm /
+              <span x-text="hunterProfile.weightKg || '--'"></span> kg /
+              <span x-text="hunterProfile.goal || '--'"></span>
+            </p>
+            <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+              <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-2">
+                <p class="text-[11px] text-slate-400 uppercase tracking-[0.12em]">Calories</p>
+                <p class="text-rank font-semibold" x-text="aiDietNutritionPlan().calories"></p>
+              </div>
+              <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-2">
+                <p class="text-[11px] text-slate-400 uppercase tracking-[0.12em]">Protein</p>
+                <p class="text-rank font-semibold"><span x-text="aiDietNutritionPlan().protein"></span>g</p>
+              </div>
+              <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-2">
+                <p class="text-[11px] text-slate-400 uppercase tracking-[0.12em]">Carbs</p>
+                <p class="text-rank font-semibold"><span x-text="aiDietNutritionPlan().carbs"></span>g</p>
+              </div>
+              <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-2">
+                <p class="text-[11px] text-slate-400 uppercase tracking-[0.12em]">Fat</p>
+                <p class="text-rank font-semibold"><span x-text="aiDietNutritionPlan().fat"></span>g</p>
+              </div>
+            </div>
+            <p class="mt-2 text-xs text-sky-300">Water Target: <span class="font-semibold" x-text="`${aiDietNutritionPlan().water_liters}L`"></span></p>
+            <p x-show="meta.aiDietPlanNote" class="mt-2 text-xs text-slate-300" x-text="meta.aiDietPlanNote"></p>
+          </div>
+          <div class="rounded-xl border border-cyan-400/30 bg-cyan-500/5 p-4">
+            <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">AI Meal Plan</p>
+            <div class="mt-3 space-y-2">
+              <template x-for="(meal, index) in aiDietMealPlan()" :key="meal.key">
+                <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3">
+                  <div class="flex items-start justify-between gap-2">
+                    <div>
+                      <p class="text-xs text-cyan-300 font-semibold" x-text="`Tier ${index + 1}`"></p>
+                      <p class="mt-1 text-sm text-slate-100" x-text="meal.food"></p>
+                    </div>
+                    <button
+                      @click="toggleDietMeal(meal.key)"
+                      :disabled="meal.done"
+                      class="rounded-lg px-2.5 py-1 text-[11px] font-semibold transition whitespace-nowrap"
+                      :class="meal.done ? 'border border-rank/60 text-rank bg-rank/10 opacity-80 cursor-not-allowed' : 'border border-slate-600 text-slate-200 hover:border-cyan-400 hover:text-cyan-300'"
+                      x-text="meal.done ? 'Completed' : 'Mark Complete'">
+                    </button>
+                  </div>
+                  <p class="mt-1 text-[11px] text-warning font-semibold" x-text="`+${meal.xp} ${dietStatLabel(meal.stat)} XP`"></p>
+                  <p class="mt-1 text-[11px] text-slate-400">
+                    <span x-text="`${meal.protein}g P`"></span>
+                    <span class="mx-1">|</span>
+                    <span x-text="`${meal.carbs}g C`"></span>
+                    <span class="mx-1">|</span>
+                    <span x-text="`${meal.calories} kcal`"></span>
+                  </p>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+        <div x-show="isDietUnlocked()" class="mt-5 rounded-xl border border-cyan-400/40 bg-cyan-500/5 p-4">
+          <div class="flex items-center justify-between gap-3">
+            <p class="text-sm text-slate-200">Need a fresh AI nutrition setup for today?</p>
+            <button
+              @click="generateDietPlan()"
+              :disabled="aiDietGenerationBusy || !canGenerateDietPlanToday()"
+              class="rounded-lg px-3 py-1.5 text-xs font-semibold transition"
+              :class="(aiDietGenerationBusy || !canGenerateDietPlanToday()) ? 'border border-cyan-400/30 text-cyan-200/60 bg-cyan-400/10 cursor-not-allowed' : 'border border-cyan-400/60 text-cyan-200 hover:bg-cyan-400/10'">
+              <span x-text="aiDietGenerationBusy ? 'Generating...' : (canGenerateDietPlanToday() ? 'Generate Diet Plan' : 'Available Tomorrow')"></span>
+            </button>
+          </div>
+          <p x-show="!hasFreshAiDietPlan()" class="mt-2 text-xs text-slate-400">Generate once to create your AI meal and nutrition plan from profile data.</p>
+          <p x-show="!canGenerateDietPlanToday()" class="mt-2 text-xs text-slate-400">Daily generation limit reached. Resets at 12:00 AM.</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="web-config.js"></script>
+  <script src="auth-guard.js"></script>
+  <script src="app.js"></script>
+  <script src="nav.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="lenis-init.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

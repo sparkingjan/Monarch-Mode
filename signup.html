@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monarch Mode - Sign Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-abyss text-slate-100 min-h-screen">
+  <div class="bg-grid"></div>
+
+  <main class="auth-shell relative z-10">
+    <section class="auth-card">
+      <p class="text-cyan-300 tracking-[0.2em] uppercase text-xs">Hunter Registration</p>
+      <h1 class="title-font text-3xl mt-2">Sign Up</h1>
+      <p class="text-slate-400 mt-1 text-sm">Create your account and set body metrics so AI can personalize your nutrition targets.</p>
+
+      <form id="signup-form" class="mt-5 space-y-3" action="#" method="post">
+        <input class="auth-input" type="text" name="name" placeholder="Name" required />
+        <input class="auth-input" type="email" name="email" placeholder="Email" required />
+        <input class="auth-input" type="password" name="password" placeholder="Password" required />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input class="auth-input" type="number" name="heightCm" min="120" max="230" step="1" placeholder="Height (cm)" required />
+          <input class="auth-input" type="number" name="weightKg" min="35" max="250" step="1" placeholder="Weight (kg)" required />
+        </div>
+        <select class="auth-input" name="goal" required>
+          <option value="maintain">Goal: Maintain / Recomp</option>
+          <option value="cut">Goal: Fat Loss</option>
+          <option value="bulk">Goal: Lean Bulk</option>
+        </select>
+        <button type="submit" class="hero-cta w-full">CREATE ACCOUNT</button>
+      </form>
+      <p id="signup-error" class="text-sm text-rose-300 mt-3 hidden"></p>
+
+      <p class="text-sm text-slate-300 mt-4">
+        Already registered? <a class="auth-link" href="login.html">Login</a>
+      </p>
+      <p class="text-sm text-slate-400 mt-2">
+        <a class="auth-link" href="index.html">Back to Main</a>
+      </p>
+    </section>
+  </main>
+  <script src="web-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script>
+    (function () {
+      const form = document.getElementById('signup-form');
+      const errorEl = document.getElementById('signup-error');
+      if (!form) return;
+
+      const cfg = window.MONARCH_CONFIG || {};
+      const firebaseCfg = cfg.firebase || {};
+      const hasFirebaseCfg = Boolean(firebaseCfg.apiKey && firebaseCfg.authDomain && firebaseCfg.projectId);
+
+      function showError(message) {
+        if (!errorEl) return;
+        errorEl.textContent = message;
+        errorEl.classList.remove('hidden');
+      }
+
+      async function updateBackendProfile(idToken, payload) {
+        const baseUrl = cfg.backendBaseUrl || 'http://127.0.0.1:8000/api/v1';
+        const response = await fetch(baseUrl + '/users/me/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + idToken
+          },
+          body: JSON.stringify({
+            name: payload.name,
+            height_cm: payload.heightCm,
+            weight_kg: payload.weightKg,
+            goal: payload.goal
+          })
+        });
+        if (!response.ok) {
+          throw new Error('Profile sync failed. Please try again.');
+        }
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (errorEl) errorEl.classList.add('hidden');
+
+        const payload = {
+          name: (form.elements.name?.value || '').trim(),
+          email: (form.elements.email?.value || '').trim(),
+          password: form.elements.password?.value || '',
+          heightCm: Number(form.elements.heightCm?.value || 0),
+          weightKg: Number(form.elements.weightKg?.value || 0),
+          goal: form.elements.goal?.value || 'maintain',
+          createdAt: new Date().toISOString()
+        };
+
+        if (!hasFirebaseCfg) {
+          showError('Firebase config missing: apiKey/authDomain/projectId in web-config.js');
+          return;
+        }
+
+        (async function run() {
+          try {
+            if (!firebase.apps.length) {
+              firebase.initializeApp(firebaseCfg);
+            }
+            const cred = await firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password);
+            await cred.user.updateProfile({ displayName: payload.name });
+            const idToken = await cred.user.getIdToken(true);
+            localStorage.setItem('firebase-id-token', idToken);
+
+            localStorage.setItem('hunter-account-profile', JSON.stringify({
+              uid: cred.user.uid,
+              name: payload.name,
+              email: payload.email,
+              galleryUrls: [],
+              heightCm: payload.heightCm,
+              weightKg: payload.weightKg,
+              goal: payload.goal,
+              createdAt: payload.createdAt
+            }));
+
+            await updateBackendProfile(idToken, payload);
+            window.location.href = 'index.html';
+          } catch (error) {
+            const code = error?.code || '';
+            if (code === 'auth/email-already-in-use') {
+              showError('Email already exists. Please login or use another email.');
+              return;
+            }
+            showError(error?.message || 'Signup failed.');
+          }
+        }());
+      });
+    }());
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="lenis-init.js"></script>
+</body>
+</html>
+
+
+
+
+

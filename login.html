@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monarch Mode - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-abyss text-slate-100 min-h-screen">
+  <div class="bg-grid"></div>
+
+  <main class="auth-shell relative z-10">
+    <section class="auth-card">
+      <p class="text-cyan-300 tracking-[0.2em] uppercase text-xs">Hunter Access</p>
+      <h1 class="title-font text-3xl mt-2">Login</h1>
+      <p class="text-slate-400 mt-1 text-sm">Enter your credentials to continue your rank-up journey.</p>
+
+      <form id="login-form" class="mt-5 space-y-3" action="#" method="post">
+        <input class="auth-input" type="email" name="email" placeholder="Email" required />
+        <input class="auth-input" type="password" name="password" placeholder="Password" required />
+        <button type="submit" class="hero-cta w-full">LOGIN</button>
+      </form>
+      <button id="forgot-password-btn" type="button" class="auth-link mt-3 text-sm">Forgot password?</button>
+      <button id="google-login-btn" type="button" class="hero-cta w-full mt-3">CONTINUE WITH GOOGLE</button>
+      <p id="login-error" class="text-sm text-rose-300 mt-3 hidden"></p>
+      <p id="login-info" class="text-sm text-cyan-300 mt-2 hidden"></p>
+
+      <p class="text-sm text-slate-300 mt-4">
+        New hunter? <a class="auth-link" href="signup.html">Sign up</a>
+      </p>
+      <p class="text-sm text-slate-400 mt-2">
+        <a class="auth-link" href="index.html">Back to Main</a>
+      </p>
+    </section>
+  </main>
+  <script src="web-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script>
+    (function () {
+      const form = document.getElementById('login-form');
+      const forgotBtn = document.getElementById('forgot-password-btn');
+      const googleBtn = document.getElementById('google-login-btn');
+      const errorEl = document.getElementById('login-error');
+      const infoEl = document.getElementById('login-info');
+      if (!form) return;
+
+      const cfg = window.MONARCH_CONFIG || {};
+      const firebaseCfg = cfg.firebase || {};
+      const hasFirebaseCfg = Boolean(firebaseCfg.apiKey && firebaseCfg.authDomain && firebaseCfg.projectId);
+
+      function showError(message) {
+        if (!errorEl) return;
+        if (infoEl) infoEl.classList.add('hidden');
+        errorEl.textContent = message;
+        errorEl.classList.remove('hidden');
+      }
+
+      function showInfo(message) {
+        if (!infoEl) return;
+        if (errorEl) errorEl.classList.add('hidden');
+        infoEl.textContent = message;
+        infoEl.classList.remove('hidden');
+      }
+
+      function initFirebase() {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseCfg);
+        }
+        return firebase.auth();
+      }
+
+      async function ensureBackendProfile(idToken) {
+        const baseUrl = cfg.backendBaseUrl || 'http://127.0.0.1:8000/api/v1';
+        const response = await fetch(baseUrl + '/users/me', {
+          method: 'GET',
+          headers: { Authorization: 'Bearer ' + idToken }
+        });
+        if (!response.ok) return null;
+        return await response.json();
+      }
+
+      async function completeLogin(user) {
+        const idToken = await user.getIdToken(true);
+        localStorage.setItem('firebase-id-token', idToken);
+        const profileWithDob = await ensureBackendProfile(idToken);
+        localStorage.setItem('hunter-account-profile', JSON.stringify({
+          uid: profileWithDob?.uid || user.uid || null,
+          name: profileWithDob?.name || user.displayName || 'Player Hunter',
+          email: profileWithDob?.email || user.email || null,
+          galleryUrls: Array.isArray(profileWithDob?.gallery_urls)
+            ? profileWithDob.gallery_urls
+            : (Array.isArray(profileWithDob?.galleryUrls) ? profileWithDob.galleryUrls : []),
+          heightCm: Number.isFinite(profileWithDob?.height_cm) ? profileWithDob.height_cm : null,
+          weightKg: Number.isFinite(profileWithDob?.weight_kg) ? profileWithDob.weight_kg : null,
+          dob: typeof profileWithDob?.dob === 'string' ? profileWithDob.dob : null,
+          goal: ['cut', 'maintain', 'bulk'].includes(profileWithDob?.goal) ? profileWithDob.goal : 'maintain',
+          isAdmin: Boolean(profileWithDob?.is_admin || profileWithDob?.isAdmin),
+          syncedAt: new Date().toISOString()
+        }));
+        const needsSetup = !profileWithDob || !profileWithDob.height_cm || !profileWithDob.weight_kg || !profileWithDob.goal || !profileWithDob.dob;
+        window.location.href = needsSetup ? 'profile-setup.html' : 'index.html';
+      }
+
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        if (errorEl) errorEl.classList.add('hidden');
+        if (infoEl) infoEl.classList.add('hidden');
+
+        if (!hasFirebaseCfg) {
+          showError('Firebase config missing: apiKey/authDomain/projectId in web-config.js');
+          return;
+        }
+
+        try {
+          const auth = initFirebase();
+          const email = (form.elements.email?.value || '').trim().toLowerCase();
+          const password = form.elements.password?.value || '';
+          const cred = await auth.signInWithEmailAndPassword(email, password);
+          await completeLogin(cred.user);
+        } catch (error) {
+          if (error?.code === 'auth/user-not-found' || error?.code === 'auth/wrong-password' || error?.code === 'auth/invalid-credential') {
+            showError('Invalid credentials.');
+            return;
+          }
+          showError(error?.message || 'Login failed.');
+        }
+      });
+
+      if (googleBtn) {
+        googleBtn.addEventListener('click', async function () {
+          if (errorEl) errorEl.classList.add('hidden');
+          if (infoEl) infoEl.classList.add('hidden');
+          if (!hasFirebaseCfg) {
+            showError('Firebase config missing: apiKey/authDomain/projectId in web-config.js');
+            return;
+          }
+          try {
+            const auth = initFirebase();
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const cred = await auth.signInWithPopup(provider);
+            await completeLogin(cred.user);
+          } catch (error) {
+            showError(error?.message || 'Google login failed.');
+          }
+        });
+      }
+
+      if (forgotBtn) {
+        forgotBtn.addEventListener('click', async function () {
+          if (errorEl) errorEl.classList.add('hidden');
+          if (infoEl) infoEl.classList.add('hidden');
+          if (!hasFirebaseCfg) {
+            showError('Firebase config missing: apiKey/authDomain/projectId in web-config.js');
+            return;
+          }
+          try {
+            const auth = initFirebase();
+            const email = (form.elements.email?.value || '').trim().toLowerCase();
+            if (!email) {
+              showError('Enter your email first.');
+              return;
+            }
+            await auth.sendPasswordResetEmail(email);
+            showInfo('Password reset email sent. Check your inbox.');
+          } catch (error) {
+            if (error?.code === 'auth/user-not-found') {
+              showError('No user found for this account.');
+              return;
+            }
+            showError(error?.message || 'Failed to send reset email.');
+          }
+        });
+      }
+    }());
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="lenis-init.js"></script>
+</body>
+</html>
+
+
+
+
+

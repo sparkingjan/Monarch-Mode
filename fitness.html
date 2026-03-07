@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monarch Mode - Looksmaxxing</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-abyss text-slate-100 min-h-screen">
+  <div class="bg-grid"></div>
+  <a class="profile-link" href="login.html" aria-label="Open login">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 21a8 8 0 0 0-16 0"></path>
+      <circle cx="12" cy="8" r="4"></circle>
+    </svg>
+  </a>
+
+  <main class="relative z-10">
+    <div class="nav-shell">
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav id="primary-nav" class="top-nav">
+        <a href="index.html">Main</a>
+        <a href="quests.html">Quests</a>
+        <a href="diet.html">Diet</a>
+        <a href="fitness.html" class="active">Looksmaxxing</a>
+        <a href="progress.html">Progress</a>
+        <a href="leaderboard.html">Leaderboard</a>
+      </nav>
+    </div>
+
+    <section class="max-w-4xl mx-auto px-4 md:px-8 mt-8 pb-16">
+      <article class="panel rounded-2xl p-8 md:p-10 border border-slate-700/80">
+        <p class="text-xs md:text-sm uppercase tracking-[0.22em] text-cyan-300/90">Module Status</p>
+        <h1 class="title-font text-3xl md:text-5xl mt-2">Looksmaxxing</h1>
+        <p class="text-slate-300 mt-3 max-w-2xl">This section is intentionally locked for now. I will open it in a future update with full routines, tracking, and progression tools.</p>
+
+        <div class="mt-7 rounded-xl border border-cyan-400/40 bg-slate-950/65 p-5 md:p-6">
+          <div class="flex items-center gap-3">
+            <div class="h-10 w-10 rounded-full border border-cyan-300/50 bg-cyan-950/50 flex items-center justify-center" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="h-5 w-5 text-cyan-200" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                <path d="M8 11V8a4 4 0 1 1 8 0v3"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="title-font text-lg tracking-wide text-cyan-100">Locked - Coming Soon</p>
+              <p class="text-sm text-slate-400">Access will be enabled in future updates.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="web-config.js"></script>
+  <script src="auth-guard.js"></script>
+  <script src="nav.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="lenis-init.js"></script>
+</body>
+</html>
+
+
+

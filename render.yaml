@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: solo-leveling-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_HOST
+        value: 0.0.0.0
+      - key: APP_PORT
+        value: 10000
+      - key: APP_CORS_ORIGINS
+        value: https://YOUR_NETLIFY_SITE.netlify.app
+      - key: FIREBASE_CREDENTIALS_PATH
+        value: ./firebase-service-account.json
+      - key: FIRESTORE_COLLECTION_USERS
+        value: users
