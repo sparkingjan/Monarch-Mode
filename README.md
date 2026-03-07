@@ -36,4 +36,4 @@ Solo Leveling/
 
 - GitHub Pages deploys `frontend/` via `.github/workflows/deploy-pages.yml`.
 - Vercel deploys backend from `backend/` using `backend/vercel.json`.
-- If Vercel project root is the repository root, it will use `vercel.json` + `api/index.py`.
+- If Vercel project root is the repository root, it will use `vercel.json` and route `/api/*` to `backend/api/index.py`.
