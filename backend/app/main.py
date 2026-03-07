@@ -10,7 +10,12 @@ from app.routers.leaderboard import router as leaderboard_router
 from app.routers.payments import router as payments_router
 from app.routers.users import router as users_router
 settings = get_settings()
-app = FastAPI(title=settings.app_name)
+
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"message": "API running"}
 
 app.add_middleware(
     CORSMiddleware,
