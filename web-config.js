@@ -4,7 +4,7 @@ window.MONARCH_CONFIG = window.MONARCH_CONFIG || {
   // Example: https://solo-leveling-api.onrender.com/api/v1
   backendBaseUrl: isLocalHost
     ? "http://127.0.0.1:8000/api/v1"
-    : "https://YOUR_RENDER_SERVICE.onrender.com/api/v1",
+    : "https://monarch-mode.vercel.app/api",
   firebase: {
     apiKey: "AIzaSyBDeKJtu2WtSy0ezyYIbHM7V7FQ9BZocXg",
     authDomain: "solo-leveling-c38fb.firebaseapp.com",
