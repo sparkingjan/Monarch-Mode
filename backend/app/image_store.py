@@ -10,8 +10,22 @@ from app.config import get_settings
 
 def _ensure_parent_dirs() -> None:
     settings = get_settings()
-    Path(settings.image_store_dir).mkdir(parents=True, exist_ok=True)
-    Path(settings.image_store_db_path).parent.mkdir(parents=True, exist_ok=True)
+    image_dir = Path(settings.image_store_dir)
+    db_path = Path(settings.image_store_db_path)
+    try:
+        image_dir.mkdir(parents=True, exist_ok=True)
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        # Vercel serverless runtime is read-only except /tmp.
+        if exc.errno != 30 and "Read-only file system" not in str(exc):
+            raise
+        fallback_root = Path("/tmp/monarch-mode")
+        image_dir = fallback_root / "images"
+        db_path = fallback_root / "images.sqlite3"
+        image_dir.mkdir(parents=True, exist_ok=True)
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        settings.image_store_dir = str(image_dir)
+        settings.image_store_db_path = str(db_path)
 
 
 def initialize_image_store() -> None:
