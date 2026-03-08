@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Optional
 
 from firebase_admin import auth
 
@@ -6,7 +7,7 @@ from app.config import get_settings
 from app.firebase import get_firestore_client
 
 
-def is_visible_admin_email(email: str | None) -> bool:
+def is_visible_admin_email(email: Optional[str]) -> bool:
     if not email or not isinstance(email, str):
         return False
     normalized = email.strip().lower()
@@ -16,7 +17,7 @@ def is_visible_admin_email(email: str | None) -> bool:
     return normalized in set(settings.visible_admin_emails)
 
 
-def _default_seed_payload(uid: str, email: str, name: str | None) -> dict:
+def _default_seed_payload(uid: str, email: str, name: Optional[str]) -> dict:
     now = datetime.now(timezone.utc)
     return {
         "uid": uid,

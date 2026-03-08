@@ -1,4 +1,5 @@
 from datetime import date, datetime, timezone
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from firebase_admin import firestore
@@ -13,7 +14,7 @@ from app.user_seed import ensure_visible_admin_records, is_visible_admin_email
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-def _normalize_phone(value: str | None) -> str | None:
+def _normalize_phone(value: Optional[str]) -> Optional[str]:
     if not value:
         return None
     raw = value.strip()
@@ -35,10 +36,10 @@ def _user_doc_ref(uid: str):
     return db.collection(settings.firestore_collection_users).document(uid)
 
 
-def _calculate_age_from_dob(raw_dob) -> int | None:
+def _calculate_age_from_dob(raw_dob) -> Optional[int]:
     if not raw_dob:
         return None
-    dob_date: date | None = None
+    dob_date: Optional[date] = None
     if isinstance(raw_dob, date):
         dob_date = raw_dob
     elif isinstance(raw_dob, datetime):
@@ -109,7 +110,7 @@ def _as_int(value, fallback: int = 0) -> int:
         return fallback
 
 
-def _as_optional_int(value) -> int | None:
+def _as_optional_int(value) -> Optional[int]:
     if value is None:
         return None
     try:
@@ -118,7 +119,7 @@ def _as_optional_int(value) -> int | None:
         return None
 
 
-def _as_optional_iso_date(value) -> str | None:
+def _as_optional_iso_date(value) -> Optional[str]:
     if value is None:
         return None
     if isinstance(value, datetime):
@@ -136,7 +137,7 @@ def _as_optional_iso_date(value) -> str | None:
     return None
 
 
-def _sanitize_user_record(data: dict, claims: dict | None = None) -> dict:
+def _sanitize_user_record(data: dict, claims: Optional[dict] = None) -> dict:
     sanitized = dict(data or {})
     defaults = _default_user_payload(claims or {"uid": sanitized.get("uid") or "", "email": sanitized.get("email")})
     for key, value in defaults.items():

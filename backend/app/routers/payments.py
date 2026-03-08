@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import json
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 from urllib import error, request
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -22,7 +23,7 @@ def _user_doc_ref(uid: str):
     return db.collection(settings.firestore_collection_users).document(uid)
 
 
-def _razorpay_request(path: str, method: str = "GET", payload: dict | None = None) -> dict:
+def _razorpay_request(path: str, method: str = "GET", payload: Optional[dict] = None) -> dict:
     settings = get_settings()
     if not settings.razorpay_key_id or not settings.razorpay_key_secret:
         raise HTTPException(status_code=503, detail="Razorpay is not configured on the server.")
