@@ -102,6 +102,40 @@ def _sanitize_goal(value) -> str:
     return goal if goal in {"cut", "maintain", "bulk"} else "maintain"
 
 
+def _as_int(value, fallback: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return fallback
+
+
+def _as_optional_int(value) -> int | None:
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _as_optional_iso_date(value) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        value = value.date()
+    if isinstance(value, date):
+        return value.isoformat()
+    if isinstance(value, str):
+        raw = value.strip()
+        if not raw:
+            return None
+        try:
+            return date.fromisoformat(raw).isoformat()
+        except ValueError:
+            return None
+    return None
+
+
 def _sanitize_user_record(data: dict, claims: dict | None = None) -> dict:
     sanitized = dict(data or {})
     defaults = _default_user_payload(claims or {"uid": sanitized.get("uid") or "", "email": sanitized.get("email")})
@@ -125,7 +159,28 @@ def _sanitize_user_record(data: dict, claims: dict | None = None) -> dict:
     if not isinstance(gallery_urls, list):
         gallery_urls = []
     sanitized["gallery_urls"] = [str(item) for item in gallery_urls if str(item).strip()]
+    sanitized["uid"] = str(sanitized.get("uid") or defaults.get("uid") or "")
+    sanitized["email"] = (str(sanitized.get("email")).strip().lower() if sanitized.get("email") else None)
+    sanitized["phone"] = _normalize_phone(sanitized.get("phone"))
+    sanitized["name"] = str(sanitized.get("name") or defaults.get("name") or "Player Hunter").strip() or "Player Hunter"
+    sanitized["rank"] = str(sanitized.get("rank") or defaults.get("rank") or "E-Rank").strip() or "E-Rank"
+    sanitized["level"] = max(1, _as_int(sanitized.get("level"), 1))
+    sanitized["xp"] = max(0, _as_int(sanitized.get("xp"), 0))
+    sanitized["survival_streak"] = max(0, _as_int(sanitized.get("survival_streak"), 0))
+    sanitized["height_cm"] = _as_optional_int(sanitized.get("height_cm"))
+    sanitized["weight_kg"] = _as_optional_int(sanitized.get("weight_kg"))
+    sanitized["dob"] = _as_optional_iso_date(sanitized.get("dob"))
     sanitized["goal"] = _sanitize_goal(sanitized.get("goal"))
+    sanitized["is_admin"] = bool(sanitized.get("is_admin"))
+    sanitized["premium_membership_active"] = bool(sanitized.get("premium_membership_active"))
+    sanitized["premium_last_payment_id"] = (
+        str(sanitized.get("premium_last_payment_id")).strip() if sanitized.get("premium_last_payment_id") else None
+    )
+    sanitized["name_change_free_used"] = bool(sanitized.get("name_change_free_used"))
+    sanitized["name_change_paid_credits"] = max(0, _as_int(sanitized.get("name_change_paid_credits"), 0))
+    sanitized["name_change_last_payment_id"] = (
+        str(sanitized.get("name_change_last_payment_id")).strip() if sanitized.get("name_change_last_payment_id") else None
+    )
     return sanitized
 
 
