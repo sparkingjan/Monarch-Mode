@@ -89,4 +89,8 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    try:
+        return Settings()
+    except Exception:
+        # Keep the API bootable even if host env vars are malformed.
+        return Settings(_env_file=None)

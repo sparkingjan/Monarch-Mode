@@ -9,7 +9,10 @@ from app.routers.images import router as images_router
 from app.routers.leaderboard import router as leaderboard_router
 from app.routers.payments import router as payments_router
 from app.routers.users import router as users_router
-settings = get_settings()
+try:
+    settings = get_settings()
+except Exception:
+    settings = None
 
 app = FastAPI()
 
@@ -19,7 +22,7 @@ def root():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=settings.cors_origins if settings else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
