@@ -2066,15 +2066,6 @@ function soloLevelingApp() {
         this.meta.loadCycleAnchorDate = this.meta.rotationAnchorDate || this.todayDateKey();
       }
 
-      const hasNoProgress = (this.profile?.xp || 0) === 0
-        && (this.meta.weeklyDirectiveTaskCompletions || 0) === 0
-        && (!Array.isArray(this.quests) || this.quests.every((quest) => !quest.done));
-      if (hasNoProgress) {
-        const today = this.todayDateKey();
-        this.meta.rotationAnchorDate = today;
-        this.meta.questRotationDate = today;
-        this.meta.protocolDay = 1;
-      }
     },
 
     syncDietPlanCompletionState() {
