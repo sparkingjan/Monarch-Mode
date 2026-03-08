@@ -97,7 +97,14 @@
       async function completeLogin(user) {
         const idToken = await user.getIdToken(true);
         localStorage.setItem('firebase-id-token', idToken);
-        const profileWithDob = await ensureBackendProfile(idToken);
+        let profileWithDob = null;
+        try {
+          profileWithDob = await ensureBackendProfile(idToken);
+        } catch (error) {
+          // Allow login even when backend profile sync is temporarily unavailable.
+          profileWithDob = null;
+          localStorage.setItem('monarch-backend-sync-warning', String(error?.message || 'Backend profile sync failed.'));
+        }
         localStorage.setItem('hunter-account-profile', JSON.stringify({
           uid: profileWithDob?.uid || user.uid || null,
           name: profileWithDob?.name || user.displayName || 'Player Hunter',
@@ -112,6 +119,10 @@
           isAdmin: Boolean(profileWithDob?.is_admin || profileWithDob?.isAdmin),
           syncedAt: new Date().toISOString()
         }));
+        if (!profileWithDob) {
+          window.location.href = 'index.html';
+          return;
+        }
         const needsSetup = !profileWithDob.height_cm || !profileWithDob.weight_kg || !profileWithDob.goal || !profileWithDob.dob;
         window.location.href = needsSetup ? 'profile-setup.html' : 'index.html';
       }
