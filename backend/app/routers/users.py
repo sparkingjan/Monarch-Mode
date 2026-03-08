@@ -97,6 +97,38 @@ def _default_user_payload(claims: dict) -> dict:
     }
 
 
+def _sanitize_goal(value) -> str:
+    goal = str(value or "").strip().lower()
+    return goal if goal in {"cut", "maintain", "bulk"} else "maintain"
+
+
+def _sanitize_user_record(data: dict, claims: dict | None = None) -> dict:
+    sanitized = dict(data or {})
+    defaults = _default_user_payload(claims or {"uid": sanitized.get("uid") or "", "email": sanitized.get("email")})
+    for key, value in defaults.items():
+        if sanitized.get(key) is None:
+            sanitized[key] = value
+
+    stats = sanitized.get("stats")
+    if not isinstance(stats, dict):
+        stats = {}
+    default_stats = defaults["stats"]
+    sanitized["stats"] = {
+        "strength": int(stats.get("strength", default_stats["strength"]) or 0),
+        "endurance": int(stats.get("endurance", default_stats["endurance"]) or 0),
+        "agility": int(stats.get("agility", default_stats["agility"]) or 0),
+        "discipline": int(stats.get("discipline", default_stats["discipline"]) or 0),
+        "aura": int(stats.get("aura", default_stats["aura"]) or 0),
+        "recovery": int(stats.get("recovery", default_stats["recovery"]) or 0),
+    }
+    gallery_urls = sanitized.get("gallery_urls")
+    if not isinstance(gallery_urls, list):
+        gallery_urls = []
+    sanitized["gallery_urls"] = [str(item) for item in gallery_urls if str(item).strip()]
+    sanitized["goal"] = _sanitize_goal(sanitized.get("goal"))
+    return sanitized
+
+
 def _apply_premium_expiry(data: dict) -> bool:
     until = data.get("premium_membership_until")
     if not isinstance(until, datetime):
@@ -118,7 +150,7 @@ def get_me(claims: dict = Depends(get_current_user)):
             payload = _default_user_payload(claims)
             doc_ref.set(payload)
             return UserRecord(**payload)
-        data = snapshot.to_dict()
+        data = _sanitize_user_record(snapshot.to_dict(), claims)
         premium_changed = _apply_premium_expiry(data)
         has_admin_upgrade = data and not bool(data.get("is_admin")) and is_visible_admin_email(data.get("email"))
         if has_admin_upgrade:
@@ -130,6 +162,8 @@ def get_me(claims: dict = Depends(get_current_user)):
                 update_payload["is_admin"] = True
             if premium_changed:
                 update_payload["premium_membership_active"] = data["premium_membership_active"]
+            if "goal" in data:
+                update_payload["goal"] = data["goal"]
             doc_ref.set(update_payload, merge=True)
         return UserRecord(**data)
     except Exception as exc:
