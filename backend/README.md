@@ -34,6 +34,8 @@ cp .env.example .env
 ```
 
 Set `FIREBASE_CREDENTIALS_PATH` in `.env` to your service account JSON path.
+Never commit real credential files (`backend/firebase-service-account.json`) to git.
+Use `backend/firebase-service-account.example.json` as a template only.
 Set `ADMIN_VISIBLE_EMAILS` (comma-separated) for admin accounts that should always have a Firestore profile/leaderboard record.
 Set Razorpay credentials for premium payments:
 
@@ -67,7 +69,8 @@ API base URL: `http://localhost:8000/api/v1`
    - `AI_API_KEY`
    - `AI_MODEL`
    - `AI_BASE_URL`
-4. Add `firebase-service-account.json` inside `backend/` (or use a secret file path).
+4. Add the credential file through a secret file path or environment-managed secret.
+   Do not commit `firebase-service-account.json` to GitHub.
 5. Set `APP_CORS_ORIGINS` to your Netlify domain(s), comma-separated.
 6. Deploy and verify: `https://<render-service>.onrender.com/api/v1/health`
 
