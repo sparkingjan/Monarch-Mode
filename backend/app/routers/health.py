@@ -39,3 +39,16 @@ def firebase_healthcheck():
         result["ok"] = False
         result["firestore_error"] = str(exc)[:300]
     return result
+
+
+@router.get("/firebase-auth")
+def firebase_auth_healthcheck():
+    result = {"ok": True, "firebase_ok": False}
+    try:
+        app = get_firebase_app()
+        result["firebase_ok"] = True
+        result["firebase_project_id"] = app.project_id
+    except Exception as exc:
+        result["ok"] = False
+        result["firebase_error"] = str(exc)[:300]
+    return result
