@@ -508,6 +508,39 @@ body {
   text-shadow: 0 0 28px rgba(251, 191, 36, 0.28);
 }
 
+@media (max-width: 1024px) {
+  .nav-shell {
+    width: min(94%, calc(100% - 1rem));
+    margin-top: 0.75rem;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .top-nav {
+    width: 100%;
+    margin-top: 0.5rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0;
+    transform: scale(1);
+  }
+
+  .top-nav.is-open {
+    display: flex;
+  }
+
+  .top-nav a {
+    min-height: 0;
+    height: 3.15rem;
+    padding: 0 0.8rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.07em;
+  }
+}
+
 @media (min-width: 769px) {
   .leaderboard-row.desktop-top {
     border-radius: 1rem;
@@ -918,7 +951,7 @@ body {
     min-height: 0;
     height: 3.1rem;
     padding: 0 0.7rem;
-    font-size: 0.78rem;
+    font-size: 0.84rem;
     letter-spacing: 0.06em;
   }
 
@@ -1102,7 +1135,7 @@ body {
   }
 
   .top-nav a {
-    font-size: 0.74rem;
+    font-size: 0.8rem;
     letter-spacing: 0.04em;
   }
 

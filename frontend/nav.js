@@ -80,7 +80,7 @@
           return;
         }
 
-        if (window.innerWidth <= 768) {
+        if (window.innerWidth <= 1024) {
           nav.classList.remove('is-open');
           button.setAttribute('aria-expanded', 'false');
         }
@@ -88,7 +88,7 @@
     });
 
     window.addEventListener('resize', function () {
-      if (window.innerWidth > 768) {
+      if (window.innerWidth > 1024) {
         nav.classList.remove('is-open');
         button.setAttribute('aria-expanded', 'false');
       }
