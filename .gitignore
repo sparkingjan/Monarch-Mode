@@ -1,4 +1,5 @@
 backend/firebase-service-account.json
+*-firebase-adminsdk-*.json
 backend/.env
 .env
 .env.*

@@ -8,10 +8,18 @@ from typing import Iterator
 from app.config import get_settings
 
 
+def resolve_store_path(raw_path: str) -> Path:
+    candidate = Path(raw_path)
+    if candidate.is_absolute():
+        return candidate
+    backend_root = Path(__file__).resolve().parents[1]
+    return backend_root / candidate
+
+
 def _ensure_parent_dirs() -> None:
     settings = get_settings()
-    image_dir = Path(settings.image_store_dir)
-    db_path = Path(settings.image_store_db_path)
+    image_dir = resolve_store_path(settings.image_store_dir)
+    db_path = resolve_store_path(settings.image_store_db_path)
     try:
         image_dir.mkdir(parents=True, exist_ok=True)
         db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -58,7 +66,7 @@ def utc_now_iso() -> str:
 def sqlite_connection() -> Iterator[sqlite3.Connection]:
     settings = get_settings()
     _ensure_parent_dirs()
-    conn = sqlite3.connect(settings.image_store_db_path)
+    conn = sqlite3.connect(str(resolve_store_path(settings.image_store_db_path)))
     conn.row_factory = sqlite3.Row
     try:
         yield conn

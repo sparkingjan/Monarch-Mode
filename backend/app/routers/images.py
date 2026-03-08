@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 from app.config import get_settings
 from app.deps import get_current_user
-from app.image_store import initialize_image_store, sqlite_connection, utc_now_iso
+from app.image_store import initialize_image_store, resolve_store_path, sqlite_connection, utc_now_iso
 
 
 router = APIRouter(prefix="/images", tags=["images"])
@@ -91,7 +91,7 @@ def upload_image(
             raise HTTPException(status_code=409, detail=f"{category} image limit reached.")
 
         image_id = uuid.uuid4().hex
-        user_dir = Path(settings.image_store_dir) / uid / category
+        user_dir = resolve_store_path(settings.image_store_dir) / uid / category
         user_dir.mkdir(parents=True, exist_ok=True)
         file_path = user_dir / f"{image_id}.{ext}"
         file_path.write_bytes(binary)

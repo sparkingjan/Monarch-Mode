@@ -93,6 +93,7 @@ class LeaderboardEntry(BaseModel):
 class LeaderboardResponse(BaseModel):
     total: int
     entries: list[LeaderboardEntry]
+    current_user: Optional[LeaderboardEntry] = None
 
 
 class ResolveEmailResponse(BaseModel):
@@ -159,4 +160,3 @@ class AiDietPlanResponse(BaseModel):
     meals: list[AiDietMeal]
     note: Optional[str] = None
     nutrition: AiNutritionPlan
-

@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_host: str = "0.0.0.0"
     app_port: int = 8000
-    app_cors_origins: str = "http://127.0.0.1:5500,http://localhost:5500,http://localhost:3000"
+    app_cors_origins: str = "*"
     firebase_credentials_path: str = "./firebase-service-account.json"
     firestore_collection_users: str = "users"
     admin_visible_emails: str = "ishraqrather19@gmail.com"
@@ -32,14 +32,16 @@ class Settings(BaseSettings):
     ai_base_url: str = ""
     openai_api_key: str = ""
     openai_model: str = "gpt-4.1-mini"
-    image_store_dir: str = "backend/data/images"
-    image_store_db_path: str = "backend/data/images.sqlite3"
+    image_store_dir: str = "data/images"
+    image_store_db_path: str = "data/images.sqlite3"
     image_store_max_bytes: int = 8 * 1024 * 1024
     image_store_gallery_limit: int = 9
 
     @property
     def cors_origins(self) -> List[str]:
         if isinstance(self.app_cors_origins, str):
+            if self.app_cors_origins.strip() == "*":
+                return ["*"]
             return [origin.strip() for origin in self.app_cors_origins.split(",") if origin.strip()]
         return list(self.app_cors_origins)
 

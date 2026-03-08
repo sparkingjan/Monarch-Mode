@@ -47,33 +47,48 @@ def _ai_chat_completion(payload: dict) -> dict:
             status_code=503,
             detail="AI API key is not configured on the server. Set AI_API_KEY (or OPENAI_API_KEY).",
         )
+    models_to_try = [settings.resolved_ai_model]
+    if settings.resolved_ai_provider == "gemini" and settings.resolved_ai_model == "gemini-2.5-flash":
+        models_to_try.extend(["gemini-2.0-flash", "gemini-1.5-flash"])
 
-    req = request.Request(
-        url=f"{settings.resolved_ai_base_url}/chat/completions",
-        method="POST",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
-        },
-        data=json.dumps(payload).encode("utf-8"),
-    )
-    try:
-        with request.urlopen(req, timeout=30) as response:
-            raw = response.read().decode("utf-8")
-            return json.loads(raw) if raw else {}
-    except error.HTTPError as exc:
-        raw = exc.read().decode("utf-8", errors="ignore")
-        detail = "AI provider request failed."
+    last_http_error: HTTPException | None = None
+    for idx, model_name in enumerate(models_to_try):
+        attempt_payload = dict(payload)
+        attempt_payload["model"] = model_name
+        req = request.Request(
+            url=f"{settings.resolved_ai_base_url}/chat/completions",
+            method="POST",
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+            },
+            data=json.dumps(attempt_payload).encode("utf-8"),
+        )
         try:
-            parsed = json.loads(raw)
-            detail = parsed.get("error", {}).get("message") or detail
-        except Exception:
-            if raw:
-                detail = raw.strip()[:500]
-        status_code = exc.code if isinstance(exc.code, int) and 400 <= exc.code <= 599 else 502
-        raise HTTPException(status_code=status_code, detail=detail) from exc
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Unable to contact AI provider: {exc}") from exc
+            with request.urlopen(req, timeout=30) as response:
+                raw = response.read().decode("utf-8")
+                return json.loads(raw) if raw else {}
+        except error.HTTPError as exc:
+            raw = exc.read().decode("utf-8", errors="ignore")
+            detail = "AI provider request failed."
+            try:
+                parsed = json.loads(raw)
+                detail = parsed.get("error", {}).get("message") or detail
+            except Exception:
+                if raw:
+                    detail = raw.strip()[:500]
+            status_code = exc.code if isinstance(exc.code, int) and 400 <= exc.code <= 599 else 502
+            last_http_error = HTTPException(status_code=status_code, detail=detail)
+            retryable_model_error = status_code in {403, 404} and idx < len(models_to_try) - 1
+            if retryable_model_error:
+                continue
+            raise last_http_error from exc
+        except Exception as exc:
+            raise HTTPException(status_code=502, detail=f"Unable to contact AI provider: {exc}") from exc
+
+    if last_http_error:
+        raise last_http_error
+    raise HTTPException(status_code=502, detail="AI provider request failed.")
 
 
 def _sanitize_ai_plan(raw: dict) -> dict:
