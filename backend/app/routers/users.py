@@ -201,7 +201,7 @@ def _apply_premium_expiry(data: dict) -> bool:
 def get_me(claims: dict = Depends(get_current_user)):
     try:
         doc_ref = _user_doc_ref(claims["uid"])
-        snapshot = doc_ref.get()
+        snapshot = doc_ref.get(timeout=8)
         if not snapshot.exists:
             payload = _default_user_payload(claims)
             doc_ref.set(payload)
@@ -229,10 +229,10 @@ def get_me(claims: dict = Depends(get_current_user)):
 @router.get("/{uid}/public", response_model=PublicUserRecord)
 def get_public_profile(uid: str):
     try:
-        snapshot = _user_doc_ref(uid).get()
+        snapshot = _user_doc_ref(uid).get(timeout=8)
         if not snapshot.exists:
             ensure_visible_admin_records()
-            snapshot = _user_doc_ref(uid).get()
+            snapshot = _user_doc_ref(uid).get(timeout=8)
         if not snapshot.exists:
             raise HTTPException(status_code=404, detail="User not found")
         data = snapshot.to_dict() or {}
@@ -261,7 +261,7 @@ def get_public_profile(uid: str):
 def update_me_profile(payload: UserProfileUpdate, claims: dict = Depends(get_current_user)):
     try:
         doc_ref = _user_doc_ref(claims["uid"])
-        snapshot = doc_ref.get()
+        snapshot = doc_ref.get(timeout=8)
         current = _default_user_payload(claims) if not snapshot.exists else snapshot.to_dict()
 
         update_data = payload.model_dump(exclude_none=True)
@@ -313,7 +313,7 @@ def update_me_profile(payload: UserProfileUpdate, claims: dict = Depends(get_cur
 def update_me_progress(payload: UserProgressUpdate, claims: dict = Depends(get_current_user)):
     try:
         doc_ref = _user_doc_ref(claims["uid"])
-        snapshot = doc_ref.get()
+        snapshot = doc_ref.get(timeout=8)
         current = _default_user_payload(claims) if not snapshot.exists else snapshot.to_dict()
 
         progress_data = payload.model_dump()

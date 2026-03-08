@@ -32,7 +32,7 @@ def firebase_healthcheck():
     try:
         db = get_firestore_client()
         # Lightweight read to validate credentials and Firestore access.
-        db.collection(settings.firestore_collection_users).document("__healthcheck__").get()
+        db.collection(settings.firestore_collection_users).document("__healthcheck__").get(timeout=8)
         result["firestore_ok"] = True
         result["firestore_project_id"] = getattr(db, "project", None)
     except Exception as exc:
