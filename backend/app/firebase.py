@@ -39,6 +39,8 @@ def get_firebase_app():
 @lru_cache
 def get_firestore_client():
     get_firebase_app()
+    # Avoid gRPC transport issues on serverless platforms; prefer HTTP transport when supported.
+    os.environ.setdefault("GOOGLE_CLOUD_DISABLE_GRPC", "1")
     return firestore.client()
 
 
