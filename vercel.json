@@ -1,13 +1,13 @@
 {
   "version": 2,
   "functions": {
-    "backend/api/index.py": {
+    "api/index.py": {
       "runtime": "python3.12"
     }
   },
   "builds": [
     {
-      "src": "backend/api/index.py",
+      "src": "api/index.py",
       "use": "@vercel/python"
     },
     {
@@ -18,7 +18,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/backend/api/index.py"
+      "dest": "/api/index.py"
     },
     {
       "src": "/$",
