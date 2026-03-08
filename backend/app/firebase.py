@@ -1,4 +1,5 @@
 import os
+import json
 from functools import lru_cache
 from pathlib import Path
 
@@ -13,6 +14,14 @@ def get_firebase_app():
     settings = get_settings()
     if firebase_admin._apps:
         return firebase_admin.get_app()
+    raw_json = (os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON") or "").strip()
+    if raw_json:
+        try:
+            service_account_info = json.loads(raw_json)
+            cred = credentials.Certificate(service_account_info)
+            return firebase_admin.initialize_app(cred)
+        except Exception:
+            pass
     raw_path = settings.firebase_credentials_path
     candidate = Path(raw_path)
     if not candidate.is_absolute():
