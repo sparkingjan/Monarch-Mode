@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Monarch Mode - Quests</title>
+  <link rel="icon" type="image/svg+xml" href="favicon-light.svg" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/svg+xml" href="favicon-dark.svg" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" type="image/svg+xml" href="favicon-dark.svg" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -27,7 +30,7 @@
           <p class="text-sm font-bold text-cyan-300" x-text="activeSystemNotification?.title"></p>
           <p class="text-sm text-slate-100 mt-1" x-text="activeSystemNotification?.message"></p>
         </div>
-        <button @click="dismissSystemNotification()" class="text-slate-400 hover:text-slate-200 text-lg leading-none" aria-label="Dismiss system notice">�</button>
+        <button @click="dismissSystemNotification()" class="text-slate-400 hover:text-slate-200 text-lg leading-none" aria-label="Dismiss system notice">ï¿½</button>
       </div>
     </div>
 
@@ -376,6 +379,7 @@
   <script defer src="lenis-init.js"></script>
 </body>
 </html>
+
 
 
 
