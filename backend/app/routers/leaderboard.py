@@ -19,7 +19,7 @@ def get_leaderboard(limit: int = Query(default=50, ge=1, le=200)):
             db.collection(settings.firestore_collection_users)
             .order_by("xp", direction="DESCENDING")
             .limit(limit)
-            .stream()
+            .stream(timeout=8)
         )
         entries = []
         for position, doc in enumerate(query, start=1):

@@ -70,6 +70,24 @@
               this.apiEntries = Array.isArray(payload.entries) ? payload.entries : [];
               if (meResponse.ok) {
                 this.currentUser = await meResponse.json();
+                const meUid = this.currentUser?.uid || '';
+                const alreadyListed = meUid
+                  ? this.apiEntries.some((entry) => (entry?.uid || '') === meUid)
+                  : false;
+                if (!alreadyListed && meUid) {
+                  this.apiEntries = [
+                    {
+                      position: this.apiEntries.length + 1,
+                      uid: meUid,
+                      name: this.currentUser?.name || 'Player Hunter',
+                      rank: this.currentUser?.rank || 'E-Rank',
+                      xp: Number(this.currentUser?.xp) || 0,
+                      survival_streak: Number(this.currentUser?.survival_streak) || 0,
+                      is_admin: Boolean(this.currentUser?.is_admin || this.currentUser?.isAdmin)
+                    },
+                    ...this.apiEntries
+                  ];
+                }
               } else {
                 this.currentUser = null;
               }
