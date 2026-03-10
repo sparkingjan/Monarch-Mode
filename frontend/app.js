@@ -716,6 +716,18 @@ function soloLevelingApp() {
       return `${year}-${month}-${day}`;
     },
 
+    setAccountQuestAnchor(dateKey) {
+      if (typeof dateKey !== 'string' || !dateKey.trim()) return false;
+      const normalized = dateKey.trim();
+      const changed = this.meta.accountCreatedDateKey !== normalized || this.meta.rotationAnchorDate !== normalized;
+      this.meta.accountCreatedDateKey = normalized;
+      this.meta.rotationAnchorDate = normalized;
+      if (changed) {
+        this.meta.questRotationDate = null;
+      }
+      return changed;
+    },
+
     calculateAgeFromDob(dobValue) {
       const normalizedDob = this.normalizeDobValue(dobValue);
       if (!normalizedDob) return null;
@@ -734,10 +746,7 @@ function soloLevelingApp() {
     applyBackendUser(user) {
       if (!user || typeof user !== 'object') return;
       const accountCreatedDateKey = this.dateKeyFromIsoTimestamp(user.created_at || user.createdAt);
-      if (accountCreatedDateKey) {
-        this.meta.accountCreatedDateKey = accountCreatedDateKey;
-        this.meta.rotationAnchorDate = accountCreatedDateKey;
-      }
+      const accountAnchorChanged = this.setAccountQuestAnchor(accountCreatedDateKey);
       const hasGalleryField = Object.prototype.hasOwnProperty.call(user, 'gallery_urls') || Object.prototype.hasOwnProperty.call(user, 'galleryUrls');
       const incomingGallery = this.sanitizeGalleryUrls(
         Array.isArray(user.gallery_urls)
@@ -767,6 +776,11 @@ function soloLevelingApp() {
       };
       this.profileNameDraft = this.profile.name || this.hunterProfile.name || this.profileNameDraft;
       this.initializeEditorFields();
+      if (accountAnchorChanged) {
+        this.syncDailyQuestRotation();
+        this.syncModeSpecificQuests();
+        this.syncStatUnlockQuests();
+      }
       localStorage.setItem(
         'hunter-account-profile',
         JSON.stringify({
@@ -1014,10 +1028,7 @@ function soloLevelingApp() {
         const parsedWeight = Number(parsed.weightKg ?? parsed.weight_kg);
         const parsedDob = this.normalizeDobValue(parsed.dob || parsed.dateOfBirth || parsed.date_of_birth);
         const parsedCreatedDateKey = this.dateKeyFromIsoTimestamp(parsed.createdAt || parsed.created_at);
-        if (parsedCreatedDateKey) {
-          this.meta.accountCreatedDateKey = parsedCreatedDateKey;
-          this.meta.rotationAnchorDate = parsedCreatedDateKey;
-        }
+        this.setAccountQuestAnchor(parsedCreatedDateKey);
         this.hunterProfile = {
           name: typeof parsed.name === 'string' && parsed.name.trim() ? parsed.name.trim() : this.hunterProfile.name,
           galleryUrls: this.sanitizeGalleryUrls(Array.isArray(parsed.galleryUrls) ? parsed.galleryUrls : parsed.gallery_urls),
