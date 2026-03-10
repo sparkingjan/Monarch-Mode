@@ -763,13 +763,8 @@ function soloLevelingApp() {
     async syncFromBackend() {
       const response = await this.backendRequest('/users/me', { method: 'GET' });
       if (!response) return;
-      const localXp = Number(this.profile?.xp);
-      const localStats = this.profile?.stats && typeof this.profile.stats === 'object'
-        ? { ...this.profile.stats }
-        : null;
-      const localSurvivalStreak = Number(this.meta?.survivalStreak);
-      const localGameStateTimestamp = this.timestampMs(this.meta?.gameStateUpdatedAt);
       const user = await response.json();
+      const localGameStateTimestamp = this.timestampMs(this.meta?.gameStateUpdatedAt);
       this.applyBackendUser(user);
       const backendGameStateTimestamp = this.timestampMs(user?.game_state_updated_at);
       const shouldApplyBackendGameState = (
@@ -777,26 +772,12 @@ function soloLevelingApp() {
         && typeof user.game_state === 'object'
         && (
           localGameStateTimestamp === null
-          || (backendGameStateTimestamp !== null && backendGameStateTimestamp > localGameStateTimestamp)
+          || backendGameStateTimestamp === null
+          || backendGameStateTimestamp >= localGameStateTimestamp
         )
       );
       if (shouldApplyBackendGameState) {
         this.applyBackendGameState(user.game_state, user.game_state_updated_at || null);
-      }
-      const backendXp = Number(user?.xp);
-      if (Number.isFinite(localXp) && Number.isFinite(backendXp) && localXp > backendXp) {
-        this.profile.xp = Math.max(0, Math.round(localXp));
-        if (localStats) {
-          this.profile.stats = {
-            ...this.profile.stats,
-            ...localStats
-          };
-        }
-        if (Number.isFinite(localSurvivalStreak)) {
-          this.meta.survivalStreak = Math.max(localSurvivalStreak, this.meta.survivalStreak || 0);
-        }
-        this.recomputeProgressFromCurrentXp();
-        this.scheduleBackendSync();
       }
       this.save({ skipBackendSync: true, preserveGameStateUpdatedAt: true });
     },
