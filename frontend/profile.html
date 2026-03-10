@@ -132,6 +132,32 @@
           <h2 class="title-font text-2xl mt-2">Premium</h2>
           <p class="mt-2 text-slate-300">Price: <span class="text-rank font-semibold" x-text="premiumMembershipPriceLabel()"></span></p>
           <p class="mt-1 text-sm text-slate-400">Required to access Diet and Looksmaxxing sections.</p>
+          <div class="mt-5 grid gap-4 md:grid-cols-2">
+            <section class="rounded-xl border border-slate-700 bg-slate-900/55 p-4">
+              <div class="flex items-center justify-between gap-3">
+                <p class="title-font text-lg text-slate-100">Free Plan</p>
+                <span x-show="!hasPremiumMembership()" class="rounded-full border border-cyan-400/50 bg-cyan-400/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] text-cyan-200">Current</span>
+              </div>
+              <ul class="mt-3 space-y-2 text-sm text-slate-300">
+                <li>Quest board and daily directives</li>
+                <li>Progress tracking, XP, and stat growth</li>
+                <li>Leaderboard access and profile management</li>
+                <li>Build selection and base training systems</li>
+              </ul>
+            </section>
+            <section class="rounded-xl border border-cyan-400/35 bg-cyan-950/25 p-4">
+              <div class="flex items-center justify-between gap-3">
+                <p class="title-font text-lg text-cyan-100">Premium Plan</p>
+                <span x-show="hasPremiumMembership()" class="rounded-full border border-rank/50 bg-rank/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] text-rank">Current</span>
+              </div>
+              <ul class="mt-3 space-y-2 text-sm text-slate-200">
+                <li>Everything in Free</li>
+                <li>Diet section access</li>
+                <li>Looksmaxxing section access</li>
+                <li>AI diet plan generation and adaptive nutrition tools</li>
+              </ul>
+            </section>
+          </div>
           <p x-show="hasPremiumMembership()" class="mt-3 text-sm text-rank">
             Active
             <span x-show="meta.premiumMembershipSince" x-text="`since ${meta.premiumMembershipSince}`"></span>
