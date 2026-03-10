@@ -71,6 +71,7 @@ function soloLevelingApp() {
       lastDailyStreakCreditDate: null,
       lastIncompleteQuestReminderDayKey: null,
       lastIncompleteQuestReminderAt: null,
+      accountCreatedDateKey: null,
       questRotationDate: null,
       rotationAnchorDate: null,
       protocolDay: 1,
@@ -704,6 +705,12 @@ function soloLevelingApp() {
       return normalized;
     },
 
+    dateKeyFromIsoTimestamp(value) {
+      const normalized = this.normalizeIsoTimestamp(value);
+      if (!normalized) return null;
+      return normalized.split('T')[0] || null;
+    },
+
     calculateAgeFromDob(dobValue) {
       const normalizedDob = this.normalizeDobValue(dobValue);
       if (!normalizedDob) return null;
@@ -721,6 +728,11 @@ function soloLevelingApp() {
 
     applyBackendUser(user) {
       if (!user || typeof user !== 'object') return;
+      const accountCreatedDateKey = this.dateKeyFromIsoTimestamp(user.created_at || user.createdAt);
+      if (accountCreatedDateKey) {
+        this.meta.accountCreatedDateKey = accountCreatedDateKey;
+        this.meta.rotationAnchorDate = accountCreatedDateKey;
+      }
       const hasGalleryField = Object.prototype.hasOwnProperty.call(user, 'gallery_urls') || Object.prototype.hasOwnProperty.call(user, 'galleryUrls');
       const incomingGallery = this.sanitizeGalleryUrls(
         Array.isArray(user.gallery_urls)
@@ -764,6 +776,7 @@ function soloLevelingApp() {
           dob: this.hunterProfile.dob || null,
           goal: this.hunterProfile.goal,
           isAdmin: this.profile.isAdmin,
+          createdAt: user.created_at || user.createdAt || null,
           syncedAt: new Date().toISOString()
         })
       );
@@ -995,6 +1008,11 @@ function soloLevelingApp() {
         const parsedHeight = Number(parsed.heightCm ?? parsed.height_cm);
         const parsedWeight = Number(parsed.weightKg ?? parsed.weight_kg);
         const parsedDob = this.normalizeDobValue(parsed.dob || parsed.dateOfBirth || parsed.date_of_birth);
+        const parsedCreatedDateKey = this.dateKeyFromIsoTimestamp(parsed.createdAt || parsed.created_at);
+        if (parsedCreatedDateKey) {
+          this.meta.accountCreatedDateKey = parsedCreatedDateKey;
+          this.meta.rotationAnchorDate = parsedCreatedDateKey;
+        }
         this.hunterProfile = {
           name: typeof parsed.name === 'string' && parsed.name.trim() ? parsed.name.trim() : this.hunterProfile.name,
           galleryUrls: this.sanitizeGalleryUrls(Array.isArray(parsed.galleryUrls) ? parsed.galleryUrls : parsed.gallery_urls),
@@ -2067,8 +2085,13 @@ function soloLevelingApp() {
         ? this.meta.lastIncompleteQuestReminderDayKey
         : null;
       this.meta.lastIncompleteQuestReminderAt = this.normalizeIsoTimestamp(this.meta.lastIncompleteQuestReminderAt);
+      this.meta.accountCreatedDateKey = typeof this.meta.accountCreatedDateKey === 'string'
+        ? this.meta.accountCreatedDateKey
+        : null;
       this.meta.questRotationDate = typeof this.meta.questRotationDate === 'string' ? this.meta.questRotationDate : null;
-      this.meta.rotationAnchorDate = typeof this.meta.rotationAnchorDate === 'string' ? this.meta.rotationAnchorDate : this.todayDateKey();
+      this.meta.rotationAnchorDate = this.meta.accountCreatedDateKey
+        || (typeof this.meta.rotationAnchorDate === 'string' ? this.meta.rotationAnchorDate : null)
+        || this.todayDateKey();
       this.meta.protocolDay = Number.isFinite(this.meta.protocolDay) ? Math.min(7, Math.max(1, this.meta.protocolDay)) : 1;
       this.meta.dailyStartXp = Number.isFinite(this.meta.dailyStartXp) ? Math.max(0, this.meta.dailyStartXp) : this.profile.xp;
       const statsSnapshot = this.meta.dailyStartStats && typeof this.meta.dailyStartStats === 'object' ? this.meta.dailyStartStats : {};
@@ -3489,8 +3512,9 @@ function soloLevelingApp() {
         lastDailyStreakCreditDate: null,
         lastIncompleteQuestReminderDayKey: null,
         lastIncompleteQuestReminderAt: null,
+        accountCreatedDateKey: this.meta.accountCreatedDateKey || this.todayDateKey(),
         questRotationDate: this.todayDateKey(),
-        rotationAnchorDate: this.todayDateKey(),
+        rotationAnchorDate: this.meta.accountCreatedDateKey || this.todayDateKey(),
         protocolDay: 1,
         dailyStartXp: 0,
         dailyStartStats: {

@@ -168,6 +168,7 @@
           dob: typeof profileWithDob?.dob === 'string' ? profileWithDob.dob : null,
           goal: ['cut', 'maintain', 'bulk'].includes(profileWithDob?.goal) ? profileWithDob.goal : 'maintain',
           isAdmin: Boolean(profileWithDob?.is_admin || profileWithDob?.isAdmin),
+          createdAt: profileWithDob?.created_at || profileWithDob?.createdAt || null,
           syncedAt: new Date().toISOString()
         }));
         if (!profileWithDob) {
