@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Ascendra</string>
+    <string name="title_activity_main">Ascendra</string>
+    <string name="package_name">com.monarchmode.app</string>
+    <string name="custom_url_scheme">com.monarchmode.app</string>
+    <string name="default_web_client_id">17935059805-409vaml1sld8oal9qsa4kaap74u965cf.apps.googleusercontent.com</string>
+</resources>

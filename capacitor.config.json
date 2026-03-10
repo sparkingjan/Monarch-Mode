@@ -1,0 +1,16 @@
+{
+  "appId": "com.monarchmode.app",
+  "appName": "Ascendra",
+  "webDir": "frontend",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": true,
+      "providers": [
+        "google.com"
+      ]
+    }
+  }
+}

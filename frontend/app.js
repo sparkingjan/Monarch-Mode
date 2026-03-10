@@ -2434,7 +2434,7 @@ function soloLevelingApp() {
           key: order.key_id,
           amount: order.amount,
           currency: order.currency,
-          name: order.name || 'Monarch Mode Premium',
+          name: order.name || 'Ascendra Premium',
           description: order.description || `Premium membership (${this.premiumMembershipPriceLabel()})`,
           order_id: order.order_id,
           prefill: {
