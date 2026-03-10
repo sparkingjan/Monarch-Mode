@@ -330,13 +330,11 @@ function soloLevelingApp() {
       this.ensureProfileStats();
       this.ensureHiddenQuestState();
       this.ensureMetaDefaults();
+      this.applyDailyResets();
       this.syncDailyQuestRotation();
       this.syncModeSpecificQuests();
       this.syncStatUnlockQuests();
       this.syncRaidTasksWithDungeon();
-      this.applyDailyResets();
-      this.syncDailyQuestRotation();
-      this.syncModeSpecificQuests();
       this.recomputeProgressFromCurrentXp();
       if (!saved) {
         this.log('System booted. New hunter detected.');
@@ -422,13 +420,11 @@ function soloLevelingApp() {
       this.ensureProfileStats();
       this.ensureHiddenQuestState();
       this.ensureMetaDefaults();
+      this.applyDailyResets();
       this.syncDailyQuestRotation();
       this.syncModeSpecificQuests();
       this.syncStatUnlockQuests();
       this.syncRaidTasksWithDungeon();
-      this.applyDailyResets();
-      this.syncDailyQuestRotation();
-      this.syncModeSpecificQuests();
       this.recomputeProgressFromCurrentXp();
     },
 
