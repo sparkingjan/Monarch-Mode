@@ -179,6 +179,7 @@
           // Ignore signOut errors and continue clearing local session.
         } finally {
           localStorage.removeItem('firebase-id-token');
+          localStorage.removeItem('monarch-session-id');
           window.location.replace('index.html');
         }
       });

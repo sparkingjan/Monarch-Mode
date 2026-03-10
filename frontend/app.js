@@ -595,6 +595,7 @@ function soloLevelingApp() {
     handleBackendAuthFailure() {
       if (typeof window === 'undefined') return;
       localStorage.removeItem('firebase-id-token');
+      localStorage.removeItem('monarch-session-id');
       localStorage.setItem('monarch-auth-expired', '1');
       const path = (window.location.pathname || '').split('/').pop() || '';
       if (!['login.html', 'signup.html'].includes(path)) {
@@ -602,13 +603,23 @@ function soloLevelingApp() {
       }
     },
 
+    activeSessionId() {
+      if (typeof window === 'undefined') return '';
+      const raw = localStorage.getItem('monarch-session-id');
+      return typeof raw === 'string' && raw.trim() ? raw.trim() : '';
+    },
+
     async backendRequest(path, options = {}) {
       const execute = async (token) => {
         if (!token) return null;
+        const sessionId = this.activeSessionId();
         const headers = {
           ...(options.headers || {}),
           Authorization: `Bearer ${token}`
         };
+        if (sessionId) {
+          headers['X-Monarch-Session'] = sessionId;
+        }
         return fetch(`${this.backendBaseUrl()}${path}`, {
           ...options,
           headers
@@ -638,10 +649,14 @@ function soloLevelingApp() {
     async backendRequestWithStatus(path, options = {}) {
       const execute = async (token) => {
         if (!token) return null;
+        const sessionId = this.activeSessionId();
         const headers = {
           ...(options.headers || {}),
           Authorization: `Bearer ${token}`
         };
+        if (sessionId) {
+          headers['X-Monarch-Session'] = sessionId;
+        }
         return fetch(`${this.backendBaseUrl()}${path}`, {
           ...options,
           headers

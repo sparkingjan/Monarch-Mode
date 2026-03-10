@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
@@ -77,6 +77,25 @@
         return firebase.auth();
       }
 
+      function createSessionId() {
+        const randomPart = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+          ? crypto.randomUUID().replace(/-/g, '')
+          : (Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
+        return `sess_${Date.now().toString(36)}_${randomPart}`;
+      }
+
+      function isNativeCapacitor() {
+        try {
+          return Boolean(window.Capacitor?.isNativePlatform?.());
+        } catch (_) {
+          return false;
+        }
+      }
+
+      function nativeFirebaseAuthPlugin() {
+        return window.Capacitor?.Plugins?.FirebaseAuthentication || null;
+      }
+
       function isPopupFallbackError(code) {
         return code === 'auth/popup-blocked'
           || code === 'auth/popup-closed-by-user'
@@ -98,11 +117,20 @@
         return error?.message || 'Google login failed.';
       }
 
-      async function ensureBackendProfile(idToken) {
-        const baseUrl = cfg.backendBaseUrl || 'http://127.0.0.1:8000/api/v1';
+      async function ensureBackendProfile(idToken, sessionId, claimSession) {
+        const baseUrl = cfg.backendBaseUrl || 'https://monarch-mode.vercel.app/api/v1';
+        const headers = {
+          Authorization: 'Bearer ' + idToken
+        };
+        if (sessionId) {
+          headers['X-Monarch-Session'] = sessionId;
+        }
+        if (claimSession) {
+          headers['X-Monarch-Claim-Session'] = '1';
+        }
         const response = await fetch(baseUrl + '/users/me', {
           method: 'GET',
-          headers: { Authorization: 'Bearer ' + idToken }
+          headers
         });
         if (!response.ok) {
           let detail = '';
@@ -117,10 +145,12 @@
 
       async function completeLogin(user) {
         const idToken = await user.getIdToken(true);
+        const sessionId = createSessionId();
         localStorage.setItem('firebase-id-token', idToken);
+        localStorage.setItem('monarch-session-id', sessionId);
         let profileWithDob = null;
         try {
-          profileWithDob = await ensureBackendProfile(idToken);
+          profileWithDob = await ensureBackendProfile(idToken, sessionId, true);
         } catch (error) {
           // Allow login even when backend profile sync is temporarily unavailable.
           profileWithDob = null;
@@ -149,6 +179,7 @@
       }
 
       async function handleGoogleAuthResult() {
+        if (isNativeCapacitor()) return;
         if (!hasFirebaseCfg) return;
         try {
           const auth = initFirebase();
@@ -198,6 +229,18 @@
           }
           try {
             const auth = initFirebase();
+            const nativeAuth = nativeFirebaseAuthPlugin();
+            if (isNativeCapacitor() && nativeAuth?.signInWithGoogle) {
+              const nativeResult = await nativeAuth.signInWithGoogle({ skipNativeAuth: true });
+              const idToken = nativeResult?.credential?.idToken || '';
+              if (!idToken) {
+                throw new Error('Google sign-in did not return an ID token.');
+              }
+              const googleCredential = firebase.auth.GoogleAuthProvider.credential(idToken);
+              const cred = await auth.signInWithCredential(googleCredential);
+              await completeLogin(cred.user);
+              return;
+            }
             const provider = new firebase.auth.GoogleAuthProvider();
             try {
               const cred = await auth.signInWithPopup(provider);

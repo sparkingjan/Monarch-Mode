@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
@@ -66,14 +66,40 @@
         errorEl.classList.remove('hidden');
       }
 
-      async function updateBackendProfile(idToken, payload) {
-        const baseUrl = cfg.backendBaseUrl || 'http://127.0.0.1:8000/api/v1';
+      function createSessionId() {
+        const randomPart = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+          ? crypto.randomUUID().replace(/-/g, '')
+          : (Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
+        return `sess_${Date.now().toString(36)}_${randomPart}`;
+      }
+
+      async function ensureBackendProfile(idToken, sessionId) {
+        const baseUrl = cfg.backendBaseUrl || 'https://monarch-mode.vercel.app/api/v1';
+        const response = await fetch(baseUrl + '/users/me', {
+          method: 'GET',
+          headers: {
+            Authorization: 'Bearer ' + idToken,
+            'X-Monarch-Session': sessionId,
+            'X-Monarch-Claim-Session': '1'
+          }
+        });
+        if (!response.ok) {
+          throw new Error('Session initialization failed. Please try again.');
+        }
+      }
+
+      async function updateBackendProfile(idToken, payload, sessionId) {
+        const baseUrl = cfg.backendBaseUrl || 'https://monarch-mode.vercel.app/api/v1';
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + idToken
+        };
+        if (sessionId) {
+          headers['X-Monarch-Session'] = sessionId;
+        }
         const response = await fetch(baseUrl + '/users/me/profile', {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + idToken
-          },
+          headers,
           body: JSON.stringify({
             name: payload.name,
             height_cm: payload.heightCm,
@@ -113,7 +139,9 @@
             const cred = await firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password);
             await cred.user.updateProfile({ displayName: payload.name });
             const idToken = await cred.user.getIdToken(true);
+            const sessionId = createSessionId();
             localStorage.setItem('firebase-id-token', idToken);
+            localStorage.setItem('monarch-session-id', sessionId);
 
             localStorage.setItem('hunter-account-profile', JSON.stringify({
               uid: cred.user.uid,
@@ -126,7 +154,8 @@
               createdAt: payload.createdAt
             }));
 
-            await updateBackendProfile(idToken, payload);
+            await ensureBackendProfile(idToken, sessionId);
+            await updateBackendProfile(idToken, payload, sessionId);
             window.location.href = 'index.html';
           } catch (error) {
             const code = error?.code || '';

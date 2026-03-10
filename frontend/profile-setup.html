@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
@@ -115,15 +115,19 @@
         (async function run() {
           try {
             const token = await getToken();
+            const sessionId = localStorage.getItem('monarch-session-id') || '';
             if (!token) {
               showError('Session missing. Please login again.');
               return;
             }
 
-            const baseUrl = cfg.backendBaseUrl || 'http://127.0.0.1:8000/api/v1';
+            const baseUrl = cfg.backendBaseUrl || 'https://monarch-mode.vercel.app/api/v1';
             const meResponse = await fetch(baseUrl + '/users/me', {
               method: 'GET',
-              headers: { Authorization: 'Bearer ' + token }
+              headers: {
+                Authorization: 'Bearer ' + token,
+                ...(sessionId ? { 'X-Monarch-Session': sessionId } : {})
+              }
             });
             if (!meResponse.ok) {
               showError('Could not load account profile. Please try again.');
@@ -135,7 +139,8 @@
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token
+                Authorization: 'Bearer ' + token,
+                ...(sessionId ? { 'X-Monarch-Session': sessionId } : {})
               },
               body: JSON.stringify({
                 name: me.name || 'Player Hunter',

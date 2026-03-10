@@ -1,7 +1,7 @@
 from datetime import date, datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 from firebase_admin import firestore
 
 from app.config import get_settings
@@ -95,6 +95,7 @@ def _default_user_payload(claims: dict) -> dict:
         "name_change_last_payment_id": None,
         "game_state": None,
         "game_state_updated_at": None,
+        "current_session_id": None,
         "created_at": now,
         "updated_at": now,
     }
@@ -220,13 +221,26 @@ def _apply_premium_expiry(data: dict) -> bool:
     return False
 
 
+def _header_truthy(value: Optional[str]) -> bool:
+    normalized = str(value or "").strip().lower()
+    return normalized in {"1", "true", "yes", "y", "on"}
+
+
 @router.get("/me", response_model=UserRecord)
-def get_me(claims: dict = Depends(get_current_user)):
+def get_me(
+    claims: dict = Depends(get_current_user),
+    x_monarch_session: str = Header(default="", alias="X-Monarch-Session"),
+    x_monarch_claim_session: str = Header(default="", alias="X-Monarch-Claim-Session"),
+):
     try:
         doc_ref = _user_doc_ref(claims["uid"])
         snapshot = doc_ref.get(timeout=8)
+        claimed_session = (x_monarch_session or "").strip()
+        should_claim_session = _header_truthy(x_monarch_claim_session) and bool(claimed_session)
         if not snapshot.exists:
             payload = _default_user_payload(claims)
+            if should_claim_session:
+                payload["current_session_id"] = claimed_session
             doc_ref.set(payload)
             return UserRecord(**payload)
         data = _sanitize_user_record(snapshot.to_dict(), claims)
@@ -235,12 +249,18 @@ def get_me(claims: dict = Depends(get_current_user)):
         if has_admin_upgrade:
             data["is_admin"] = True
             data["updated_at"] = datetime.now(timezone.utc)
-        if has_admin_upgrade or premium_changed:
+        session_changed = should_claim_session and data.get("current_session_id") != claimed_session
+        if session_changed:
+            data["current_session_id"] = claimed_session
+            data["updated_at"] = datetime.now(timezone.utc)
+        if has_admin_upgrade or premium_changed or session_changed:
             update_payload = {"updated_at": data["updated_at"]}
             if has_admin_upgrade:
                 update_payload["is_admin"] = True
             if premium_changed:
                 update_payload["premium_membership_active"] = data["premium_membership_active"]
+            if session_changed:
+                update_payload["current_session_id"] = data["current_session_id"]
             if "goal" in data:
                 update_payload["goal"] = data["goal"]
             doc_ref.set(update_payload, merge=True)

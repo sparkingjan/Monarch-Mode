@@ -60,7 +60,11 @@
               this.loadError = 'Backend URL is not set for production. Update backendBaseUrl in web-config.js.';
             }
             const token = localStorage.getItem('firebase-id-token');
+            const sessionId = localStorage.getItem('monarch-session-id') || '';
             const headers = token ? { Authorization: 'Bearer ' + token } : {};
+            if (token && sessionId) {
+              headers['X-Monarch-Session'] = sessionId;
+            }
             try {
               const [leaderboardResponse, meResponse] = await Promise.all([
                 fetch(baseUrl + '/leaderboard?limit=100', { headers }),
@@ -68,6 +72,7 @@
               ]);
               if (leaderboardResponse.status === 401 || leaderboardResponse.status === 403 || meResponse.status === 401 || meResponse.status === 403) {
                 localStorage.removeItem('firebase-id-token');
+                localStorage.removeItem('monarch-session-id');
                 window.location.replace('login.html');
                 return;
               }

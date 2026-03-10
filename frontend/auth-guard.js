@@ -62,6 +62,7 @@
 
   if (token && isTokenExpired(token)) {
     localStorage.removeItem('firebase-id-token');
+    localStorage.removeItem('monarch-session-id');
     token = null;
     if (!publicPages.has(path)) {
       window.location.replace('login.html');

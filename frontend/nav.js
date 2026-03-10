@@ -60,9 +60,15 @@
       return href.split('?')[0].split('#')[0].split('/').pop();
     }
 
-    button.addEventListener('click', function () {
-      const open = nav.classList.toggle('is-open');
+    function setMenuOpen(open) {
+      nav.classList.toggle('is-open', open);
+      document.body.classList.toggle('nav-menu-open', open);
       button.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    button.addEventListener('click', function () {
+      const open = !nav.classList.contains('is-open');
+      setMenuOpen(open);
     });
 
     nav.querySelectorAll('a').forEach(function (link) {
@@ -81,16 +87,22 @@
         }
 
         if (window.innerWidth <= 1024) {
-          nav.classList.remove('is-open');
-          button.setAttribute('aria-expanded', 'false');
+          setMenuOpen(false);
         }
       });
     });
 
+    document.addEventListener('click', function (event) {
+      if (window.innerWidth > 1024) return;
+      if (!nav.classList.contains('is-open')) return;
+      const target = event.target;
+      if (button.contains(target) || nav.contains(target)) return;
+      setMenuOpen(false);
+    });
+
     window.addEventListener('resize', function () {
       if (window.innerWidth > 1024) {
-        nav.classList.remove('is-open');
-        button.setAttribute('aria-expanded', 'false');
+        setMenuOpen(false);
       }
     });
   }
