@@ -66,6 +66,9 @@
       button.setAttribute('aria-expanded', open ? 'true' : 'false');
     }
 
+    // Ensure stale classes from bfcache/history restore do not block page taps.
+    setMenuOpen(false);
+
     button.addEventListener('click', function () {
       const open = !nav.classList.contains('is-open');
       setMenuOpen(open);
@@ -102,6 +105,12 @@
 
     window.addEventListener('resize', function () {
       if (window.innerWidth > 1024) {
+        setMenuOpen(false);
+      }
+    });
+
+    window.addEventListener('pageshow', function () {
+      if (window.innerWidth <= 1024) {
         setMenuOpen(false);
       }
     });

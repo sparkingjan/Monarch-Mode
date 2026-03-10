@@ -528,6 +528,7 @@ body {
     max-width: 100%;
     margin-top: 0;
     display: none;
+    pointer-events: none;
     flex-direction: column;
     gap: 0.75rem;
     padding: 0;
@@ -537,6 +538,7 @@ body {
 
   .top-nav.is-open {
     display: flex;
+    pointer-events: auto;
     position: absolute;
     top: calc(100% + 0.5rem);
     left: 0;
@@ -961,6 +963,7 @@ body {
     width: 100%;
     margin-top: 0;
     display: none;
+    pointer-events: none;
     flex-direction: column;
     gap: 0.75rem;
     padding: 0;
@@ -970,6 +973,7 @@ body {
 
   .top-nav.is-open {
     display: flex;
+    pointer-events: auto;
   }
 
   .top-nav a {
