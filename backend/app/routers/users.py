@@ -93,6 +93,8 @@ def _default_user_payload(claims: dict) -> dict:
         "name_change_free_used": False,
         "name_change_paid_credits": 0,
         "name_change_last_payment_id": None,
+        "game_state": None,
+        "game_state_updated_at": None,
         "created_at": now,
         "updated_at": now,
     }
@@ -182,7 +184,28 @@ def _sanitize_user_record(data: dict, claims: Optional[dict] = None) -> dict:
     sanitized["name_change_last_payment_id"] = (
         str(sanitized.get("name_change_last_payment_id")).strip() if sanitized.get("name_change_last_payment_id") else None
     )
+    game_state = sanitized.get("game_state")
+    sanitized["game_state"] = game_state if isinstance(game_state, dict) else None
+    game_state_updated_at = sanitized.get("game_state_updated_at")
+    if isinstance(game_state_updated_at, datetime):
+        sanitized["game_state_updated_at"] = game_state_updated_at
+    elif isinstance(game_state_updated_at, str):
+        try:
+            parsed = datetime.fromisoformat(game_state_updated_at.replace("Z", "+00:00"))
+            sanitized["game_state_updated_at"] = parsed
+        except ValueError:
+            sanitized["game_state_updated_at"] = None
+    else:
+        sanitized["game_state_updated_at"] = None
     return sanitized
+
+
+def _utc_datetime(value: Optional[datetime]) -> Optional[datetime]:
+    if not isinstance(value, datetime):
+        return None
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
 
 
 def _apply_premium_expiry(data: dict) -> bool:
@@ -317,6 +340,22 @@ def update_me_progress(payload: UserProgressUpdate, claims: dict = Depends(get_c
         current = _default_user_payload(claims) if not snapshot.exists else snapshot.to_dict()
 
         progress_data = payload.model_dump()
+        incoming_state_ts = _utc_datetime(progress_data.get("game_state_updated_at"))
+        current_state_ts = _utc_datetime(current.get("game_state_updated_at"))
+        incoming_is_stale = (
+            incoming_state_ts is not None
+            and current_state_ts is not None
+            and incoming_state_ts < current_state_ts
+        )
+        if incoming_is_stale:
+            # Prevent older devices from overwriting fresher progress from another device.
+            progress_data["xp"] = current.get("xp", progress_data.get("xp"))
+            progress_data["level"] = current.get("level", progress_data.get("level"))
+            progress_data["rank"] = current.get("rank", progress_data.get("rank"))
+            progress_data["stats"] = current.get("stats", progress_data.get("stats"))
+            progress_data["survival_streak"] = current.get("survival_streak", progress_data.get("survival_streak"))
+            progress_data["game_state"] = current.get("game_state")
+            progress_data["game_state_updated_at"] = current.get("game_state_updated_at")
         current.update(progress_data)
         current["updated_at"] = datetime.now(timezone.utc)
         if not snapshot.exists:

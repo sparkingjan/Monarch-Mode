@@ -285,6 +285,7 @@ function soloLevelingApp() {
     showResetProgressModal: false,
     logs: [],
     backendSyncTimer: null,
+    backendRefreshTimer: null,
     backendSyncPending: false,
     aiDietGenerationBusy: false,
     voiceAnnouncerEnabled: true,
@@ -346,10 +347,11 @@ function soloLevelingApp() {
       this.recordDailyNutritionSnapshot();
       this.profileNameDraft = this.profile.name || this.hunterProfile.name || 'Player Hunter';
       this.initializeEditorFields();
-      this.save();
+      this.save({ skipBackendSync: true, preserveGameStateUpdatedAt: true });
       this.syncFromBackend().catch(() => {
         // Keep local-mode behavior if backend is unavailable.
       });
+      this.startBackendRefreshLoop();
     },
 
     activeUidFromStoredProfile() {
@@ -430,8 +432,12 @@ function soloLevelingApp() {
       this.recomputeProgressFromCurrentXp();
     },
 
-    save() {
-      this.meta.gameStateUpdatedAt = new Date().toISOString();
+    save(options = {}) {
+      const skipBackendSync = Boolean(options.skipBackendSync);
+      const preserveGameStateUpdatedAt = Boolean(options.preserveGameStateUpdatedAt);
+      if (!preserveGameStateUpdatedAt) {
+        this.meta.gameStateUpdatedAt = new Date().toISOString();
+      }
       const stateKey = this.stateStorageKey();
       const fullState = {
         profile: this.profile,
@@ -455,7 +461,9 @@ function soloLevelingApp() {
         };
         localStorage.setItem(stateKey, JSON.stringify(slimState));
       }
-      this.scheduleBackendSync();
+      if (!skipBackendSync) {
+        this.scheduleBackendSync();
+      }
     },
 
     backendBaseUrl() {
@@ -790,7 +798,7 @@ function soloLevelingApp() {
         this.recomputeProgressFromCurrentXp();
         this.scheduleBackendSync();
       }
-      this.save();
+      this.save({ skipBackendSync: true, preserveGameStateUpdatedAt: true });
     },
 
     async syncProgressToBackend() {
@@ -847,6 +855,15 @@ function soloLevelingApp() {
             this.backendSyncPending = false;
           });
       }, 900);
+    },
+
+    startBackendRefreshLoop() {
+      if (this.backendRefreshTimer) {
+        clearInterval(this.backendRefreshTimer);
+      }
+      this.backendRefreshTimer = setInterval(() => {
+        this.syncFromBackend().catch(() => {});
+      }, 30000);
     },
 
     async readImageAsDataUrl(file, maxWidth, maxHeight, quality) {
