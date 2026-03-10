@@ -592,6 +592,16 @@ function soloLevelingApp() {
       }
     },
 
+    handleBackendAuthFailure() {
+      if (typeof window === 'undefined') return;
+      localStorage.removeItem('firebase-id-token');
+      localStorage.setItem('monarch-auth-expired', '1');
+      const path = (window.location.pathname || '').split('/').pop() || '';
+      if (!['login.html', 'signup.html'].includes(path)) {
+        window.location.replace('login.html');
+      }
+    },
+
     async backendRequest(path, options = {}) {
       const execute = async (token) => {
         if (!token) return null;
@@ -613,6 +623,10 @@ function soloLevelingApp() {
         token = await this.ensureFirebaseIdToken(true);
         response = await execute(token);
         if (!response) return null;
+        if (response.status === 401 || response.status === 403) {
+          this.handleBackendAuthFailure();
+          return null;
+        }
       }
 
       if (!response.ok) {
@@ -641,6 +655,9 @@ function soloLevelingApp() {
       if ((response.status === 401 || response.status === 403) && typeof window !== 'undefined') {
         token = await this.ensureFirebaseIdToken(true);
         response = await execute(token);
+        if (response && (response.status === 401 || response.status === 403)) {
+          this.handleBackendAuthFailure();
+        }
       }
       return response;
     },

@@ -1,6 +1,6 @@
 (function () {
   const path = (window.location.pathname || '').split('/').pop() || 'index.html';
-  const token = localStorage.getItem('firebase-id-token');
+  let token = localStorage.getItem('firebase-id-token');
   const publicPages = new Set(['index.html', 'login.html', 'signup.html']);
   const premiumPages = new Set(['diet.html', 'fitness.html']);
 
@@ -17,6 +17,22 @@
         : (typeof payload.uid === 'string' ? payload.uid : (typeof payload.sub === 'string' ? payload.sub : null));
     } catch (_) {
       return null;
+    }
+  }
+
+  function isTokenExpired(rawToken) {
+    if (typeof rawToken !== 'string' || !rawToken.trim()) return true;
+    try {
+      const segments = rawToken.split('.');
+      if (segments.length < 2) return true;
+      const base64 = segments[1].replace(/-/g, '+').replace(/_/g, '/');
+      const normalized = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+      const payload = JSON.parse(atob(normalized));
+      const expSeconds = Number(payload?.exp);
+      if (!Number.isFinite(expSeconds)) return false;
+      return (Date.now() + 30000) >= (expSeconds * 1000);
+    } catch (_) {
+      return true;
     }
   }
 
@@ -42,6 +58,15 @@
   if (!token && !publicPages.has(path)) {
     window.location.replace('login.html');
     return;
+  }
+
+  if (token && isTokenExpired(token)) {
+    localStorage.removeItem('firebase-id-token');
+    token = null;
+    if (!publicPages.has(path)) {
+      window.location.replace('login.html');
+      return;
+    }
   }
 
   if (token && premiumPages.has(path) && !hasPremiumMembership()) {
