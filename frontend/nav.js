@@ -19,10 +19,16 @@
     });
 
     nav.querySelectorAll('a').forEach(function (link) {
-      link.addEventListener('click', function () {
-        if (window.innerWidth <= 1024) {
+      link.addEventListener('click', function (event) {
+        if (window.innerWidth > 1024) return;
+        const href = (link.getAttribute('href') || '').trim();
+        if (!href || href.startsWith('#') || link.target === '_blank') {
           setMenuOpen(false);
+          return;
         }
+        event.preventDefault();
+        setMenuOpen(false);
+        window.location.assign(href);
       });
     });
 
