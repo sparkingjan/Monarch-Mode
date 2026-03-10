@@ -69,6 +69,8 @@ function soloLevelingApp() {
       focusBuildDayKey: null,
       lastFullClearBonusDate: null,
       lastDailyStreakCreditDate: null,
+      lastIncompleteQuestReminderDayKey: null,
+      lastIncompleteQuestReminderAt: null,
       questRotationDate: null,
       rotationAnchorDate: null,
       protocolDay: 1,
@@ -99,7 +101,8 @@ function soloLevelingApp() {
       premiumLastPaymentId: null,
       nameChangeFreeUsed: false,
       nameChangePaidCredits: 0,
-      nameChangeLastPaymentId: null
+      nameChangeLastPaymentId: null,
+      gameStateUpdatedAt: null
     },
     quests: [],
     weeklyProtocols: [
@@ -287,12 +290,14 @@ function soloLevelingApp() {
     voiceAnnouncerEnabled: true,
     speechVoiceName: '',
     speechPrimed: false,
+    questReminderWindowMs: 60 * 60 * 1000,
 
     init() {
       if (typeof window !== 'undefined') {
         window.__soloLevelingApp = this;
       }
       this.initializeVoiceAnnouncer();
+      this.initializeQuestReminderNotifications();
       const stateKey = this.stateStorageKey();
       let saved = localStorage.getItem(stateKey);
       if (!saved && stateKey !== 'monarch-mode-state') {
@@ -372,7 +377,61 @@ function soloLevelingApp() {
       return resolvedUid ? `monarch-mode-state:${resolvedUid}` : 'monarch-mode-state';
     },
 
+    normalizeIsoTimestamp(value) {
+      if (typeof value !== 'string' || !value.trim()) return null;
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+    },
+
+    timestampMs(value) {
+      const normalized = this.normalizeIsoTimestamp(value);
+      if (!normalized) return null;
+      const ms = Date.parse(normalized);
+      return Number.isFinite(ms) ? ms : null;
+    },
+
+    localGameStatePayload() {
+      return {
+        meta: { ...this.meta },
+        quests: Array.isArray(this.quests) ? this.quests : [],
+        raidTasks: Array.isArray(this.raidTasks) ? this.raidTasks : [],
+        hiddenQuest: this.hiddenQuest && typeof this.hiddenQuest === 'object'
+          ? { ...this.hiddenQuest }
+          : null
+      };
+    },
+
+    applyBackendGameState(gameState, updatedAt = null) {
+      if (!gameState || typeof gameState !== 'object') return;
+      if (gameState.meta && typeof gameState.meta === 'object') {
+        this.meta = { ...this.meta, ...gameState.meta };
+      }
+      if (Array.isArray(gameState.quests)) {
+        this.quests = gameState.quests;
+      }
+      if (Array.isArray(gameState.raidTasks)) {
+        this.raidTasks = gameState.raidTasks;
+      }
+      if (gameState.hiddenQuest && typeof gameState.hiddenQuest === 'object') {
+        this.hiddenQuest = { ...this.hiddenQuest, ...gameState.hiddenQuest };
+      }
+      const normalizedUpdatedAt = this.normalizeIsoTimestamp(updatedAt);
+      this.meta.gameStateUpdatedAt = normalizedUpdatedAt || this.meta.gameStateUpdatedAt || new Date().toISOString();
+      this.ensureProfileStats();
+      this.ensureHiddenQuestState();
+      this.ensureMetaDefaults();
+      this.syncDailyQuestRotation();
+      this.syncModeSpecificQuests();
+      this.syncStatUnlockQuests();
+      this.syncRaidTasksWithDungeon();
+      this.applyDailyResets();
+      this.syncDailyQuestRotation();
+      this.syncModeSpecificQuests();
+      this.recomputeProgressFromCurrentXp();
+    },
+
     save() {
+      this.meta.gameStateUpdatedAt = new Date().toISOString();
       const stateKey = this.stateStorageKey();
       const fullState = {
         profile: this.profile,
@@ -400,7 +459,7 @@ function soloLevelingApp() {
     },
 
     backendBaseUrl() {
-      return window.MONARCH_CONFIG?.backendBaseUrl || 'http://127.0.0.1:8000/api/v1';
+      return window.MONARCH_CONFIG?.backendBaseUrl || 'https://monarch-mode.vercel.app/api/v1';
     },
 
     activeUidFromToken() {
@@ -701,8 +760,21 @@ function soloLevelingApp() {
         ? { ...this.profile.stats }
         : null;
       const localSurvivalStreak = Number(this.meta?.survivalStreak);
+      const localGameStateTimestamp = this.timestampMs(this.meta?.gameStateUpdatedAt);
       const user = await response.json();
       this.applyBackendUser(user);
+      const backendGameStateTimestamp = this.timestampMs(user?.game_state_updated_at);
+      const shouldApplyBackendGameState = (
+        user?.game_state
+        && typeof user.game_state === 'object'
+        && (
+          localGameStateTimestamp === null
+          || (backendGameStateTimestamp !== null && backendGameStateTimestamp > localGameStateTimestamp)
+        )
+      );
+      if (shouldApplyBackendGameState) {
+        this.applyBackendGameState(user.game_state, user.game_state_updated_at || null);
+      }
       const backendXp = Number(user?.xp);
       if (Number.isFinite(localXp) && Number.isFinite(backendXp) && localXp > backendXp) {
         this.profile.xp = Math.max(0, Math.round(localXp));
@@ -722,12 +794,16 @@ function soloLevelingApp() {
     },
 
     async syncProgressToBackend() {
+      const gameStateUpdatedAt = this.normalizeIsoTimestamp(this.meta?.gameStateUpdatedAt) || new Date().toISOString();
+      this.meta.gameStateUpdatedAt = gameStateUpdatedAt;
       const payload = {
         xp: this.profile.xp,
         level: this.profile.level,
         rank: this.profile.rank,
         survival_streak: this.meta.survivalStreak || 0,
-        stats: this.profile.stats
+        stats: this.profile.stats,
+        game_state: this.localGameStatePayload(),
+        game_state_updated_at: gameStateUpdatedAt
       };
       await this.backendRequest('/users/me/progress', {
         method: 'PUT',
@@ -1722,6 +1798,7 @@ function soloLevelingApp() {
       this.resetCountdownText = this.formatDuration(this.timeUntilDailyResetMs());
       const previousResetDate = this.meta.lastDailyResetDate;
       this.applyDailyResets();
+      this.maybeSendIncompleteQuestReminder();
       if (this.meta.lastDailyResetDate !== previousResetDate) {
         this.save();
       }
@@ -1952,6 +2029,7 @@ function soloLevelingApp() {
     ensureMetaDefaults() {
       this.meta.pushupConsistencyDays = Number.isFinite(this.meta.pushupConsistencyDays) ? this.meta.pushupConsistencyDays : 0;
       this.meta.pushupTier = Number.isFinite(this.meta.pushupTier) ? this.meta.pushupTier : 0;
+      this.meta.gameStateUpdatedAt = this.normalizeIsoTimestamp(this.meta.gameStateUpdatedAt);
       this.meta.loadTier = Number.isFinite(this.meta.loadTier) ? Math.max(0, this.meta.loadTier) : 0;
       this.meta.loadCycleAnchorDate = typeof this.meta.loadCycleAnchorDate === 'string' ? this.meta.loadCycleAnchorDate : null;
       this.meta.loadCycleFullClears = Number.isFinite(this.meta.loadCycleFullClears) ? Math.max(0, this.meta.loadCycleFullClears) : 0;
@@ -1959,6 +2037,10 @@ function soloLevelingApp() {
       this.meta.extremeModeStreak = Number.isFinite(this.meta.extremeModeStreak) ? Math.max(0, this.meta.extremeModeStreak) : 0;
       this.meta.lastExtremeRiskAlertDayKey = typeof this.meta.lastExtremeRiskAlertDayKey === 'string' ? this.meta.lastExtremeRiskAlertDayKey : null;
       this.meta.lastDailyStreakCreditDate = typeof this.meta.lastDailyStreakCreditDate === 'string' ? this.meta.lastDailyStreakCreditDate : null;
+      this.meta.lastIncompleteQuestReminderDayKey = typeof this.meta.lastIncompleteQuestReminderDayKey === 'string'
+        ? this.meta.lastIncompleteQuestReminderDayKey
+        : null;
+      this.meta.lastIncompleteQuestReminderAt = this.normalizeIsoTimestamp(this.meta.lastIncompleteQuestReminderAt);
       this.meta.questRotationDate = typeof this.meta.questRotationDate === 'string' ? this.meta.questRotationDate : null;
       this.meta.rotationAnchorDate = typeof this.meta.rotationAnchorDate === 'string' ? this.meta.rotationAnchorDate : this.todayDateKey();
       this.meta.protocolDay = Number.isFinite(this.meta.protocolDay) ? Math.min(7, Math.max(1, this.meta.protocolDay)) : 1;
@@ -2846,6 +2928,8 @@ function soloLevelingApp() {
         this.meta.focusBuildDayKey = null;
         this.meta.lastFullClearBonusDate = null;
         this.meta.lastDailyStreakCreditDate = null;
+        this.meta.lastIncompleteQuestReminderDayKey = null;
+        this.meta.lastIncompleteQuestReminderAt = null;
         this.meta.dailyStartXp = this.profile.xp;
         this.meta.dailyStartStats = {
           strength: this.profile.stats.strength,
@@ -3159,6 +3243,88 @@ function soloLevelingApp() {
       }
     },
 
+    initializeQuestReminderNotifications() {
+      if (typeof window === 'undefined') return;
+      const primePermission = () => {
+        this.ensureQuestReminderPermissions().catch(() => {});
+      };
+      window.addEventListener('pointerdown', primePermission, { once: true });
+      window.addEventListener('keydown', primePermission, { once: true });
+    },
+
+    async ensureQuestReminderPermissions() {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+        try {
+          await Notification.requestPermission();
+        } catch (_) {
+          // Ignore browser notification permission failures.
+        }
+      }
+      const localNotifications = window?.Capacitor?.Plugins?.LocalNotifications;
+      if (!localNotifications || typeof localNotifications.checkPermissions !== 'function') return;
+      try {
+        const permission = await localNotifications.checkPermissions();
+        if (permission?.display !== 'granted' && typeof localNotifications.requestPermissions === 'function') {
+          await localNotifications.requestPermissions();
+        }
+      } catch (_) {
+        // Ignore native notification permission failures.
+      }
+    },
+
+    shouldSendIncompleteQuestReminder() {
+      if (this.allDailyQuestsComplete()) return false;
+      const remainingMs = this.timeUntilDailyResetMs();
+      if (remainingMs <= 0 || remainingMs > this.questReminderWindowMs) return false;
+      const today = this.todayDateKey();
+      return this.meta.lastIncompleteQuestReminderDayKey !== today;
+    },
+
+    maybeSendIncompleteQuestReminder() {
+      if (!this.shouldSendIncompleteQuestReminder()) return;
+      const today = this.todayDateKey();
+      const remaining = this.formatDuration(this.timeUntilDailyResetMs());
+      const title = 'Daily Quest Reminder';
+      const message = `Daily directives are still incomplete. ${remaining} left before reset.`;
+      this.activeSystemNotification = {
+        id: Date.now(),
+        title: 'System Alert',
+        message
+      };
+      this.log(`Reminder: Daily directives are incomplete. ${remaining} left before reset.`);
+      this.sendPlatformQuestReminder(title, message);
+      this.meta.lastIncompleteQuestReminderDayKey = today;
+      this.meta.lastIncompleteQuestReminderAt = new Date().toISOString();
+      this.save();
+    },
+
+    sendPlatformQuestReminder(title, message) {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        try {
+          new Notification(title, {
+            body: message,
+            tag: `daily-quest-reminder-${this.todayDateKey()}`
+          });
+        } catch (_) {
+          // Ignore browser notification send failures.
+        }
+      }
+      const localNotifications = window?.Capacitor?.Plugins?.LocalNotifications;
+      if (!localNotifications || typeof localNotifications.schedule !== 'function') return;
+      localNotifications.schedule({
+        notifications: [
+          {
+            id: Number(String(Date.now()).slice(-9)),
+            title,
+            body: message,
+            schedule: { at: new Date(Date.now() + 1000) }
+          }
+        ]
+      }).catch(() => {
+        // Ignore native notification send failures.
+      });
+    },
+
     rollSystemNotification(force = false) {
       if (this.activeSystemNotification) return;
       if (!force && Math.random() > 0.35) return;
@@ -3295,6 +3461,8 @@ function soloLevelingApp() {
         focusBuildDayKey: null,
         lastFullClearBonusDate: null,
         lastDailyStreakCreditDate: null,
+        lastIncompleteQuestReminderDayKey: null,
+        lastIncompleteQuestReminderAt: null,
         questRotationDate: this.todayDateKey(),
         rotationAnchorDate: this.todayDateKey(),
         protocolDay: 1,
@@ -3343,7 +3511,8 @@ function soloLevelingApp() {
         premiumMembershipActive: false,
         premiumMembershipSince: null,
         premiumMembershipUntil: null,
-        premiumLastPaymentId: null
+        premiumLastPaymentId: null,
+        gameStateUpdatedAt: null
       };
       this.hiddenQuest = {
         active: false,
