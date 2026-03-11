@@ -743,8 +743,9 @@ function soloLevelingApp() {
       return age;
     },
 
-    applyBackendUser(user) {
+    applyBackendUser(user, options = {}) {
       if (!user || typeof user !== 'object') return;
+      const applyProgressFields = options.applyProgressFields !== false;
       const accountCreatedDateKey = this.dateKeyFromIsoTimestamp(user.created_at || user.createdAt);
       const accountAnchorChanged = this.setAccountQuestAnchor(accountCreatedDateKey);
       const hasGalleryField = Object.prototype.hasOwnProperty.call(user, 'gallery_urls') || Object.prototype.hasOwnProperty.call(user, 'galleryUrls');
@@ -799,7 +800,9 @@ function soloLevelingApp() {
           syncedAt: new Date().toISOString()
         })
       );
-      this.meta.survivalStreak = Number.isFinite(user.survival_streak) ? user.survival_streak : (this.meta.survivalStreak || 0);
+      if (applyProgressFields && Number.isFinite(user.survival_streak)) {
+        this.meta.survivalStreak = user.survival_streak;
+      }
       this.meta.premiumMembershipActive = Boolean(user.premium_membership_active ?? this.meta.premiumMembershipActive);
       this.meta.premiumMembershipSince = typeof user.premium_membership_since === 'string'
         ? user.premium_membership_since
@@ -825,17 +828,17 @@ function soloLevelingApp() {
       if (!response) return;
       const user = await response.json();
       const localGameStateTimestamp = this.timestampMs(this.meta?.gameStateUpdatedAt);
-      this.applyBackendUser(user);
       const backendGameStateTimestamp = this.timestampMs(user?.game_state_updated_at);
+      const hasBackendGameState = user?.game_state && typeof user.game_state === 'object';
       const shouldApplyBackendGameState = (
-        user?.game_state
-        && typeof user.game_state === 'object'
+        hasBackendGameState
         && (
           localGameStateTimestamp === null
           || backendGameStateTimestamp === null
           || backendGameStateTimestamp >= localGameStateTimestamp
         )
       );
+      this.applyBackendUser(user, { applyProgressFields: !hasBackendGameState || shouldApplyBackendGameState });
       if (shouldApplyBackendGameState) {
         this.applyBackendGameState(user.game_state, user.game_state_updated_at || null);
       }
