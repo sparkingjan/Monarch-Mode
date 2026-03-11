@@ -1,0 +1,32 @@
+{
+  "name": "solo-leveling",
+  "version": "1.0.0",
+  "description": "This repository is organized into clear frontend and backend boundaries.",
+  "main": "index.js",
+  "scripts": {
+    "cap:copy": "npx cap copy android",
+    "cap:sync": "npx cap sync android",
+    "android:open": "npx cap open android",
+    "apk:debug": "cd android && gradlew.bat assembleDebug",
+    "test": "echo \"No tests configured\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sparkingjan/Monarch-Mode.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sparkingjan/Monarch-Mode/issues"
+  },
+  "homepage": "https://github.com/sparkingjan/Monarch-Mode#readme",
+  "dependencies": {
+    "@capacitor-firebase/authentication": "^8.1.0",
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
+    "@capacitor/local-notifications": "^8.0.2"
+  }
+}

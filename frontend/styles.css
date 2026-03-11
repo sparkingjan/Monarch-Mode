@@ -251,12 +251,15 @@ body {
 
 .nav-shell {
   position: relative;
-  z-index: 3;
+  z-index: 30;
+  isolation: isolate;
   width: min(70%, calc(100% - 2rem));
   margin: 1rem auto 0;
 }
 
 .menu-toggle {
+  position: relative;
+  z-index: 52;
   display: none;
   align-items: center;
   justify-content: center;
@@ -280,7 +283,7 @@ body {
 
 .top-nav {
   position: relative;
-  z-index: 3;
+  z-index: 50;
   display: flex;
   gap: 1.05rem;
   flex-wrap: nowrap;
@@ -511,6 +514,11 @@ body {
 @media (max-width: 1024px) {
   body.nav-menu-open {
     overflow: hidden;
+    overscroll-behavior: contain;
+  }
+
+  body.nav-menu-open .hero-content {
+    pointer-events: none;
   }
 
   .nav-shell {
@@ -554,6 +562,7 @@ body {
     border-radius: 0.95rem;
     background: linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(2, 6, 23, 0.96));
     box-shadow: 0 18px 36px rgba(2, 6, 23, 0.62);
+    isolation: isolate;
     max-height: min(68vh, 430px);
     overflow-y: auto;
   }
@@ -919,8 +928,8 @@ body {
     min-height: 100vh;
     background: linear-gradient(to bottom, rgba(2, 6, 23, 0.34), rgba(2, 6, 23, 0.74)),
       radial-gradient(ellipse at center 35%, rgba(0, 151, 255, 0.18), rgba(2, 6, 23, 0.1) 45%, transparent 72%),
-      url('./assets/media/mobile.gif')
-        center center / cover no-repeat;
+      url('./assets/media/main-hero-mobile.gif')
+        center 22% / cover no-repeat;
     background-attachment: scroll;
     will-change: auto;
   }
