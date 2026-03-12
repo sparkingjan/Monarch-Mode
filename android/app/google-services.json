@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "17935059805",
+    "project_id": "solo-leveling-c38fb",
+    "storage_bucket": "solo-leveling-c38fb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:17935059805:android:889c93730141b3aa91f6b4",
+        "android_client_info": {
+          "package_name": "com.monarchmode.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "17935059805-9t0i233mq76digufo8vc9kq33imnoi6r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.monarchmode.app",
+            "certificate_hash": "40aba1bde57c6cbbdcc3a566f3a0151a886f6b46"
+          }
+        },
+        {
+          "client_id": "17935059805-cjtfv48b6k0b8mihoqij5ocrd6e64am2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.monarchmode.app",
+            "certificate_hash": "cfa893342b1058c38a415b03c9fa975899bc65da"
+          }
+        },
+        {
+          "client_id": "17935059805-409vaml1sld8oal9qsa4kaap74u965cf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwGC-NKCpN73pclbtN6vJcQw0oQ9FOX1k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "17935059805-409vaml1sld8oal9qsa4kaap74u965cf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

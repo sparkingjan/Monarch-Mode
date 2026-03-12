@@ -183,6 +183,238 @@ function soloLevelingApp() {
       { id: 22, title: '📖 Mind Discipline: Focus Reading', xp: 150 },
       { id: 23, title: '🧘 Mind Discipline: Meditation Protocol', xp: 130 }
     ],
+    questTutorialLibrary: {
+      pushup_basics: {
+        title: 'Push-Up Form Basics',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=bwbBTPKHjtI',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/bwbBTPKHjtI?rel=0'
+      },
+      bench_dips: {
+        title: 'Bench Dips Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=Dk5JR0heZ9g',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/Dk5JR0heZ9g?rel=0'
+      },
+      diamond_pushups: {
+        title: 'Diamond Push-Up Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=ocrasqz9bMA',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/ocrasqz9bMA?rel=0'
+      },
+      plank_form: {
+        title: 'Plank Form Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=ASdvN_XEl_c',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/ASdvN_XEl_c?rel=0'
+      },
+      pullup_form: {
+        title: 'Pull-Up Form Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=eGo4IYlbE5g',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/eGo4IYlbE5g?rel=0'
+      },
+      inverted_row: {
+        title: 'Inverted Row Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=hXTc1mDnZCw',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/hXTc1mDnZCw?rel=0'
+      },
+      band_curl: {
+        title: 'Resistance Band Curl Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=8LlgPpIlJlg',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/8LlgPpIlJlg?rel=0'
+      },
+      dead_hang: {
+        title: 'Dead Hang Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=pov0CUoWfjo',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/pov0CUoWfjo?rel=0'
+      },
+      squat_form: {
+        title: 'Bodyweight Squat Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=Yv6pKfdDRcM',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/Yv6pKfdDRcM?rel=0'
+      },
+      forward_lunge: {
+        title: 'Forward Lunge Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=QOVaHwm-Q6U',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/QOVaHwm-Q6U?rel=0'
+      },
+      wall_sit: {
+        title: 'Wall Sit Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=-cdph8hv0O0',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/-cdph8hv0O0?rel=0'
+      },
+      calf_raise: {
+        title: 'Standing Calf Raise Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=VdGuHOh7vE8',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/VdGuHOh7vE8?rel=0'
+      },
+      pike_pushup: {
+        title: 'Pike Push-Up Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=_w8Al0EHhkY',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/_w8Al0EHhkY?rel=0'
+      },
+      band_lateral_raise: {
+        title: 'Resistance Band Lateral Raise Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=UxxlX3smXHs',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/UxxlX3smXHs?rel=0'
+      },
+      lying_leg_raise: {
+        title: 'Lying Leg Raise Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=JB2oyawG9KI',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/JB2oyawG9KI?rel=0'
+      },
+      burpee_form: {
+        title: 'Burpee Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=G2hv_NYhM-A',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/G2hv_NYhM-A?rel=0'
+      },
+      jump_squat: {
+        title: 'Jump Squat Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=CVaEhXotL7M',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/CVaEhXotL7M?rel=0'
+      },
+      mountain_climber: {
+        title: 'Mountain Climber Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=2YggU-cce38',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/2YggU-cce38?rel=0'
+      },
+      interval_running: {
+        title: 'Interval Running Tutorial',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=8hJ1HDcMowk',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/8hJ1HDcMowk?rel=0'
+      },
+      mobility_routine: {
+        title: '10-Minute Mobility Routine',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=Eae4ENV1Vsc',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/Eae4ENV1Vsc?rel=0'
+      },
+      full_body_stretch: {
+        title: 'Full Body Stretch Routine',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=L_xrDAtykMI',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/L_xrDAtykMI?rel=0'
+      },
+      walking_cardio: {
+        title: 'Walking Cardio Workout',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=enYITYwvPAQ',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/enYITYwvPAQ?rel=0'
+      },
+      sleep_hygiene: {
+        title: 'Sleep Hygiene Guide',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=FwcjXaXCEWY',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/FwcjXaXCEWY?rel=0'
+      },
+      social_media_detox: {
+        title: 'Quit Social Media Guide',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=8cXuJrQaltg',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/8cXuJrQaltg?rel=0'
+      },
+      reading_focus: {
+        title: 'Read and Remember More',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=1caaJDVl_64',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/1caaJDVl_64?rel=0'
+      },
+      guided_meditation: {
+        title: 'Guided Meditation for Beginners',
+        sourceLabel: 'YouTube',
+        watchUrl: 'https://www.youtube.com/watch?v=ETXwO9ssXqQ',
+        embedUrl: 'https://www.youtube-nocookie.com/embed/ETXwO9ssXqQ?rel=0'
+      }
+    },
+    questTutorialKeys: {
+      pushups_main: 'pushup_basics',
+      dips: 'bench_dips',
+      diamond_pushups: 'diamond_pushups',
+      plank_hold: 'plank_form',
+      pullups: 'pullup_form',
+      rows: 'inverted_row',
+      band_curls: 'band_curl',
+      dead_hangs: 'dead_hang',
+      squats: 'squat_form',
+      lunges: 'forward_lunge',
+      wall_sit: 'wall_sit',
+      calf_raises: 'calf_raise',
+      pike_pushups: 'pike_pushup',
+      lateral_raises: 'band_lateral_raise',
+      plank_variations: 'plank_form',
+      leg_raises: 'lying_leg_raise',
+      burpees: 'burpee_form',
+      jump_squats: 'jump_squat',
+      mountain_climbers: 'mountain_climber',
+      sprint_intervals: 'interval_running',
+      mobility_work: 'mobility_routine',
+      stretching: 'full_body_stretch',
+      light_cardio: 'walking_cardio',
+      sleep_requirement: 'sleep_hygiene',
+      boss_pushups: 'pushup_basics',
+      boss_squats: 'squat_form',
+      boss_pullups: 'pullup_form',
+      boss_burpees: 'burpee_form'
+    },
+    questTutorialIds: {
+      6: 'pushup_basics',
+      7: 'walking_cardio',
+      21: 'social_media_detox',
+      22: 'reading_focus',
+      23: 'guided_meditation'
+    },
+    questTutorialQueries: {
+      pushups_main: 'push up proper form tutorial bodyweight',
+      dips: 'bench dips proper form tutorial',
+      diamond_pushups: 'diamond push up proper form tutorial',
+      plank_hold: 'plank proper form tutorial',
+      pullups: 'pull up proper form tutorial',
+      rows: 'inverted row proper form tutorial',
+      band_curls: 'resistance band bicep curl proper form tutorial',
+      dead_hangs: 'dead hang grip training tutorial',
+      squats: 'bodyweight squat proper form tutorial',
+      lunges: 'bodyweight lunge proper form tutorial',
+      wall_sit: 'wall sit proper form tutorial',
+      calf_raises: 'standing calf raise proper form tutorial',
+      pike_pushups: 'pike push up proper form tutorial',
+      lateral_raises: 'resistance band lateral raise proper form tutorial',
+      plank_variations: 'plank variations tutorial',
+      leg_raises: 'lying leg raise proper form tutorial',
+      burpees: 'burpee proper form tutorial',
+      jump_squats: 'jump squat proper form tutorial',
+      mountain_climbers: 'mountain climber proper form tutorial',
+      sprint_intervals: 'sprint interval workout tutorial',
+      mobility_work: 'full body mobility routine tutorial',
+      stretching: 'full body stretching routine tutorial',
+      light_cardio: 'low intensity cardio workout tutorial',
+      sleep_requirement: 'sleep hygiene recovery routine tutorial',
+      boss_pushups: 'push up proper form tutorial bodyweight',
+      boss_squats: 'bodyweight squat proper form tutorial',
+      boss_pullups: 'pull up proper form tutorial',
+      boss_burpees: 'burpee proper form tutorial'
+    },
+    questTutorialQueriesById: {
+      6: 'weighted push up proper form tutorial',
+      7: 'walking posture and daily step goal tutorial',
+      21: 'dopamine detox no social media challenge tutorial',
+      22: 'how to read with focus and concentration tutorial',
+      23: '10 minute meditation for beginners'
+    },
     focusBuildProfiles: {
       aesthetic: {
         label: 'Aesthetic Build',
@@ -283,6 +515,8 @@ function soloLevelingApp() {
       text: ''
     },
     showAbandonModal: false,
+    showQuestTutorialModal: false,
+    activeQuestTutorial: null,
     showResetProgressModal: false,
     logs: [],
     backendSyncTimer: null,
@@ -293,6 +527,11 @@ function soloLevelingApp() {
     speechVoiceName: '',
     speechPrimed: false,
     questReminderWindowMs: 60 * 60 * 1000,
+    questReminderNotificationId: 11001,
+    questReminderChannelId: 'daily-quest-reminders',
+    questReminderChannelReady: false,
+    questReminderSyncSignature: '',
+    questReminderAppListenerBound: false,
 
     init() {
       if (typeof window !== 'undefined') {
@@ -427,6 +666,7 @@ function soloLevelingApp() {
       this.syncStatUnlockQuests();
       this.syncRaidTasksWithDungeon();
       this.recomputeProgressFromCurrentXp();
+      this.syncNativeQuestReminder(true).catch(() => {});
     },
 
     save(options = {}) {
@@ -458,6 +698,7 @@ function soloLevelingApp() {
         };
         localStorage.setItem(stateKey, JSON.stringify(slimState));
       }
+      this.syncNativeQuestReminder().catch(() => {});
       if (!skipBackendSync) {
         this.scheduleBackendSync();
       }
@@ -2035,6 +2276,69 @@ function soloLevelingApp() {
       return quest.note || '';
     },
 
+    questTutorialQuery(quest) {
+      if (!quest) return '';
+      const byKey = quest.key ? this.questTutorialQueries[quest.key] : '';
+      const byId = Number.isFinite(quest.id) ? this.questTutorialQueriesById[quest.id] : '';
+      if (byKey) return byKey;
+      if (byId) return byId;
+      const fallbackTitle = String(quest.title || '').replace(/[^\w\s-]+/g, ' ').trim();
+      return fallbackTitle ? `${fallbackTitle} tutorial` : '';
+    },
+
+    questTutorial(quest) {
+      if (!quest) return null;
+      const tutorialId =
+        (quest.key && this.questTutorialKeys[quest.key])
+        || (Number.isFinite(quest.id) ? this.questTutorialIds[quest.id] : '');
+      if (tutorialId && this.questTutorialLibrary[tutorialId]) {
+        return this.questTutorialLibrary[tutorialId];
+      }
+      const query = this.questTutorialQuery(quest);
+      if (!query) return null;
+      return {
+        title: `${String(quest.title || 'Quest').trim()} tutorial search`,
+        sourceLabel: 'YouTube Search',
+        watchUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`,
+        embedUrl: ''
+      };
+    },
+
+    questTutorialUrl(quest) {
+      return this.questTutorial(quest)?.watchUrl || '';
+    },
+
+    questTutorialHint(quest) {
+      const tutorial = this.questTutorial(quest);
+      if (!tutorial) return '';
+      if (!tutorial.embedUrl) {
+        return 'Fallback web source: YouTube search';
+      }
+      return `Curated from web: ${tutorial.sourceLabel} video`;
+    },
+
+    questTutorialButtonLabel(quest) {
+      return this.questTutorial(quest)?.embedUrl ? 'Watch tutorial' : 'Open search';
+    },
+
+    openQuestTutorial(quest) {
+      const tutorial = this.questTutorial(quest);
+      if (!tutorial) return;
+      if (!tutorial.embedUrl) {
+        if (typeof window !== 'undefined' && tutorial.watchUrl) {
+          window.open(tutorial.watchUrl, '_blank', 'noopener,noreferrer');
+        }
+        return;
+      }
+      this.activeQuestTutorial = tutorial;
+      this.showQuestTutorialModal = true;
+    },
+
+    closeQuestTutorial() {
+      this.showQuestTutorialModal = false;
+      this.activeQuestTutorial = null;
+    },
+
     syncModeSpecificQuests() {
       if (!Array.isArray(this.quests)) this.quests = [];
       const hasMindMode = this.meta.dailyMode === 'hard' || this.meta.dailyMode === 'extreme';
@@ -3311,6 +3615,113 @@ function soloLevelingApp() {
       }
     },
 
+    localNotificationsPlugin() {
+      return window?.Capacitor?.Plugins?.LocalNotifications || null;
+    },
+
+    isNativeApp() {
+      if (typeof window === 'undefined' || !window.Capacitor) return false;
+      if (typeof window.Capacitor.isNativePlatform === 'function') {
+        return window.Capacitor.isNativePlatform();
+      }
+      if (typeof window.Capacitor.getPlatform === 'function') {
+        return window.Capacitor.getPlatform() !== 'web';
+      }
+      return false;
+    },
+
+    shouldMaintainNativeQuestReminder() {
+      if (!this.isNativeApp()) return false;
+      if (!this.isFocusBuildSelected() || !this.isDailyModeSelected()) return false;
+      if (!Array.isArray(this.quests) || this.quests.length === 0) return false;
+      return !this.allDailyQuestsComplete();
+    },
+
+    nativeQuestReminderAt() {
+      if (!this.shouldMaintainNativeQuestReminder()) return null;
+      const remainingMs = this.timeUntilDailyResetMs();
+      if (!Number.isFinite(remainingMs) || remainingMs <= this.questReminderWindowMs) {
+        return null;
+      }
+      return new Date(Date.now() + remainingMs - this.questReminderWindowMs);
+    },
+
+    async ensureNativeQuestReminderChannel() {
+      if (this.questReminderChannelReady) return;
+      const localNotifications = this.localNotificationsPlugin();
+      if (!localNotifications || typeof localNotifications.createChannel !== 'function') return;
+      try {
+        await localNotifications.createChannel({
+          id: this.questReminderChannelId,
+          name: 'Daily Quest Reminders',
+          description: 'Reminders before the daily quest reset.',
+          importance: 4,
+          visibility: 1,
+          vibration: true,
+          lights: true,
+          lightColor: '#22d3ee'
+        });
+        this.questReminderChannelReady = true;
+      } catch (_) {
+        // Ignore channel creation failures; default channel is an acceptable fallback.
+      }
+    },
+
+    async syncNativeQuestReminder(force = false) {
+      const localNotifications = this.localNotificationsPlugin();
+      if (!localNotifications || !this.isNativeApp()) return;
+
+      const reminderAt = this.nativeQuestReminderAt();
+      const signature = reminderAt
+        ? `schedule:${this.todayDateKey()}:${reminderAt.toISOString()}`
+        : `cancel:${this.todayDateKey()}:${this.isFocusBuildSelected()}:${this.isDailyModeSelected()}:${this.allDailyQuestsComplete()}`;
+      if (!force && this.questReminderSyncSignature === signature) return;
+      this.questReminderSyncSignature = signature;
+
+      try {
+        if (typeof localNotifications.cancel === 'function') {
+          await localNotifications.cancel({
+            notifications: [{ id: this.questReminderNotificationId }]
+          });
+        }
+      } catch (_) {
+        // Ignore cancellation failures and continue with best-effort scheduling.
+      }
+
+      if (!reminderAt) return;
+
+      try {
+        const permission = typeof localNotifications.checkPermissions === 'function'
+          ? await localNotifications.checkPermissions()
+          : { display: 'prompt' };
+        if (permission?.display !== 'granted') return;
+        await this.ensureNativeQuestReminderChannel();
+        if (typeof localNotifications.schedule !== 'function') return;
+        await localNotifications.schedule({
+          notifications: [
+            {
+              id: this.questReminderNotificationId,
+              title: 'Daily Quest Reminder',
+              body: 'Daily directives are still incomplete. 1 hour left before reset.',
+              largeBody: 'Daily directives are still incomplete. Return to Ascendra and finish your quests before the daily reset.',
+              summaryText: 'Ascendra quest reset',
+              channelId: this.questReminderChannelId,
+              schedule: {
+                at: reminderAt,
+                allowWhileIdle: true
+              },
+              extra: {
+                type: 'daily-quest-reminder',
+                dayKey: this.todayDateKey()
+              }
+            }
+          ]
+        });
+      } catch (_) {
+        // Ignore native scheduling failures; the in-app reminder still acts as fallback.
+      }
+    },
+
     initializeQuestReminderNotifications() {
       if (typeof window === 'undefined') return;
       const primePermission = () => {
@@ -3318,6 +3729,18 @@ function soloLevelingApp() {
       };
       window.addEventListener('pointerdown', primePermission, { once: true });
       window.addEventListener('keydown', primePermission, { once: true });
+      if (!this.questReminderAppListenerBound) {
+        const appPlugin = window?.Capacitor?.Plugins?.App;
+        if (appPlugin && typeof appPlugin.addListener === 'function') {
+          appPlugin.addListener('appStateChange', ({ isActive }) => {
+            if (!isActive) return;
+            this.applyDailyResets();
+            this.syncNativeQuestReminder(true).catch(() => {});
+          });
+          this.questReminderAppListenerBound = true;
+        }
+      }
+      this.syncNativeQuestReminder().catch(() => {});
     },
 
     async ensureQuestReminderPermissions() {
@@ -3335,6 +3758,8 @@ function soloLevelingApp() {
         if (permission?.display !== 'granted' && typeof localNotifications.requestPermissions === 'function') {
           await localNotifications.requestPermissions();
         }
+        await this.ensureNativeQuestReminderChannel();
+        await this.syncNativeQuestReminder(true);
       } catch (_) {
         // Ignore native notification permission failures.
       }
