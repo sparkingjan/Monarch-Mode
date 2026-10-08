@@ -1,179 +1,358 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ascendra - Sign Up</title>
-  <link rel="icon" type="image/png" href="logo.png" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ascendra - Sign Up</title>
+<link rel="icon" type="image/png" href="logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #01020a;
+    --abyss: #040715;
+    --deep: #080e22;
+    --ice: #7eb8d4;
+    --ice-bright: #a8d8f0;
+    --ice-glow: #4a9fc8;
+    --silver: #c8d8e8;
+    --white: #f0f4f8;
+    --gold: #c9a96e;
+    --crimson: #8b1a2e;
+    --green: #4caf82;
+    --border: rgba(126,184,212,0.12);
+    --border-h: rgba(126,184,212,0.28);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--void);color:var(--silver);font-family:'Rajdhani',sans-serif;overflow-x:hidden;min-height:100vh;cursor:none;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+
+  .cursor{position:fixed;width:8px;height:8px;background:var(--ice-bright);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s;mix-blend-mode:screen;}
+  .cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(126,184,212,0.5);border-radius:50%;pointer-events:none;z-index:9998;transition:width 0.3s,height 0.3s,border-color 0.3s;}
+
+  .bg-fixed{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 100% 100% at 50% 50%,#080e22 0%,#040715 45%,#01020a 100%);}
+  .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(126,184,212,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(126,184,212,0.025) 1px,transparent 1px);background-size:60px 60px;}
+  .scanlines{position:fixed;inset:0;z-index:1000;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);}
+  .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 100% 100% at 50% 50%,transparent 30%,rgba(1,2,10,0.92) 100%);}
+
+  .rune-field{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:1;}
+  .rune-ring{position:absolute;border-radius:50%;top:50%;left:50%;}
+  .r1{width:900px;height:900px;margin:-450px 0 0 -450px;border:1px dashed rgba(201,169,110,0.03);animation:spin 100s linear infinite;}
+  .r2{width:620px;height:620px;margin:-310px 0 0 -310px;border:1px solid rgba(201,169,110,0.05);animation:spin-r 65s linear infinite;}
+  .r3{width:380px;height:380px;margin:-190px 0 0 -190px;border:1px dashed rgba(201,169,110,0.07);animation:spin 45s linear infinite;}
+  @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  @keyframes spin-r{from{transform:rotate(0deg);}to{transform:rotate(-360deg);}}
+
+  .particle{position:fixed;border-radius:50%;pointer-events:none;z-index:1;opacity:0;animation:float-p var(--dur) var(--delay) infinite ease-in;}
+  @keyframes float-p{0%{opacity:0;transform:translateY(0);}15%{opacity:var(--op);}85%{opacity:var(--op);}100%{opacity:0;transform:translateY(-80px);}}
+
+  @keyframes reveal-up{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+  /* CARD */
+  .signup-card{position:relative;z-index:10;width:100%;max-width:500px;background:rgba(8,14,34,0.9);border:1px solid rgba(201,169,110,0.15);backdrop-filter:blur(24px);animation:reveal-up 1s 0.2s both;overflow:hidden;}
+  .signup-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),rgba(126,184,212,0.5),transparent);}
+  .signup-card::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(201,169,110,0.04) 0%,transparent 60%);pointer-events:none;}
+
+  /* LOGO */
+  .card-logo{padding:28px 40px 0;display:flex;align-items:center;justify-content:space-between;}
+  .logo-mark{font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:0.4em;color:var(--ice);text-decoration:none;}
+  .logo-back{font-size:9px;letter-spacing:0.3em;color:rgba(200,216,232,0.25);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color 0.3s;}
+  .logo-back:hover{color:var(--ice);}
+  .logo-back svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;}
+
+  /* HEADER */
+  .card-header{padding:20px 40px 24px;}
+  .card-eyebrow{font-size:9px;letter-spacing:0.5em;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+  .card-eyebrow::before{content:'';width:16px;height:1px;background:var(--gold);}
+  .card-title{font-family:'Cinzel',serif;font-size:36px;font-weight:600;letter-spacing:0.08em;color:var(--white);margin-bottom:6px;line-height:1;}
+  .card-sub{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:300;font-style:italic;color:rgba(200,216,232,0.4);}
+
+  /* FORM */
+  .card-form{padding:0 40px 36px;display:flex;flex-direction:column;gap:14px;}
+
+  .input-wrap{}
+  .input-label{font-size:9px;letter-spacing:0.4em;color:rgba(200,216,232,0.3);margin-bottom:6px;display:block;}
+  .input-field{width:100%;background:rgba(4,7,21,0.7);border:1px solid var(--border);color:var(--silver);font-family:'Rajdhani',sans-serif;font-size:14px;letter-spacing:0.08em;padding:14px 18px;outline:none;transition:border-color 0.3s,box-shadow 0.3s;-webkit-appearance:none;}
+  .input-field::placeholder{color:rgba(200,216,232,0.18);}
+  .input-field:focus{border-color:rgba(201,169,110,0.5);box-shadow:0 0 0 1px rgba(201,169,110,0.12),inset 0 0 20px rgba(201,169,110,0.02);}
+  .input-field.error{border-color:rgba(139,26,46,0.6);}
+  .input-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  select.input-field{appearance:none;}
+  select.input-field option{background:var(--abyss);}
+
+  /* GOAL GRID */
+  .goal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .goal-btn{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.15em;color:rgba(200,216,232,0.35);background:rgba(4,7,21,0.6);border:1px solid var(--border);padding:12px 8px;cursor:none;transition:all 0.3s;text-align:center;clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);}
+  .goal-btn:hover{border-color:var(--border-h);color:var(--silver);}
+  .goal-btn.selected{border-color:var(--gold);color:var(--gold);background:rgba(201,169,110,0.08);}
+
+  /* BUTTONS */
+  .btn-primary{font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:0.3em;color:var(--void);background:var(--gold);border:none;padding:15px;cursor:none;position:relative;overflow:hidden;transition:transform 0.2s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);width:100%;}
+  .btn-primary::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);transition:left 0.5s;}
+  .btn-primary:hover::after{left:100%;}
+  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-primary:active{transform:scale(0.98);}
+  .btn-primary.loading{opacity:0.7;pointer-events:none;}
+
+  /* ERROR MSG */
+  .error-msg{font-size:10px;color:rgba(139,26,46,0.8);letter-spacing:0.1em;display:none;align-items:center;gap:6px;padding:10px 14px;border:1px solid rgba(139,26,46,0.25);background:rgba(139,26,46,0.06);}
+  .error-msg.show{display:flex;}
+  .error-msg::before{content:'⚠';}
+
+  /* FOOTER LINKS */
+  .card-footer{padding:16px 40px 28px;border-top:1px solid rgba(126,184,212,0.06);}
+  .footer-link-text{font-size:11px;color:rgba(200,216,232,0.3);letter-spacing:0.05em;}
+  .footer-link{color:var(--ice-glow);text-decoration:none;transition:color 0.3s;}
+  .footer-link:hover{color:var(--ice-bright);}
+  a,button{cursor:none;}
+  @media(max-width:480px){.card-logo,.card-header,.card-form,.card-footer{padding-left:20px;padding-right:20px;}.card-logo,.card-footer{flex-wrap:wrap;gap:12px;}.card-title{font-size:30px;}.input-field{min-width:0;font-size:16px;}.input-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}.goal-grid{grid-template-columns:1fr;}}
+</style>
 </head>
-<body class="bg-abyss text-slate-100 min-h-screen">
-  <div class="bg-grid"></div>
+<body>
 
-  <main class="auth-shell relative z-10">
-    <section class="auth-card">
-      <p class="text-cyan-300 tracking-[0.2em] uppercase text-xs">Hunter Registration</p>
-      <h1 class="title-font text-3xl mt-2">Sign Up</h1>
-      <p class="text-slate-400 mt-1 text-sm">Create your account and set body metrics so AI can personalize your nutrition targets.</p>
+<div class="bg-fixed"></div>
+<div class="bg-grid"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="rune-field">
+  <div class="rune-ring r1"></div>
+  <div class="rune-ring r2"></div>
+  <div class="rune-ring r3"></div>
+</div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
-      <form id="signup-form" class="mt-5 space-y-3" action="#" method="post">
-        <input class="auth-input" type="text" name="name" placeholder="Name" required />
-        <input class="auth-input" type="email" name="email" placeholder="Email" required />
-        <input class="auth-input" type="password" name="password" placeholder="Password" required />
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <input class="auth-input" type="number" name="heightCm" min="120" max="230" step="1" placeholder="Height (cm)" required />
-          <input class="auth-input" type="number" name="weightKg" min="35" max="250" step="1" placeholder="Weight (kg)" required />
+<div class="signup-card">
+
+  <div class="card-logo">
+    <a href="index.html" class="logo-mark">ASCENDRA</a>
+    <a href="login.html" class="logo-back">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      BACK TO LOGIN
+    </a>
+  </div>
+
+  <div class="card-header">
+    <div class="card-eyebrow">HUNTER REGISTRATION</div>
+    <div class="card-title">AWAKEN</div>
+    <div class="card-sub">Create your account and set body metrics so AI can personalize your nutrition targets.</div>
+  </div>
+
+  <div class="card-form">
+    <div class="error-msg" id="signup-error"></div>
+
+    <form id="signup-form" style="display:contents;" action="#" method="post">
+      <div class="input-wrap">
+        <label class="input-label">NAME</label>
+        <input class="input-field" type="text" name="name" placeholder="Hunter Name" required>
+      </div>
+
+      <div class="input-wrap">
+        <label class="input-label">EMAIL</label>
+        <input class="input-field" type="email" name="email" placeholder="hunter@ascendra.com" required>
+      </div>
+
+      <div class="input-wrap">
+        <label class="input-label">PASSWORD</label>
+        <input class="input-field" type="password" name="password" placeholder="••••••••••" required>
+      </div>
+
+      <div class="input-row">
+        <div class="input-wrap">
+          <label class="input-label">HEIGHT (CM)</label>
+          <input class="input-field" type="number" name="heightCm" min="120" max="230" step="1" placeholder="Height (cm)" required>
         </div>
-        <select class="auth-input" name="goal" required>
-          <option value="maintain">Goal: Maintain / Recomp</option>
-          <option value="cut">Goal: Fat Loss</option>
-          <option value="bulk">Goal: Lean Bulk</option>
-        </select>
-        <button type="submit" class="hero-cta w-full">CREATE ACCOUNT</button>
-      </form>
-      <p id="signup-error" class="text-sm text-rose-300 mt-3 hidden"></p>
+        <div class="input-wrap">
+          <label class="input-label">WEIGHT (KG)</label>
+          <input class="input-field" type="number" name="weightKg" min="35" max="250" step="1" placeholder="Weight (kg)" required>
+        </div>
+      </div>
 
-      <p class="text-sm text-slate-300 mt-4">
-        Already registered? <a class="auth-link" href="login.html">Login</a>
-      </p>
-      <p class="text-sm text-slate-400 mt-2">
-        <a class="auth-link" href="index.html">Back to Main</a>
-      </p>
-    </section>
-  </main>
-  <script src="web-config.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script>
-    (function () {
-      const form = document.getElementById('signup-form');
-      const errorEl = document.getElementById('signup-error');
-      if (!form) return;
+      <div class="input-wrap">
+        <label class="input-label">BUILD FOCUS</label>
+        <div class="goal-grid" id="goalGrid">
+          <button type="button" class="goal-btn" data-goal="maintain" onclick="selectGoal(this,'maintain')">MAINTAIN</button>
+          <button type="button" class="goal-btn" data-goal="cut" onclick="selectGoal(this,'cut')">CUT</button>
+          <button type="button" class="goal-btn selected" data-goal="bulk" onclick="selectGoal(this,'bulk')">LEAN BULK</button>
+        </div>
+        <input type="hidden" name="goal" id="goalInput" value="bulk">
+      </div>
 
-      const cfg = window.MONARCH_CONFIG || {};
-      const firebaseCfg = cfg.firebase || {};
-      const hasFirebaseCfg = Boolean(firebaseCfg.apiKey && firebaseCfg.authDomain && firebaseCfg.projectId);
+      <button type="submit" class="btn-primary" id="signupBtn">CREATE ACCOUNT</button>
+    </form>
+  </div>
 
-      function showError(message) {
-        if (!errorEl) return;
-        errorEl.textContent = message;
-        errorEl.classList.remove('hidden');
-      }
+  <div class="card-footer">
+    <div class="footer-link-text">Already registered? <a href="login.html" class="footer-link">Login</a></div>
+  </div>
 
-      function createSessionId() {
-        const randomPart = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
-          ? crypto.randomUUID().replace(/-/g, '')
-          : (Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
-        return `sess_${Date.now().toString(36)}_${randomPart}`;
-      }
+</div>
 
-      async function ensureBackendProfile(idToken, sessionId) {
-        const baseUrl = cfg.backendBaseUrl || 'https://monarch-mode.vercel.app/api/v1';
-        const response = await fetch(baseUrl + '/users/me', {
-          method: 'GET',
-          headers: {
-            Authorization: 'Bearer ' + idToken,
-            'X-Monarch-Session': sessionId,
-            'X-Monarch-Claim-Session': '1'
-          }
-        });
-        if (!response.ok) {
-          throw new Error('Session initialization failed. Please try again.');
+<!-- EXTERNAL SCRIPTS -->
+<script src="web-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+<!-- GOAL SELECTOR -->
+<script>
+  function selectGoal(el, val) {
+    document.querySelectorAll('#goalGrid .goal-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('goalInput').value = val;
+  }
+</script>
+
+<!-- FIREBASE AUTH LOGIC (PRESERVED) -->
+<script>
+  (function () {
+    const form = document.getElementById('signup-form');
+    const errorEl = document.getElementById('signup-error');
+    if (!form) return;
+
+    const cfg = window.MONARCH_CONFIG || {};
+    const firebaseCfg = cfg.firebase || {};
+    const hasFirebaseCfg = Boolean(firebaseCfg.apiKey && firebaseCfg.authDomain && firebaseCfg.projectId);
+
+    function showError(message) {
+      if (!errorEl) return;
+      errorEl.textContent = message;
+      errorEl.classList.add('show');
+    }
+
+    function createSessionId() {
+      const randomPart = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+        ? crypto.randomUUID().replace(/-/g, '')
+        : (Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
+      return `sess_${Date.now().toString(36)}_${randomPart}`;
+    }
+
+    async function ensureBackendProfile(idToken, sessionId) {
+      const baseUrl = cfg.backendBaseUrl || 'https://monarch-mode.vercel.app/api/v1';
+      const response = await fetch(baseUrl + '/users/me', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer ' + idToken,
+          'X-Monarch-Session': sessionId,
+          'X-Monarch-Claim-Session': '1'
         }
-      }
-
-      async function updateBackendProfile(idToken, payload, sessionId) {
-        const baseUrl = cfg.backendBaseUrl || 'https://monarch-mode.vercel.app/api/v1';
-        const headers = {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + idToken
-        };
-        if (sessionId) {
-          headers['X-Monarch-Session'] = sessionId;
-        }
-        const response = await fetch(baseUrl + '/users/me/profile', {
-          method: 'PUT',
-          headers,
-          body: JSON.stringify({
-            name: payload.name,
-            height_cm: payload.heightCm,
-            weight_kg: payload.weightKg,
-            goal: payload.goal
-          })
-        });
-        if (!response.ok) {
-          throw new Error('Profile sync failed. Please try again.');
-        }
-      }
-
-      form.addEventListener('submit', function (event) {
-        event.preventDefault();
-        if (errorEl) errorEl.classList.add('hidden');
-
-        const payload = {
-          name: (form.elements.name?.value || '').trim(),
-          email: (form.elements.email?.value || '').trim(),
-          password: form.elements.password?.value || '',
-          heightCm: Number(form.elements.heightCm?.value || 0),
-          weightKg: Number(form.elements.weightKg?.value || 0),
-          goal: form.elements.goal?.value || 'maintain',
-          createdAt: new Date().toISOString()
-        };
-
-        if (!hasFirebaseCfg) {
-          showError('Firebase config missing: apiKey/authDomain/projectId in web-config.js');
-          return;
-        }
-
-        (async function run() {
-          try {
-            if (!firebase.apps.length) {
-              firebase.initializeApp(firebaseCfg);
-            }
-            const cred = await firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password);
-            await cred.user.updateProfile({ displayName: payload.name });
-            const idToken = await cred.user.getIdToken(true);
-            const sessionId = createSessionId();
-            localStorage.setItem('firebase-id-token', idToken);
-            localStorage.setItem('monarch-session-id', sessionId);
-
-            localStorage.setItem('hunter-account-profile', JSON.stringify({
-              uid: cred.user.uid,
-              name: payload.name,
-              email: payload.email,
-              galleryUrls: [],
-              heightCm: payload.heightCm,
-              weightKg: payload.weightKg,
-              goal: payload.goal,
-              createdAt: payload.createdAt
-            }));
-
-            await ensureBackendProfile(idToken, sessionId);
-            await updateBackendProfile(idToken, payload, sessionId);
-            window.location.href = 'index.html';
-          } catch (error) {
-            const code = error?.code || '';
-            if (code === 'auth/email-already-in-use') {
-              showError('Email already exists. Please login or use another email.');
-              return;
-            }
-            showError(error?.message || 'Signup failed.');
-          }
-        }());
       });
-    }());
-  </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
-  <script defer src="lenis-init.js"></script>
+      if (!response.ok) {
+        throw new Error('Session initialization failed. Please try again.');
+      }
+    }
+
+    async function updateBackendProfile(idToken, payload, sessionId) {
+      const baseUrl = cfg.backendBaseUrl || 'https://monarch-mode.vercel.app/api/v1';
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + idToken
+      };
+      if (sessionId) {
+        headers['X-Monarch-Session'] = sessionId;
+      }
+      const response = await fetch(baseUrl + '/users/me/profile', {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          name: payload.name,
+          height_cm: payload.heightCm,
+          weight_kg: payload.weightKg,
+          goal: payload.goal
+        })
+      });
+      if (!response.ok) {
+        throw new Error('Profile sync failed. Please try again.');
+      }
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (errorEl) errorEl.classList.remove('show');
+
+      const payload = {
+        name: (form.elements.name?.value || '').trim(),
+        email: (form.elements.email?.value || '').trim(),
+        password: form.elements.password?.value || '',
+        heightCm: Number(form.elements.heightCm?.value || 0),
+        weightKg: Number(form.elements.weightKg?.value || 0),
+        goal: form.elements.goal?.value || 'maintain',
+        createdAt: new Date().toISOString()
+      };
+
+      if (!hasFirebaseCfg) {
+        showError('Firebase config missing: apiKey/authDomain/projectId in web-config.js');
+        return;
+      }
+
+      (async function run() {
+        try {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseCfg);
+          }
+          const cred = await firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password);
+          await cred.user.updateProfile({ displayName: payload.name });
+          const idToken = await cred.user.getIdToken(true);
+          const sessionId = createSessionId();
+          localStorage.setItem('firebase-id-token', idToken);
+          localStorage.setItem('monarch-session-id', sessionId);
+
+          localStorage.setItem('hunter-account-profile', JSON.stringify({
+            uid: cred.user.uid,
+            name: payload.name,
+            email: payload.email,
+            galleryUrls: [],
+            heightCm: payload.heightCm,
+            weightKg: payload.weightKg,
+            goal: payload.goal,
+            createdAt: payload.createdAt
+          }));
+
+          await ensureBackendProfile(idToken, sessionId);
+          await updateBackendProfile(idToken, payload, sessionId);
+          window.location.href = 'index.html';
+        } catch (error) {
+          const code = error?.code || '';
+          if (code === 'auth/email-already-in-use') {
+            showError('Email already exists. Please login or use another email.');
+            return;
+          }
+          showError(error?.message || 'Signup failed.');
+        }
+      }());
+    });
+  }());
+</script>
+
+<!-- CURSOR + PARTICLES -->
+<script>
+  (function() {
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    if (!cursor || !ring) return;
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx - 4 + 'px';
+      cursor.style.top  = my - 4 + 'px';
+    });
+    (function animRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx - 16 + 'px';
+      ring.style.top  = ry - 16 + 'px';
+      requestAnimationFrame(animRing);
+    })();
+    document.querySelectorAll('a,button,.input-field,.goal-btn').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.transform = 'scale(2)'; ring.style.width = '44px'; ring.style.height = '44px'; ring.style.borderColor = 'rgba(201,169,110,0.8)'; });
+      el.addEventListener('mouseleave', () => { cursor.style.transform = 'scale(1)'; ring.style.width = '32px'; ring.style.height = '32px'; ring.style.borderColor = 'rgba(126,184,212,0.5)'; });
+    });
+
+    // particles
+    for (let i = 0; i < 25; i++) {
+      const p = document.createElement('div'); p.className = 'particle';
+      p.style.cssText = `left:${Math.random()*100}%;bottom:${Math.random()*40}%;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;background:rgba(201,169,110,0.6);--dur:${6+Math.random()*10}s;--delay:${Math.random()*8}s;--op:${0.06+Math.random()*0.18};`;
+      document.body.appendChild(p);
+    }
+  })();
+</script>
 </body>
 </html>
-
-
-
-
-
-

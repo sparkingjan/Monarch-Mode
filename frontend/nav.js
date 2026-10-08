@@ -8,6 +8,7 @@
       nav.classList.toggle('is-open', open);
       document.body.classList.toggle('nav-menu-open', open);
       button.setAttribute('aria-expanded', open ? 'true' : 'false');
+      button.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     }
 
     // Ensure stale classes from bfcache/history restore do not block page taps.
@@ -38,6 +39,13 @@
       const target = event.target;
       if (button.contains(target) || nav.contains(target)) return;
       setMenuOpen(false);
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && nav.classList.contains('is-open')) {
+        setMenuOpen(false);
+        button.focus();
+      }
     });
 
     window.addEventListener('resize', function () {

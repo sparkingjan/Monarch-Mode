@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
@@ -9,158 +9,376 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root{--void:#01020a;--abyss:#040715;--deep:#080e22;--shadow:#0d1535;--ice:#7eb8d4;--ice-bright:#a8d8f0;--ice-glow:#4a9fc8;--silver:#c8d8e8;--white:#f0f4f8;--gold:#c9a96e;--crimson:#8b1a2e;--green:#4caf82;--green-soft:rgba(76,175,130,0.12);--panel:rgba(8,14,34,0.85);--border:rgba(126,184,212,0.1);--border-hover:rgba(126,184,212,0.25);}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--void)!important;color:var(--silver)!important;font-family:'Rajdhani',sans-serif!important;overflow-x:hidden;min-height:100vh;cursor:none;}
+    .cursor{position:fixed;width:8px;height:8px;background:var(--ice-bright);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s;mix-blend-mode:screen;}
+    .cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(126,184,212,0.5);border-radius:50%;pointer-events:none;z-index:9998;transition:width 0.3s,height 0.3s,border-color 0.3s;}
+    .bg-fixed{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 20% 30%,#080e22 0%,#040715 50%,#01020a 100%);pointer-events:none;}
+    .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(126,184,212,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(126,184,212,0.025) 1px,transparent 1px)!important;background-size:60px 60px!important;mask-image:radial-gradient(ellipse 100% 100% at 50% 0%,black 0%,transparent 80%)!important;}
+    .scanlines{position:fixed;inset:0;z-index:1000;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px)!important;}
+    .vignette{position:fixed;inset:0;z-index:999;pointer-events:none;background:radial-gradient(ellipse 100% 100% at 50% 50%,transparent 50%,rgba(1,2,10,0.7) 100%)!important;}
+    /* NAV */
+    /* PAGE */
+    .page{position:relative;z-index:10;padding:36px 40px 60px;max-width:1200px;margin:0 auto;}
+    @keyframes reveal-up{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+    .page-header{margin-bottom:40px;animation:reveal-up 0.8s 0.2s both;}
+    .page-eyebrow{font-size:10px;letter-spacing:0.5em;color:var(--ice-glow);margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+    .page-eyebrow::before{content:'';width:24px;height:1px;background:var(--ice-glow);}
+    .page-title{font-family:'Cinzel',serif;font-size:clamp(28px,4vw,48px);font-weight:600;letter-spacing:0.1em;color:var(--white);margin-bottom:8px;}
+    .page-sub{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;font-style:italic;color:rgba(200,216,232,0.45);}
+    /* STATUS BANNER */
+    .status-banner{display:flex;align-items:center;gap:12px;padding:12px 24px;margin-bottom:32px;border:1px solid rgba(76,175,130,0.25);background:var(--green-soft);animation:reveal-up 0.8s 0.3s both;position:relative;overflow:hidden;}
+    .status-banner::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--green);}
+    .status-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse-green 2s infinite;flex-shrink:0;}
+    @keyframes pulse-green{0%,100%{box-shadow:0 0 0 0 rgba(76,175,130,0.5);}50%{box-shadow:0 0 0 5px rgba(76,175,130,0);}}
+    .status-text{font-size:12px;letter-spacing:0.2em;color:var(--green);font-weight:600;text-transform:uppercase;}
+    /* XP CARDS */
+    .xp-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-bottom:24px;animation:reveal-up 0.8s 0.4s both;}
+    .xp-card{background:var(--abyss);padding:28px 28px 24px;position:relative;overflow:hidden;cursor:none;transition:background 0.3s;}
+    .xp-card:hover{background:var(--deep);}
+    .xp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ice-glow),transparent);opacity:0;transition:opacity 0.3s;}
+    .xp-card:hover::before{opacity:1;}
+    .xp-ghost{position:absolute;top:12px;right:16px;font-family:'Cinzel',serif;font-size:44px;font-weight:900;color:rgba(126,184,212,0.04);line-height:1;}
+    .xp-label{font-size:9px;letter-spacing:0.45em;color:rgba(200,216,232,0.3);margin-bottom:12px;text-transform:uppercase;}
+    .xp-val{font-family:'Cinzel',serif;font-size:48px;font-weight:900;color:var(--white);line-height:1;margin-bottom:8px;}
+    .xp-sub{font-size:12px;color:rgba(200,216,232,0.35);letter-spacing:0.1em;margin-bottom:16px;}
+    .xp-mini-track{height:2px;background:rgba(126,184,212,0.08);}
+    .xp-mini-fill{height:100%;background:var(--ice-glow);transition:width 1.5s 1s cubic-bezier(0.16,1,0.3,1);}
+    /* AI PANEL */
+    .ai-panel{background:var(--panel);border:1px solid var(--border);position:relative;overflow:hidden;margin-bottom:24px;animation:reveal-up 0.8s 0.5s both;}
+    .ai-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(126,184,212,0.3),rgba(201,169,110,0.2),transparent);}
+    .ai-inner{padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;}
+    .ai-left{flex:1;min-width:200px;}
+    .ai-tag{font-size:9px;letter-spacing:0.5em;color:var(--ice-glow);margin-bottom:8px;text-transform:uppercase;}
+    .ai-title{font-family:'Cinzel',serif;font-size:18px;font-weight:600;letter-spacing:0.1em;color:var(--white);margin-bottom:6px;}
+    .ai-desc{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:300;font-style:italic;color:rgba(200,216,232,0.45);}
+    .btn-primary{font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:0.25em;color:var(--void);background:var(--ice-bright);border:none;padding:14px 28px;cursor:none;white-space:nowrap;position:relative;overflow:hidden;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:transform 0.3s;}
+    .btn-primary::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent);transition:left 0.5s;}
+    .btn-primary:hover::after{left:100%;}
+    .btn-primary:hover{transform:translateY(-2px);}
+    .btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+    .btn-secondary{font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:0.25em;color:var(--ice);background:transparent;border:1px solid rgba(126,184,212,0.3);padding:13px 28px;cursor:none;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all 0.3s;display:inline-block;}
+    .btn-secondary:hover{border-color:var(--ice);background:rgba(126,184,212,0.08);transform:translateY(-2px);}
+    .btn-secondary:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+    /* MACRO TRACKER */
+    .macro-section{animation:reveal-up 0.8s 0.6s both;}
+    .section-label{font-size:10px;letter-spacing:0.45em;color:rgba(200,216,232,0.25);margin-bottom:16px;display:flex;align-items:center;gap:12px;text-transform:uppercase;}
+    .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+    .macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);margin-bottom:24px;}
+    .macro-card{background:var(--abyss);padding:24px 20px;text-align:center;cursor:none;transition:background 0.3s;position:relative;overflow:hidden;}
+    .macro-card:hover{background:var(--deep);}
+    .macro-card::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:var(--ice-glow);opacity:0;transition:opacity 0.3s;}
+    .macro-card:hover::after{opacity:0.5;}
+    .macro-icon{width:32px;height:32px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);transform:rotate(45deg);}
+    .macro-icon svg{width:14px;height:14px;stroke:var(--ice-glow);fill:none;stroke-width:1.5;transform:rotate(-45deg);}
+    .macro-name{font-size:9px;letter-spacing:0.4em;color:rgba(200,216,232,0.3);margin-bottom:8px;text-transform:uppercase;}
+    .macro-val{font-family:'Cinzel',serif;font-size:28px;font-weight:900;color:var(--white);line-height:1;margin-bottom:4px;}
+    .macro-unit{font-size:11px;color:rgba(200,216,232,0.3);letter-spacing:0.1em;}
+    .macro-bar-wrap{height:2px;background:rgba(126,184,212,0.08);margin-top:12px;}
+    .macro-bar{height:100%;background:var(--ice-glow);transition:width 1.5s 1.2s cubic-bezier(0.16,1,0.3,1);width:0%;}
+    /* HYDRATION */
+    .hydro-row{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:24px;}
+    .hydro-card{background:var(--abyss);padding:28px;cursor:none;transition:background 0.3s;}
+    .hydro-card:hover{background:var(--deep);}
+    .hydro-label{font-size:9px;letter-spacing:0.45em;color:rgba(200,216,232,0.3);margin-bottom:12px;text-transform:uppercase;}
+    .hydro-display{display:flex;align-items:flex-end;gap:8px;margin-bottom:16px;}
+    .hydro-val{font-family:'Cinzel',serif;font-size:42px;font-weight:900;color:var(--white);line-height:1;}
+    .hydro-unit{font-size:16px;color:rgba(200,216,232,0.4);margin-bottom:6px;letter-spacing:0.1em;}
+    .hydro-target{font-size:12px;color:var(--ice-glow);letter-spacing:0.1em;}
+    .hydro-track{height:3px;background:rgba(126,184,212,0.08);}
+    .hydro-fill{height:100%;background:linear-gradient(90deg,var(--ice-glow),var(--ice-bright));transition:width 1.5s 1.3s cubic-bezier(0.16,1,0.3,1);width:0%;box-shadow:0 0 8px var(--ice);}
+    .cups-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+    .cup{width:28px;height:36px;border:1px solid rgba(126,184,212,0.15);position:relative;cursor:none;transition:all 0.2s;clip-path:polygon(2px 0%,calc(100% - 2px) 0%,100% 100%,0% 100%);}
+    .cup.filled{background:rgba(126,184,212,0.2);border-color:var(--ice-glow);}
+    .cup.filled::after{content:'';position:absolute;bottom:3px;left:3px;right:3px;top:40%;background:rgba(126,184,212,0.4);}
+    .cup:hover{border-color:var(--ice);transform:translateY(-3px);}
+    /* MEAL LOG */
+    .meal-section{animation:reveal-up 0.8s 0.7s both;}
+    .meal-empty{background:var(--panel);border:1px solid var(--border);padding:48px;text-align:center;}
+    .meal-empty-icon{width:48px;height:48px;margin:0 auto 16px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transform:rotate(45deg);}
+    .meal-empty-icon svg{width:20px;height:20px;stroke:rgba(126,184,212,0.3);fill:none;stroke-width:1.2;transform:rotate(-45deg);}
+    .meal-empty-title{font-family:'Cinzel',serif;font-size:16px;color:rgba(200,216,232,0.3);letter-spacing:0.15em;margin-bottom:6px;}
+    .meal-empty-sub{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:rgba(200,216,232,0.2);}
+    /* MEAL CARD (AI plan) */
+    .meal-card{background:var(--abyss);border:1px solid var(--border);padding:16px 20px;margin-bottom:1px;transition:background 0.3s;}
+    .meal-card:hover{background:var(--deep);}
+    .meal-tier{font-size:10px;letter-spacing:0.2em;color:var(--ice);font-weight:600;}
+    .meal-food{font-size:14px;color:var(--white);margin-top:4px;}
+    .meal-xp{font-size:11px;color:var(--gold);font-weight:600;margin-top:4px;}
+    .meal-macros{font-size:11px;color:rgba(200,216,232,0.35);margin-top:4px;}
+    .meal-btn{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.15em;padding:6px 14px;border:1px solid var(--border);background:transparent;color:var(--ice-bright);cursor:none;transition:all 0.3s;}
+    .meal-btn:hover{border-color:var(--ice);background:rgba(126,184,212,0.06);}
+    .meal-btn.done{border-color:rgba(126,184,212,0.3);color:var(--ice-bright);background:rgba(126,184,212,0.06);opacity:0.7;cursor:not-allowed;}
+    /* DIET LOCK */
+    .diet-lock-banner{border:1px solid rgba(201,169,110,0.2);background:rgba(201,169,110,0.04);padding:18px 24px;position:relative;overflow:hidden;margin-bottom:24px;animation:reveal-up 0.8s 0.3s both;}
+    .diet-lock-banner::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold);}
+    .diet-lock-title{font-size:10px;letter-spacing:0.4em;color:var(--gold);margin-bottom:4px;font-weight:600;text-transform:uppercase;}
+    .diet-lock-text{font-family:'Cormorant Garamond',serif;font-size:15px;color:rgba(200,216,232,0.45);font-style:italic;}
+    .diet-lock-link{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.2em;color:var(--gold);border:1px solid rgba(201,169,110,0.3);padding:7px 16px;cursor:none;transition:all 0.3s;display:inline-block;margin-top:12px;text-decoration:none;clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);}
+    .diet-lock-link:hover{background:rgba(201,169,110,0.08);border-color:var(--gold);}
+    /* INFO PANEL */
+    .info-panel{background:var(--panel);border:1px solid var(--border);position:relative;overflow:hidden;margin-bottom:24px;animation:reveal-up 0.8s 0.5s both;}
+    .info-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-hover),transparent);}
+    .info-panel-inner{padding:20px 24px;}
+    .info-tag{font-size:9px;letter-spacing:0.45em;color:var(--ice-glow);margin-bottom:6px;text-transform:uppercase;}
+    .info-detail{font-size:12px;color:rgba(200,216,232,0.45);}
+    .info-detail .hl{color:var(--ice-bright);font-weight:600;}
+    .info-note{font-size:11px;color:rgba(200,216,232,0.3);margin-top:6px;}
+    /* STAT MINI */
+    .stat-mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);margin-top:12px;}
+    .stat-mini{background:var(--abyss);padding:12px 16px;}
+    .stat-mini-label{font-size:9px;letter-spacing:0.3em;color:rgba(200,216,232,0.3);text-transform:uppercase;}
+    .stat-mini-val{font-family:'Cinzel',serif;font-size:16px;font-weight:900;color:var(--ice-bright);}
+    /* FOOTER */
+    .page-footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;animation:reveal-up 0.8s 0.9s both;}
+    .footer-logo{font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.3em;color:rgba(200,216,232,0.2);}
+    .footer-right{font-size:10px;letter-spacing:0.3em;color:rgba(200,216,232,0.15);}
+    a,button{cursor:none;}
+    @media(max-width:768px){.page{padding:36px 20px 40px;}.macro-grid{grid-template-columns:repeat(2,1fr);}.hydro-row{grid-template-columns:1fr;}.xp-row{grid-template-columns:1fr;}}
+  </style>
 </head>
-<body class="bg-abyss text-slate-100 min-h-screen">
-  <div class="bg-grid"></div>
-  <a class="profile-link" href="login.html" aria-label="Open login">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M20 21a8 8 0 0 0-16 0"></path>
-      <circle cx="12" cy="8" r="4"></circle>
-    </svg>
-  </a>
+<body>
 
-  <main x-data="soloLevelingApp()" x-init="init()" class="relative z-10">
-    <div class="nav-shell">
-      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      <nav id="primary-nav" class="top-nav">
-        <a href="index.html">Main</a>
-        <a href="quests.html">Quests</a>
-        <a href="diet.html" class="active">Diet</a>
-        <a href="fitness.html">Looksmaxxing</a>
-        <a href="progress.html">Progress</a>
-        <a href="leaderboard.html">Leaderboard</a>
-      </nav>
+<div class="bg-fixed"></div>
+<div class="bg-grid"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<main x-data="soloLevelingApp()" x-init="init()" class="relative z-10">
+  <div class="nav-shell">
+      <a href="index.html" class="nav-logo">ASCENDRA</a>
+    <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="primary-nav" class="top-nav">
+      <a href="index.html">Main</a>
+      <a href="quests.html">Quests</a>
+      <a href="diet.html" class="active">Diet</a>
+      <a href="fitness.html">Looksmaxxing</a>
+      <a href="progress.html">Progress</a>
+      <a href="leaderboard.html">Leaderboard</a>
+    </nav>
+    <div><a class="profile-link" href="login.html" aria-label="Open login"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="8" r="4"></circle></svg></a></div>
+  </div>
+
+  <div class="page"><p class="account-data-status" role="status" x-text="dataStatusLabel()" style="padding:12px 20px;color:var(--ice);"></p>
+    <!-- HEADER -->
+    <div class="page-header">
+      <div class="page-eyebrow">SYSTEM MODULE</div>
+      <h1 class="page-title">MONARCH FUEL SYSTEM</h1>
+      <p class="page-sub">Diet system is active. Track your nutrition and hydration daily.</p>
     </div>
 
-    <section class="max-w-4xl mx-auto px-4 md:px-8 mt-8 pb-16">
-      <article class="panel rounded-2xl p-6 border border-slate-700">
-        <h1 class="title-font text-3xl md:text-4xl">Monarch Fuel System</h1>
-        <p class="text-sm text-slate-400 mt-2">Diet system is active. Track your nutrition and hydration daily.</p>
-        <div x-show="!isDietUnlocked()" class="mt-4 rounded-xl border border-warning/60 bg-warning/10 p-4">
-          <p class="text-xs uppercase tracking-[0.14em] text-warning">Diet Locked</p>
-          <p class="mt-2 text-sm text-slate-200">Select your Build Focus from Quests first. Diet targets will unlock and adapt automatically to your build and profile.</p>
-          <a href="quests.html" class="inline-block mt-3 rounded-lg px-3 py-1.5 text-xs font-semibold border border-warning/70 text-warning hover:bg-warning/10 transition">Go To Quests</a>
-        </div>
-        <div x-show="isDietUnlocked()" class="mt-4 grid gap-3 md:grid-cols-3">
-          <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3">
-            <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Strength XP</p>
-            <p class="mt-1 text-lg font-semibold text-rank"><span x-text="meta.dietStatXp.strength"></span></p>
-            <p class="text-xs text-slate-400">Carry: <span x-text="dietStatProgress('strength')"></span></p>
-          </div>
-          <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3">
-            <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Endurance XP</p>
-            <p class="mt-1 text-lg font-semibold text-rank"><span x-text="meta.dietStatXp.endurance"></span></p>
-            <p class="text-xs text-slate-400">Carry: <span x-text="dietStatProgress('endurance')"></span></p>
-          </div>
-          <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3">
-            <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Recovery XP</p>
-            <p class="mt-1 text-lg font-semibold text-rank"><span x-text="meta.dietStatXp.recovery"></span></p>
-            <p class="text-xs text-slate-400">Carry: <span x-text="dietStatProgress('recovery')"></span></p>
-          </div>
-        </div>
-        <div x-show="isDietUnlocked() && hasFreshAiDietPlan()" class="mt-5 grid gap-4 md:grid-cols-2">
-          <div class="rounded-xl border border-cyan-400/30 bg-cyan-500/5 p-4">
-            <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">AI Nutrition Plan</p>
-            <p class="mt-1 text-xs text-slate-400">
-              Based on
-              <span x-text="hunterProfile.heightCm || '--'"></span> cm /
-              <span x-text="hunterProfile.weightKg || '--'"></span> kg /
-              <span x-text="hunterProfile.goal || '--'"></span>
-            </p>
-            <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
-              <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-2">
-                <p class="text-[11px] text-slate-400 uppercase tracking-[0.12em]">Calories</p>
-                <p class="text-rank font-semibold" x-text="aiDietNutritionPlan().calories"></p>
-              </div>
-              <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-2">
-                <p class="text-[11px] text-slate-400 uppercase tracking-[0.12em]">Protein</p>
-                <p class="text-rank font-semibold"><span x-text="aiDietNutritionPlan().protein"></span>g</p>
-              </div>
-              <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-2">
-                <p class="text-[11px] text-slate-400 uppercase tracking-[0.12em]">Carbs</p>
-                <p class="text-rank font-semibold"><span x-text="aiDietNutritionPlan().carbs"></span>g</p>
-              </div>
-              <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-2">
-                <p class="text-[11px] text-slate-400 uppercase tracking-[0.12em]">Fat</p>
-                <p class="text-rank font-semibold"><span x-text="aiDietNutritionPlan().fat"></span>g</p>
-              </div>
-            </div>
-            <p class="mt-2 text-xs text-sky-300">Water Target: <span class="font-semibold" x-text="`${aiDietNutritionPlan().water_liters}L`"></span></p>
-            <p x-show="meta.aiDietPlanNote" class="mt-2 text-xs text-slate-300" x-text="meta.aiDietPlanNote"></p>
-          </div>
-          <div class="rounded-xl border border-cyan-400/30 bg-cyan-500/5 p-4">
-            <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">AI Meal Plan</p>
-            <div class="mt-3 space-y-2">
-              <template x-for="(meal, index) in aiDietMealPlan()" :key="meal.key">
-                <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3">
-                  <div class="flex items-start justify-between gap-2">
-                    <div>
-                      <p class="text-xs text-cyan-300 font-semibold" x-text="`Tier ${index + 1}`"></p>
-                      <p class="mt-1 text-sm text-slate-100" x-text="meal.food"></p>
-                    </div>
-                    <button
-                      @click="toggleDietMeal(meal.key)"
-                      :disabled="meal.done"
-                      class="rounded-lg px-2.5 py-1 text-[11px] font-semibold transition whitespace-nowrap"
-                      :class="meal.done ? 'border border-rank/60 text-rank bg-rank/10 opacity-80 cursor-not-allowed' : 'border border-slate-600 text-slate-200 hover:border-cyan-400 hover:text-cyan-300'"
-                      x-text="meal.done ? 'Completed' : 'Mark Complete'">
-                    </button>
-                  </div>
-                  <p class="mt-1 text-[11px] text-warning font-semibold" x-text="`+${meal.xp} ${dietStatLabel(meal.stat)} XP`"></p>
-                  <p class="mt-1 text-[11px] text-slate-400">
-                    <span x-text="`${meal.protein}g P`"></span>
-                    <span class="mx-1">|</span>
-                    <span x-text="`${meal.carbs}g C`"></span>
-                    <span class="mx-1">|</span>
-                    <span x-text="`${meal.calories} kcal`"></span>
-                  </p>
-                </div>
-              </template>
-            </div>
-          </div>
-        </div>
-        <div x-show="isDietUnlocked()" class="mt-5 rounded-xl border border-cyan-400/40 bg-cyan-500/5 p-4">
-          <div class="flex items-center justify-between gap-3">
-            <p class="text-sm text-slate-200">Need a fresh AI nutrition setup for today?</p>
-            <button
-              @click="generateDietPlan()"
-              :disabled="aiDietGenerationBusy || !canGenerateDietPlanToday()"
-              class="rounded-lg px-3 py-1.5 text-xs font-semibold transition"
-              :class="(aiDietGenerationBusy || !canGenerateDietPlanToday()) ? 'border border-cyan-400/30 text-cyan-200/60 bg-cyan-400/10 cursor-not-allowed' : 'border border-cyan-400/60 text-cyan-200 hover:bg-cyan-400/10'">
-              <span x-text="aiDietGenerationBusy ? 'Generating...' : (canGenerateDietPlanToday() ? 'Generate Diet Plan' : 'Available Tomorrow')"></span>
-            </button>
-          </div>
-          <p x-show="!hasFreshAiDietPlan()" class="mt-2 text-xs text-slate-400">Generate once to create your AI meal and nutrition plan from profile data.</p>
-          <p x-show="!canGenerateDietPlanToday()" class="mt-2 text-xs text-slate-400">Daily generation limit reached. Resets at 12:00 AM.</p>
-        </div>
-      </article>
-    </section>
-  </main>
+    <!-- DIET LOCKED -->
+    <div x-show="!isDietUnlocked()" class="diet-lock-banner">
+      <div class="diet-lock-title">&#9888; Diet Locked</div>
+      <div class="diet-lock-text">Select your Build Focus from Quests first. Diet targets will unlock and adapt automatically to your build and profile.</div>
+      <a href="quests.html" class="diet-lock-link">GO TO QUESTS</a>
+    </div>
 
-  <script src="web-config.js"></script>
-  <script src="auth-guard.js"></script>
-  <script src="app.js"></script>
-  <script src="nav.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
-  <script defer src="lenis-init.js"></script>
+    <!-- STATUS BANNER (shown when unlocked) -->
+    <div x-show="isDietUnlocked()" class="status-banner">
+      <div class="status-dot"></div>
+      <div class="status-text">Diet System Active — Tracking Enabled</div>
+    </div>
+
+    <!-- XP CARDS -->
+    <div x-show="isDietUnlocked()" class="xp-row">
+      <div class="xp-card">
+        <div class="xp-ghost">S</div>
+        <div class="xp-label">Strength XP</div>
+        <div class="xp-val" x-text="meta.dietStatXp.strength"></div>
+        <div class="xp-sub">Carry: <span x-text="dietStatProgress('strength')"></span></div>
+        <div class="xp-mini-track"><div class="xp-mini-fill" :style="`width:${dietStatPercent('strength')}%`"></div></div>
+      </div>
+      <div class="xp-card">
+        <div class="xp-ghost">E</div>
+        <div class="xp-label">Endurance XP</div>
+        <div class="xp-val" x-text="meta.dietStatXp.endurance"></div>
+        <div class="xp-sub">Carry: <span x-text="dietStatProgress('endurance')"></span></div>
+        <div class="xp-mini-track"><div class="xp-mini-fill" :style="`width:${dietStatPercent('endurance')}%`"></div></div>
+      </div>
+      <div class="xp-card">
+        <div class="xp-ghost">R</div>
+        <div class="xp-label">Recovery XP</div>
+        <div class="xp-val" x-text="meta.dietStatXp.recovery"></div>
+        <div class="xp-sub">Carry: <span x-text="dietStatProgress('recovery')"></span></div>
+        <div class="xp-mini-track"><div class="xp-mini-fill" :style="`width:${dietStatPercent('recovery')}%`"></div></div>
+      </div>
+    </div>
+
+    <!-- AI DIET PANEL (generate) -->
+    <div x-show="isDietUnlocked()" class="ai-panel">
+      <div class="ai-inner">
+        <div class="ai-left">
+          <div class="ai-tag">// AI Nutrition Engine</div>
+          <div class="ai-title">Need a fresh AI nutrition setup for today?</div>
+          <div class="ai-desc">Generate once to create your AI meal and nutrition plan from profile data.</div>
+          <p x-show="!canGenerateDietPlanToday()" class="info-note" style="margin-top:8px;">Daily generation limit reached. Resets at 12:00 AM.</p>
+        </div>
+        <button @click="generateDietPlan()" :disabled="aiDietGenerationBusy || !canGenerateDietPlanToday()" class="btn-primary">
+          <span x-text="aiDietGenerationBusy ? 'GENERATING...' : (canGenerateDietPlanToday() ? 'GENERATE DIET PLAN' : 'AVAILABLE TOMORROW')"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- AI NUTRITION + MEAL PLAN (two-col) -->
+    <div x-show="isDietUnlocked() && hasFreshAiDietPlan()" class="nutrition-plan-grid">
+      <!-- Nutrition panel -->
+      <div style="background:var(--abyss);padding:24px;">
+        <div class="info-tag">AI Nutrition Plan</div>
+        <p class="info-detail" style="margin-top:8px;">
+          Based on <span class="hl" x-text="hunterProfile.heightCm || '--'"></span> cm /
+          <span class="hl" x-text="hunterProfile.weightKg || '--'"></span> kg /
+          <span class="hl" x-text="hunterProfile.goal || '--'"></span>
+        </p>
+        <div class="stat-mini-grid" style="margin-top:16px;">
+          <div class="stat-mini"><div class="stat-mini-label">Calories</div><div class="stat-mini-val" x-text="aiDietNutritionPlan().calories"></div></div>
+          <div class="stat-mini"><div class="stat-mini-label">Protein</div><div class="stat-mini-val"><span x-text="aiDietNutritionPlan().protein"></span>g</div></div>
+          <div class="stat-mini"><div class="stat-mini-label">Carbs</div><div class="stat-mini-val"><span x-text="aiDietNutritionPlan().carbs"></span>g</div></div>
+          <div class="stat-mini"><div class="stat-mini-label">Fat</div><div class="stat-mini-val"><span x-text="aiDietNutritionPlan().fat"></span>g</div></div>
+        </div>
+        <p style="margin-top:12px;font-size:12px;color:var(--ice-glow);">Water Target: <span style="font-weight:700;" x-text="`${aiDietNutritionPlan().water_liters}L`"></span></p>
+        <p x-show="meta.aiDietPlanNote" style="margin-top:8px;font-size:11px;color:rgba(200,216,232,0.35);" x-text="meta.aiDietPlanNote"></p>
+      </div>
+      <!-- Meal plan -->
+      <div style="background:var(--abyss);padding:24px;">
+        <div class="info-tag">AI Meal Plan</div>
+        <div style="margin-top:12px;">
+          <template x-for="(meal, index) in aiDietMealPlan()" :key="meal.key">
+            <div class="meal-card">
+              <div style="display:flex;align-items:start;justify-content:space-between;gap:8px;">
+                <div>
+                  <div class="meal-tier" x-text="`Tier ${index + 1}`"></div>
+                  <div class="meal-food" x-text="meal.food"></div>
+                </div>
+                <button @click="toggleDietMeal(meal.key)" :disabled="meal.done" class="meal-btn" :class="meal.done?'done':''" x-text="meal.done ? 'Completed' : 'Mark Complete'"></button>
+              </div>
+              <div class="meal-xp" x-text="`+${meal.xp} ${dietStatLabel(meal.stat)} XP`"></div>
+              <div class="meal-macros">
+                <span x-text="`${meal.protein}g P`"></span> |
+                <span x-text="`${meal.carbs}g C`"></span> |
+                <span x-text="`${meal.calories} kcal`"></span>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- MACRO TRACKER (shown when plan exists) -->
+    <div x-show="isDietUnlocked() && hasFreshAiDietPlan()" class="macro-section">
+      <div class="section-label">TODAY'S MACROS</div>
+      <div class="macro-grid">
+        <div class="macro-card">
+          <div class="macro-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="macro-name">Calories</div>
+          <div class="macro-val" x-text="nutritionConsumed().calories"></div>
+          <div class="macro-unit">/ <span x-text="nutritionPlanTotals().calories"></span> kcal</div>
+          <div class="macro-bar-wrap"><div class="macro-bar" :style="`width:${nutritionPercent('calories')}%`"></div></div>
+        </div>
+        <div class="macro-card">
+          <div class="macro-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+          <div class="macro-name">Protein</div>
+          <div class="macro-val" x-text="nutritionConsumed().protein"></div>
+          <div class="macro-unit">/ <span x-text="nutritionPlanTotals().protein"></span> g</div>
+          <div class="macro-bar-wrap"><div class="macro-bar" :style="`width:${nutritionPercent('protein')}%`"></div></div>
+        </div>
+        <div class="macro-card">
+          <div class="macro-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+          <div class="macro-name">Carbs</div>
+          <div class="macro-val" x-text="nutritionConsumed().carbs"></div>
+          <div class="macro-unit">/ <span x-text="nutritionPlanTotals().carbs"></span> g</div>
+          <div class="macro-bar-wrap"><div class="macro-bar" :style="`width:${nutritionPercent('carbs')}%`"></div></div>
+        </div>
+        <div class="macro-card">
+          <div class="macro-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="macro-name">Fats</div>
+          <div class="macro-val" x-text="nutritionConsumed().fat || 0"></div>
+          <div class="macro-unit">/ <span x-text="nutritionPlanTotals().fat || '--'"></span> g</div>
+          <div class="macro-bar-wrap"><div class="macro-bar" :style="`width:${nutritionPercent('fat')}%`"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HYDRATION -->
+    <div x-show="isDietUnlocked()" class="section-label">HYDRATION PROTOCOL</div>
+    <div x-show="isDietUnlocked()" class="hydro-row">
+      <div class="hydro-card">
+        <div class="hydro-label">Water Intake</div>
+        <div class="hydro-display">
+          <div class="hydro-val" x-text="(meta.dietWaterLiters || 0).toFixed(1)"></div>
+          <div class="hydro-unit">L</div>
+        </div>
+        <div class="hydro-target" style="margin-bottom:12px;">Target: <span x-text="`${waterGoalLiters || 3}L`"></span> / day</div>
+        <div class="hydro-track"><div class="hydro-fill" :style="`width:${Math.min(100,((meta.dietWaterLiters||0)/(waterGoalLiters||3))*100)}%`"></div></div>
+      </div>
+      <div class="hydro-card">
+        <div class="hydro-label">Cups Logged Today</div>
+        <div class="cups-grid" id="cupsGrid"></div>
+        <div style="display:flex;gap:12px;">
+          <button class="btn-secondary" onclick="addCup()" style="padding:10px 20px;font-size:10px;">+ LOG CUP</button>
+          <button class="btn-secondary" onclick="resetCups()" style="padding:10px 20px;font-size:10px;color:rgba(200,216,232,0.3);border-color:rgba(200,216,232,0.1);">RESET</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEAL LOG (empty state) -->
+    <div x-show="isDietUnlocked() && !hasFreshAiDietPlan()" class="meal-section">
+      <div class="section-label">MEAL LOG</div>
+      <div class="meal-empty">
+        <div class="meal-empty-icon">
+          <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        </div>
+        <div class="meal-empty-title">NO MEALS LOGGED</div>
+        <div class="meal-empty-sub">Generate your AI diet plan to begin tracking today's meals.</div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="page-footer">
+      <div class="footer-logo">ASCENDRA</div>
+      <div class="footer-right">MONARCH FUEL v1.2 · DIET SYSTEM ACTIVE</div>
+    </div>
+  </div>
+</main>
+
+<script>
+  // CURSOR
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx-4+'px';cursor.style.top=my-4+'px';});
+  function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx-16+'px';ring.style.top=ry-16+'px';requestAnimationFrame(animRing);}
+  animRing();
+  document.querySelectorAll('a,button,.xp-card,.macro-card,.hydro-card,.cup,.meal-card').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cursor.style.transform='scale(2)';ring.style.width='44px';ring.style.height='44px';ring.style.borderColor='rgba(126,184,212,0.8)';});
+    el.addEventListener('mouseleave',()=>{cursor.style.transform='scale(1)';ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(126,184,212,0.5)';});
+  });
+  // CUPS
+  let cups=0;
+  function renderCups(){
+    const grid=document.getElementById('cupsGrid');if(!grid)return;grid.innerHTML='';
+    for(let i=0;i<8;i++){const c=document.createElement('div');c.className='cup'+(i<cups?' filled':'');c.addEventListener('click',()=>{if(i<cups){cups=i;}else{cups=i+1;}renderCups();});grid.appendChild(c);}
+  }
+  function addCup(){if(cups<8)cups++;renderCups();}
+  function resetCups(){cups=0;renderCups();}
+  renderCups();
+  // SCROLL REVEAL
+  const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';}});},{threshold:0.05});
+  document.querySelectorAll('.xp-card,.macro-card,.hydro-card').forEach(el=>{el.style.opacity='0';el.style.transform='translateY(15px)';el.style.transition='opacity 0.5s ease,transform 0.5s ease';obs.observe(el);});
+</script>
+<script src="web-config.js"></script>
+<script src="auth-guard.js"></script>
+<script src="app.js"></script>
+<script src="nav.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+<script defer src="lenis-init.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-

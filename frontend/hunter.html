@@ -9,17 +9,162 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root {
+      --panel: rgba(8,14,34,0.85);
+      --border: rgba(126,184,212,0.1);
+      --border-h: rgba(126,184,212,0.25);
+      --green: #4caf82;
+    }
+
+    /* ── PAGE ── */
+    .page { position:relative; z-index:10; padding:36px 40px 80px; max-width:1300px; margin:0 auto; }
+
+    /* ── PAGE HEADER ── */
+    .page-header { margin-bottom:36px; animation:reveal-up 0.8s 0.2s both; }
+    .page-eyebrow { font-size:10px; letter-spacing:0.5em; color:var(--ice-glow); margin-bottom:8px; display:flex; align-items:center; gap:12px; }
+    .page-eyebrow::before { content:''; width:24px; height:1px; background:var(--ice-glow); }
+    .page-title { font-family:'Cinzel',serif; font-size:clamp(28px,4vw,52px); font-weight:600; letter-spacing:0.1em; color:var(--white); margin-bottom:6px; }
+    .page-sub { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:300; font-style:italic; color:rgba(200,216,232,0.4); }
+
+    /* ── HERO CARD ── */
+    .hero-card { position:relative; overflow:hidden; background:var(--panel); border:1px solid var(--border); margin-bottom:28px; animation:reveal-up 0.8s 0.3s both; }
+    .hero-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--ice),rgba(201,169,110,0.5),transparent); }
+    .hero-card-bg { position:absolute; inset:0; background:radial-gradient(ellipse 60% 100% at 80% 50%,rgba(126,184,212,0.04) 0%,transparent 60%); pointer-events:none; }
+    .hero-inner { padding:36px 40px; display:flex; align-items:flex-start; justify-content:space-between; gap:32px; flex-wrap:wrap; }
+    .hero-left { display:flex; align-items:flex-start; gap:28px; }
+
+    /* ── AVATAR ── */
+    .avatar-wrap { position:relative; flex-shrink:0; }
+    .avatar { width:88px; height:88px; display:flex; align-items:center; justify-content:center; background:rgba(126,184,212,0.06); border:1px solid rgba(126,184,212,0.25); clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%); position:relative; }
+    .avatar span { font-family:'Cinzel',serif; font-size:38px; font-weight:900; color:var(--ice-bright); }
+    .avatar-ring { position:absolute; inset:-8px; border:1px solid rgba(126,184,212,0.1); clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%); pointer-events:none; }
+    .online-dot { position:absolute; bottom:4px; right:-4px; width:10px; height:10px; background:var(--green); border-radius:50%; border:2px solid var(--void); animation:pulse-dot 2s infinite; }
+
+    /* ── HUNTER INFO ── */
+    .hunter-label-h { font-size:9px; letter-spacing:0.5em; color:var(--ice-glow); margin-bottom:6px; }
+    .hunter-name-h { font-family:'Cinzel',serif; font-size:clamp(22px,3vw,36px); font-weight:600; letter-spacing:0.08em; color:var(--white); margin-bottom:10px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .badge-admin { font-size:8px; letter-spacing:0.25em; color:var(--crimson); border:1px solid rgba(139,26,46,0.5); padding:3px 10px; background:rgba(139,26,46,0.1); clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%); }
+    .hunter-badges { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+    .badge-rank { font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.2em; color:var(--gold); border:1px solid rgba(201,169,110,0.4); padding:4px 14px; background:rgba(201,169,110,0.08); clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%); }
+    .badge-streak { font-size:11px; color:var(--gold); display:flex; align-items:center; gap:6px; }
+    .streak-dot { width:6px; height:6px; background:var(--gold); border-radius:50%; animation:pulse-dot 2s infinite; }
+    .hunter-uid { font-size:10px; color:rgba(200,216,232,0.2); letter-spacing:0.08em; font-family:'Rajdhani',monospace; }
+
+    /* ── XP SECTION RIGHT ── */
+    .hero-right { text-align:right; flex-shrink:0; }
+    .xp-big { font-family:'Cinzel',serif; font-size:clamp(28px,3vw,44px); font-weight:900; color:var(--white); line-height:1; margin-bottom:6px; text-shadow:0 0 30px rgba(126,184,212,0.3); }
+    .xp-big span { color:var(--ice); }
+    .xp-to-next { font-size:11px; color:rgba(200,216,232,0.35); letter-spacing:0.1em; margin-bottom:12px; }
+    .xp-progress-wrap { width:180px; margin-left:auto; }
+    .xp-progress-label { display:flex; justify-content:space-between; font-size:9px; letter-spacing:0.3em; color:rgba(200,216,232,0.25); margin-bottom:6px; }
+    .xp-track { height:3px; background:rgba(126,184,212,0.08); }
+    .xp-fill { height:100%; background:linear-gradient(90deg,var(--ice-glow),var(--ice-bright)); box-shadow:0 0 8px var(--ice); width:0%; animation:fill-bar 1.5s 0.8s cubic-bezier(0.16,1,0.3,1) forwards; }
+    @keyframes fill-bar { to { width:var(--w); } }
+
+    /* ── STAT GRID ── */
+    .stat-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:1px; background:rgba(126,184,212,0.07); border-top:1px solid var(--border); }
+    .stat-cell { background:var(--abyss); padding:20px 18px; transition:background 0.3s; cursor:none; position:relative; overflow:hidden; }
+    .stat-cell:hover { background:var(--deep); }
+    .stat-cell::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--ice-glow),transparent); opacity:0; transition:opacity 0.3s; }
+    .stat-cell:hover::before { opacity:1; }
+    .stat-cell-label { font-size:8px; letter-spacing:0.45em; color:rgba(200,216,232,0.25); margin-bottom:8px; }
+    .stat-cell-val { font-family:'Cinzel',serif; font-size:clamp(18px,2vw,26px); font-weight:900; color:var(--white); line-height:1; margin-bottom:2px; }
+    .stat-cell-unit { font-size:10px; color:rgba(200,216,232,0.3); letter-spacing:0.1em; }
+    .stat-cell-val.goal { font-size:clamp(14px,1.5vw,18px); color:var(--ice-bright); }
+
+    /* ── TWO COL ── */
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px; }
+    .full-col { margin-bottom:24px; }
+
+    .hp-panel { background:var(--panel); border:1px solid var(--border); position:relative; overflow:hidden; animation:reveal-up 0.8s var(--delay,0.4s) both; }
+    .hp-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--border-h),transparent); }
+    .panel-head { padding:20px 28px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .panel-tag { font-size:9px; letter-spacing:0.45em; color:var(--ice-glow); margin-bottom:4px; }
+    .panel-title-h { font-family:'Cinzel',serif; font-size:15px; font-weight:600; letter-spacing:0.12em; color:var(--white); }
+    .panel-body { padding:24px 28px; }
+
+    /* ── ATTRIBUTE BARS ── */
+    .attr-list { display:flex; flex-direction:column; gap:14px; }
+    .attr-row { display:grid; grid-template-columns:90px 1fr 40px; align-items:center; gap:14px; cursor:none; }
+    .attr-row:hover .attr-fill { filter:brightness(1.3); }
+    .attr-name { font-size:9px; letter-spacing:0.35em; color:rgba(200,216,232,0.4); text-align:right; }
+    .attr-track { height:3px; background:rgba(126,184,212,0.06); overflow:visible; position:relative; }
+    .attr-fill { height:100%; width:0%; position:relative; transition:width 1.5s cubic-bezier(0.16,1,0.3,1); }
+    .attr-fill::after { content:''; position:absolute; right:-3px; top:50%; transform:translateY(-50%); width:7px; height:7px; border-radius:50%; box-shadow:0 0 8px currentColor; }
+    .af-str { background:linear-gradient(90deg,rgba(74,159,200,0.4),var(--ice)); } .af-str::after { background:var(--ice); color:var(--ice); }
+    .af-end { background:linear-gradient(90deg,rgba(76,175,130,0.4),var(--green)); } .af-end::after { background:var(--green); color:var(--green); }
+    .af-agi { background:linear-gradient(90deg,rgba(168,216,240,0.4),var(--ice-bright)); } .af-agi::after { background:var(--ice-bright); color:var(--ice-bright); }
+    .af-dis { background:linear-gradient(90deg,rgba(201,169,110,0.4),var(--gold)); } .af-dis::after { background:var(--gold); color:var(--gold); }
+    .af-aur { background:linear-gradient(90deg,rgba(139,26,46,0.4),#c94a5e); } .af-aur::after { background:#c94a5e; color:#c94a5e; }
+    .af-rec { background:linear-gradient(90deg,rgba(126,184,212,0.3),var(--ice-glow)); } .af-rec::after { background:var(--ice-glow); color:var(--ice-glow); }
+    .attr-num { font-family:'Cinzel',serif; font-size:16px; font-weight:900; color:var(--white); }
+
+    /* ── RADAR ── */
+    #radarSvg { display:block; margin:0 auto; filter:drop-shadow(0 0 20px rgba(126,184,212,0.1)); }
+
+    /* ── ACHIEVEMENT GRID ── */
+    .ach-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .ach-card { padding:16px; border:1px solid var(--border); background:rgba(4,7,21,0.6); text-align:center; transition:all 0.3s; cursor:none; position:relative; overflow:hidden; }
+    .ach-card:hover { border-color:var(--border-h); background:var(--deep); }
+    .ach-card.locked { opacity:0.35; }
+    .ach-icon { font-size:22px; margin-bottom:8px; display:block; }
+    .ach-name { font-family:'Cinzel',serif; font-size:10px; font-weight:600; letter-spacing:0.1em; color:var(--silver); margin-bottom:4px; }
+    .ach-desc { font-size:10px; color:rgba(200,216,232,0.3); }
+    .ach-card.unlocked::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--gold); opacity:0.6; }
+
+    /* ── BODY STATS ── */
+    .body-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); }
+    .body-cell { background:var(--abyss); padding:22px 20px; text-align:center; cursor:none; transition:background 0.3s; }
+    .body-cell:hover { background:var(--deep); }
+    .body-label { font-size:8px; letter-spacing:0.45em; color:rgba(200,216,232,0.25); margin-bottom:8px; }
+    .body-val { font-family:'Cinzel',serif; font-size:28px; font-weight:900; color:var(--white); line-height:1; margin-bottom:3px; }
+    .body-unit { font-size:11px; color:rgba(200,216,232,0.3); letter-spacing:0.1em; }
+    .body-bmi { font-size:10px; color:var(--ice-glow); margin-top:4px; letter-spacing:0.1em; }
+
+    /* ── SECTION LABEL ── */
+    .section-label { font-size:10px; letter-spacing:0.45em; color:rgba(200,216,232,0.2); margin-bottom:14px; display:flex; align-items:center; gap:12px; }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* ── FOOTER ── */
+    .page-footer { margin-top:48px; padding-top:24px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+    .footer-logo { font-family:'Cinzel',serif; font-size:12px; letter-spacing:0.3em; color:rgba(200,216,232,0.2); }
+    .footer-right { font-size:10px; letter-spacing:0.3em; color:rgba(200,216,232,0.15); }
+
+    /* ── LOADING / ERROR ── */
+    .loading-msg { animation:reveal-up 0.8s 0.2s both; padding:40px; text-align:center; font-size:13px; letter-spacing:0.2em; color:rgba(200,216,232,0.4); }
+    .error-msg { animation:reveal-up 0.8s 0.2s both; padding:40px; text-align:center; font-size:13px; letter-spacing:0.1em; color:var(--crimson); border:1px solid rgba(139,26,46,0.3); background:rgba(139,26,46,0.05); }
+
+    a, button { cursor:none; }
+
+    @media (max-width: 768px) {
+      .page { padding:36px 20px 60px; }
+      .hero-inner { padding:24px 20px; flex-direction:column; }
+      .stat-grid { grid-template-columns:repeat(2,1fr); }
+      .two-col { grid-template-columns:1fr; }
+      .ach-grid { grid-template-columns:repeat(2,1fr); }
+      .body-grid { grid-template-columns:1fr; }
+      .avatar { width:64px; height:64px; }
+      .avatar span { font-size:28px; }
+      .panel-body { padding:16px 18px; }
+      .panel-head { padding:16px 18px 12px; }
+    }
+    @media (max-width: 480px) {
+      .stat-grid { grid-template-columns:1fr 1fr; }
+      .avatar { width:56px; height:56px; }
+      .avatar span { font-size:24px; }
+    }
+  </style>
 </head>
 <body class="bg-abyss text-slate-100 min-h-screen">
+  <div class="bg-fixed" style="position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 20% 30%,#080e22 0%,#040715 50%,#01020a 100%);pointer-events:none;"></div>
   <div class="bg-grid"></div>
-  <a class="profile-link" href="login.html" aria-label="Open login">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M20 21a8 8 0 0 0-16 0"></path>
-      <circle cx="12" cy="8" r="4"></circle>
-    </svg>
-  </a>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
 
   <main
     class="relative z-10 pb-12"
@@ -42,7 +187,7 @@
       },
       rankKey(rank = '') {
         const value = String(rank || '').toLowerCase();
-        if (value.includes('s++')) return 'spp';
+        if (value.includes('s++ rank')) return 'spp';
         if (value.includes('s-rank') || value === 's') return 's';
         if (value.includes('a-rank') || value === 'a') return 'a';
         if (value.includes('b-rank') || value === 'b') return 'b';
@@ -52,6 +197,69 @@
       },
       rankPillClass(rank = '') {
         return `rank-pill-${this.rankKey(rank)}`;
+      },
+      xpPercent() {
+        if (!this.user) return 0;
+        const xp = Number(this.user.xp || 0);
+        const next = soloLevelingApp().xpThresholdForLevel(Number(this.user.level) + 1);
+        if (next <= 0) return 0;
+        const start = soloLevelingApp().xpThresholdForLevel(Number(this.user.level));
+        return Math.max(0, Math.min(((xp - start) / (next - start)) * 100, 100));
+      },
+      xpToNext() {
+        if (!this.user) return 0;
+        const xp = Number(this.user.xp || 0);
+        const next = soloLevelingApp().xpThresholdForLevel(Number(this.user.level) + 1);
+        return Math.max(next - xp, 0);
+      },
+      bmi() {
+        if (!this.user) return null;
+        const h = Number(this.user.height_cm || 0);
+        const w = Number(this.user.weight_kg || 0);
+        if (h <= 0 || w <= 0) return null;
+        return (w / ((h/100) * (h/100))).toFixed(1);
+      },
+      bmiLabel() {
+        const b = this.bmi();
+        if (!b) return '';
+        const v = parseFloat(b);
+        if (v < 18.5) return 'Underweight';
+        if (v < 25) return 'Normal';
+        if (v < 30) return 'Overweight';
+        return 'Obese';
+      },
+      getStats() {
+        if (!this.user) return { strength:0, endurance:0, agility:0, discipline:0, aura:0, recovery:0 };
+        const s = this.user.stats || {};
+        return {
+          strength: Number(s.strength || 0),
+          endurance: Number(s.endurance || 0),
+          agility: Number(s.agility || 0),
+          discipline: Number(s.discipline || 0),
+          aura: Number(s.aura || 0),
+          recovery: Number(s.recovery || 0)
+        };
+      },
+      getAchievements() {
+        if (!this.user) return [];
+        const u = this.user;
+        const s = u.stats || {};
+        const level = Number(u.level || 1);
+        const streak = Number(u.survival_streak || 0);
+        const totalStats = Number(s.strength||0) + Number(s.endurance||0) + Number(s.agility||0) + Number(s.discipline||0) + Number(s.aura||0) + Number(s.recovery||0);
+        return [
+          { icon:'⚡', name:'AWAKENED', desc:'Reach Level 5', unlocked: level >= 5 },
+          { icon:'🔥', name:'STREAK BORN', desc:'5 day streak', unlocked: streak >= 5 },
+          { icon:'💀', name:'IRON WILL', desc:'30 day streak', unlocked: streak >= 30 },
+          { icon:'👑', name:'D-RANK', desc:'Ascend to D-Rank', unlocked: ['d-rank','c-rank','b-rank','a-rank','s-rank','s++ rank'].includes(String(u.rank||'').toLowerCase()) },
+          { icon:'🗡️', name:'CENTURION', desc:'100 total stat points', unlocked: totalStats >= 100 },
+          { icon:'🌑', name:'SHADOW BORN', desc:'Reach S-Rank', unlocked: ['s-rank','s++ rank'].includes(String(u.rank||'').toLowerCase()) },
+          { icon:'💪', name:'POWER SURGE', desc:'50 strength', unlocked: Number(s.strength||0) >= 50 },
+          { icon:'∞', name:'MONARCH', desc:'Reach S++ Rank', unlocked: String(u.rank||'').toLowerCase().includes('s++ rank') }
+        ];
+      },
+      unlockedCount() {
+        return this.getAchievements().filter(a => a.unlocked).length;
       },
       async init() {
         this.uid = this.parseUid();
@@ -69,15 +277,92 @@
           }
           this.user = await response.json();
           this.loading = false;
+          this.$nextTick(() => {
+            this.buildAttrBars();
+            this.buildRadar();
+          });
         } catch (_) {
           this.error = 'Could not connect to profile service.';
           this.loading = false;
         }
+      },
+      buildAttrBars() {
+        const stats = this.getStats();
+        const attrs = [
+          { name:'STRENGTH', val:stats.strength, max:100, cls:'af-str' },
+          { name:'ENDURANCE', val:stats.endurance, max:100, cls:'af-end' },
+          { name:'AGILITY', val:stats.agility, max:100, cls:'af-agi' },
+          { name:'DISCIPLINE', val:stats.discipline, max:100, cls:'af-dis' },
+          { name:'AURA', val:stats.aura, max:100, cls:'af-aur' },
+          { name:'RECOVERY', val:stats.recovery, max:100, cls:'af-rec' }
+        ];
+        const list = document.getElementById('attrList');
+        if (!list) return;
+        list.innerHTML = '';
+        attrs.forEach((a, i) => {
+          const row = document.createElement('div'); row.className = 'attr-row';
+          row.innerHTML = `<div class=\'attr-name\'>${a.name}</div><div class=\'attr-track\'><div class=\'attr-fill ${a.cls}\'></div></div><div class=\'attr-num\'>${a.val}</div>`;
+          list.appendChild(row);
+          setTimeout(() => { row.querySelector('.attr-fill').style.width = Math.max(a.val / a.max * 100, 0.5) + '%'; }, 400 + i * 80);
+        });
+      },
+      buildRadar() {
+        const svg = document.getElementById('radarSvg');
+        if (!svg) return;
+        svg.innerHTML = '';
+        const stats = this.getStats();
+        const cx=130, cy=130, r=90;
+        const statArr = [
+          { name:'STRENGTH', val:stats.strength },
+          { name:'ENDURANCE', val:stats.endurance },
+          { name:'AGILITY', val:stats.agility },
+          { name:'DISCIPLINE', val:stats.discipline },
+          { name:'AURA', val:stats.aura },
+          { name:'RECOVERY', val:stats.recovery }
+        ];
+        const n = statArr.length;
+        const angle = i => (Math.PI*2*i/n) - Math.PI/2;
+        const pt = (i, rad) => [cx+Math.cos(angle(i))*rad, cy+Math.sin(angle(i))*rad];
+
+        [0.25,0.5,0.75,1].forEach(f => {
+          const pts = statArr.map((_, i) => pt(i, r*f).join(',')).join(' ');
+          const p = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+          p.setAttribute('points', pts); p.setAttribute('fill','none');
+          p.setAttribute('stroke', `rgba(126,184,212,${f===1?0.14:0.06})`); p.setAttribute('stroke-width','1');
+          svg.appendChild(p);
+        });
+        statArr.forEach((_, i) => {
+          const [x,y] = pt(i, r);
+          const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+          line.setAttribute('x1',cx); line.setAttribute('y1',cy); line.setAttribute('x2',x); line.setAttribute('y2',y);
+          line.setAttribute('stroke','rgba(126,184,212,0.07)'); line.setAttribute('stroke-width','1');
+          svg.appendChild(line);
+        });
+        const dataPts = statArr.map((s,i) => pt(i, r*Math.max(s.val/100,0.05)).join(',')).join(' ');
+        const dp = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+        dp.setAttribute('points', dataPts); dp.setAttribute('fill','rgba(126,184,212,0.07)');
+        dp.setAttribute('stroke','rgba(126,184,212,0.45)'); dp.setAttribute('stroke-width','1.5');
+        dp.style.opacity = '0'; setTimeout(() => { dp.style.transition = 'opacity 1s 0.5s'; dp.style.opacity = '1'; }, 100);
+        svg.appendChild(dp);
+        statArr.forEach((s,i) => {
+          const [x,y] = pt(i, r*Math.max(s.val/100,0.05));
+          const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+          c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r','4');
+          c.setAttribute('fill', s.val>0 ? 'var(--ice)' : 'rgba(126,184,212,0.2)');
+          c.style.opacity = '0'; setTimeout(() => { c.style.transition = 'opacity 0.5s '+(0.8+i*0.1)+'s'; c.style.opacity = '1'; }, 100);
+          svg.appendChild(c);
+          const [lx,ly] = pt(i, r*1.2);
+          const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+          t.setAttribute('x',lx); t.setAttribute('y',ly); t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','middle');
+          t.setAttribute('font-size','8'); t.setAttribute('fill','rgba(200,216,232,0.35)'); t.setAttribute('font-family','Rajdhani'); t.setAttribute('letter-spacing','1.5');
+          t.textContent = s.name; svg.appendChild(t);
+        });
       }
     }"
     x-init="init()"
   >
     <div class="nav-shell">
+      <a href="index.html" class="nav-logo">ASCENDRA</a>
       <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
         <span></span>
         <span></span>
@@ -91,73 +376,194 @@
         <a href="progress.html">Progress</a>
         <a href="leaderboard.html">Leaderboard</a>
       </nav>
+      <div><a class="profile-link" href="login.html" aria-label="Open login"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="8" r="4"></circle></svg></a></div>
     </div>
 
-    <section class="w-[92%] lg:w-[70%] max-w-none mx-auto px-4 md:px-8 mt-8">
-      <header class="panel rounded-2xl border border-cyan-400/30 p-6">
-        <p class="text-cyan-300 tracking-[0.2em] uppercase text-xs">Hunter Record</p>
-        <h1 class="title-font text-3xl md:text-4xl mt-2">Public Profile</h1>
-      </header>
+    <div class="page">
+      <!-- LOADING -->
+      <div x-show="loading" class="loading-msg">Loading hunter profile...</div>
+      <!-- ERROR -->
+      <div x-show="error" class="error-msg" x-text="error"></div>
 
-      <div x-show="loading" class="mt-6 panel rounded-xl border border-slate-700/85 p-4 text-slate-300">
-        Loading hunter profile...
-      </div>
-      <div x-show="error" class="mt-6 panel rounded-xl border border-red-500/50 p-4 text-red-200" x-text="error"></div>
+      <template x-if="user && !loading && !error">
+        <div>
+          <!-- PAGE HEADER -->
+          <div class="page-header">
+            <div class="page-eyebrow">HUNTER RECORD</div>
+            <h1 class="page-title">PUBLIC PROFILE</h1>
+            <p class="page-sub">Shadow monarch in the making — every stat a testament.</p>
+          </div>
 
-      <article x-show="user && !loading && !error" class="mt-6 relative overflow-hidden rounded-2xl border border-cyan-300/45 p-6 panel hunter-public-card">
-        <div class="relative z-10 flex items-center justify-between gap-4 hunter-public-head">
-          <div class="flex items-center gap-4 hunter-public-identity">
-            <div class="h-16 w-16 rounded-xl border border-cyan-200/60 bg-slate-900/80 flex items-center justify-center hunter-public-avatar">
-              <span class="title-font text-2xl text-cyan-100" x-text="(user?.name || 'P').charAt(0).toUpperCase()">
-              </span>
-            </div>
-            <div>
-              <p class="text-xs uppercase tracking-[0.12em] text-cyan-300">Hunter</p>
-              <div class="flex items-center gap-2 hunter-public-name-row">
-                <h2 class="title-font text-2xl hunter-public-name" x-text="user?.name || 'Player Hunter'"></h2>
-                <span x-show="user?.is_admin || user?.isAdmin" class="px-2 py-0.5 rounded-full border border-rose-300/70 bg-rose-500/20 text-rose-100 text-[10px] uppercase tracking-[0.1em]">Admin</span>
+          <!-- HERO CARD -->
+          <div class="hero-card">
+            <div class="hero-card-bg"></div>
+            <div class="hero-inner">
+              <div class="hero-left">
+                <div class="avatar-wrap">
+                  <div class="avatar"><span x-text="(user?.name || 'P').charAt(0).toUpperCase()"></span></div>
+                  <div class="avatar-ring"></div>
+                  <div class="online-dot"></div>
+                </div>
+                <div>
+                  <div class="hunter-label-h">HUNTER</div>
+                  <div class="hunter-name-h">
+                    <span x-text="user?.name || 'Player Hunter'"></span>
+                    <span x-show="user?.is_admin || user?.isAdmin" class="badge-admin">ADMIN</span>
+                  </div>
+                  <div class="hunter-badges">
+                    <div class="badge-rank" x-text="user?.rank || 'E-Rank'"></div>
+                    <div class="badge-streak"><div class="streak-dot"></div> Survival Streak: <span x-text="user?.survival_streak || 0"></span></div>
+                  </div>
+                  <div class="hunter-uid" x-text="'UID: ' + (user?.uid || '')"></div>
+                </div>
               </div>
-              <p class="hunter-rank-pill mt-1" :class="rankPillClass(user?.rank || 'E-Rank')" x-text="user?.rank || 'E-Rank'"></p>
-              <p class="text-xs text-slate-300 mt-1" x-text="`UID: ${user?.uid || ''}`"></p>
+              <div class="hero-right">
+                <div class="xp-big"><span x-text="Number(user?.xp || 0).toLocaleString()"></span> <span>XP</span></div>
+                <div class="xp-to-next" x-text="xpToNext().toLocaleString() + ' XP to next level'"></div>
+                <div class="xp-progress-wrap">
+                  <div class="xp-progress-label">
+                    <span x-text="'LV.' + (user?.level || 1)"></span>
+                    <span x-text="'LV.' + ((user?.level || 1) + 1)"></span>
+                  </div>
+                  <div class="xp-track"><div class="xp-fill" :style="'--w:' + xpPercent() + '%'"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STAT GRID -->
+            <div class="stat-grid">
+              <div class="stat-cell">
+                <div class="stat-cell-label">LEVEL</div>
+                <div class="stat-cell-val" x-text="user?.level || 1"></div>
+                <div class="stat-cell-unit">Hunter</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-cell-label">SURVIVAL STREAK</div>
+                <div class="stat-cell-val" x-text="user?.survival_streak || 0"></div>
+                <div class="stat-cell-unit">Days</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-cell-label">GOAL</div>
+                <div class="stat-cell-val goal" x-text="goalLabel(user?.goal)"></div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-cell-label">HEIGHT</div>
+                <div class="stat-cell-val" x-text="user?.height_cm || '-'"></div>
+                <div class="stat-cell-unit">CM</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-cell-label">WEIGHT</div>
+                <div class="stat-cell-val" x-text="user?.weight_kg || '-'"></div>
+                <div class="stat-cell-unit">KG</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-cell-label">AGE</div>
+                <div class="stat-cell-val" x-text="Number.isFinite(user?.age) ? user.age : '-'"></div>
+                <div class="stat-cell-unit">Years</div>
+              </div>
             </div>
           </div>
-          <p class="title-font text-2xl text-cyan-200 hunter-public-xp" x-text="`${Number(user?.xp || 0).toLocaleString()} XP`"></p>
-        </div>
 
-        <div class="relative z-10 mt-6 grid md:grid-cols-6 gap-3">
-          <div class="panel-dark rounded-xl p-4">
-            <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">Level</p>
-            <p class="mt-2 text-2xl title-font" x-text="user?.level || 1"></p>
+          <!-- TWO COL: ATTRIBUTES + RADAR -->
+          <div class="two-col">
+            <div class="hp-panel" style="--delay:0.4s;">
+              <div class="panel-head">
+                <div><div class="panel-tag">// STAT BREAKDOWN</div><div class="panel-title-h">ATTRIBUTE LEVELS</div></div>
+              </div>
+              <div class="panel-body">
+                <div class="attr-list" id="attrList"></div>
+              </div>
+            </div>
+            <div class="hp-panel" style="--delay:0.45s;">
+              <div class="panel-head">
+                <div><div class="panel-tag">// STAT MAP</div><div class="panel-title-h">HUNTER RADAR</div></div>
+              </div>
+              <div class="panel-body">
+                <svg id="radarSvg" width="260" height="260" viewBox="0 0 260 260"></svg>
+              </div>
+            </div>
           </div>
-          <div class="panel-dark rounded-xl p-4">
-            <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">Survival Streak</p>
-            <p class="mt-2 text-2xl title-font" x-text="user?.survival_streak || 0"></p>
+
+          <!-- BODY STATS -->
+          <div class="hp-panel full-col" style="--delay:0.5s;margin-bottom:24px;">
+            <div class="panel-head">
+              <div><div class="panel-tag">// PHYSICAL DATA</div><div class="panel-title-h">BODY STATISTICS</div></div>
+            </div>
+            <div class="panel-body" style="padding:0;">
+              <div class="body-grid">
+                <div class="body-cell">
+                  <div class="body-label">HEIGHT</div>
+                  <div class="body-val" x-text="user?.height_cm || '-'"></div>
+                  <div class="body-unit">CM</div>
+                </div>
+                <div class="body-cell">
+                  <div class="body-label">WEIGHT</div>
+                  <div class="body-val" x-text="user?.weight_kg || '-'"></div>
+                  <div class="body-unit">KG</div>
+                  <div class="body-bmi" x-show="bmi()" x-text="'BMI: ' + bmi() + ' — ' + bmiLabel()"></div>
+                </div>
+                <div class="body-cell">
+                  <div class="body-label">AGE</div>
+                  <div class="body-val" x-text="Number.isFinite(user?.age) ? user.age : '-'"></div>
+                  <div class="body-unit">Years</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="panel-dark rounded-xl p-4">
-            <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">Goal</p>
-            <p class="mt-2 text-2xl title-font" x-text="goalLabel(user?.goal)"></p>
+
+          <!-- ACHIEVEMENTS -->
+          <div class="hp-panel full-col" style="--delay:0.55s;margin-bottom:24px;">
+            <div class="panel-head">
+              <div><div class="panel-tag">// HONOURS</div><div class="panel-title-h">ACHIEVEMENTS</div></div>
+              <div style="font-size:10px;color:rgba(200,216,232,0.25);letter-spacing:0.1em;" x-text="unlockedCount() + ' / ' + getAchievements().length + ' Unlocked'"></div>
+            </div>
+            <div class="panel-body">
+              <div class="ach-grid">
+                <template x-for="(ach, idx) in getAchievements()" :key="idx">
+                  <div class="ach-card" :class="ach.unlocked ? 'unlocked' : 'locked'">
+                    <span class="ach-icon" x-text="ach.icon"></span>
+                    <div class="ach-name" x-text="ach.name"></div>
+                    <div class="ach-desc" x-text="ach.desc"></div>
+                  </div>
+                </template>
+              </div>
+            </div>
           </div>
-          <div class="panel-dark rounded-xl p-4">
-            <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">Height</p>
-            <p class="mt-2 text-2xl title-font" x-text="user?.height_cm ? `${user.height_cm} cm` : '-'"></p>
-          </div>
-          <div class="panel-dark rounded-xl p-4">
-            <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">Weight</p>
-            <p class="mt-2 text-2xl title-font" x-text="user?.weight_kg ? `${user.weight_kg} kg` : '-'"></p>
-          </div>
-          <div class="panel-dark rounded-xl p-4">
-            <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">Age</p>
-            <p class="mt-2 text-2xl title-font" x-text="Number.isFinite(user?.age) ? user.age : '-'"></p>
+
+          <!-- FOOTER -->
+          <div class="page-footer">
+            <div class="footer-logo">ASCENDRA</div>
+            <div class="footer-right">HUNTER PROFILE · PUBLIC ACCOUNT DATA</div>
           </div>
         </div>
-
-      </article>
-    </section>
+      </template>
+    </div>
   </main>
 
   <script src="web-config.js"></script>
   <script src="auth-guard.js"></script>
+  <script src="app.js"></script>
   <script src="nav.js"></script>
+
+  <!-- Custom cursor -->
+  <script>
+    const cursor = document.getElementById('cursor'), ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx - 4 + 'px'; cursor.style.top = my - 4 + 'px'; });
+    (function animRing() { rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12; ring.style.left = rx - 16 + 'px'; ring.style.top = ry - 16 + 'px'; requestAnimationFrame(animRing); })();
+
+    // Re-bind cursor hover after Alpine renders content
+    const observer = new MutationObserver(() => {
+      document.querySelectorAll('a,button,.stat-cell,.attr-row,.ach-card,.body-cell').forEach(el => {
+        if (el._cursorBound) return;
+        el._cursorBound = true;
+        el.addEventListener('mouseenter', () => { cursor.style.transform = 'scale(2)'; ring.style.width = '44px'; ring.style.height = '44px'; ring.style.borderColor = 'rgba(126,184,212,0.8)'; });
+        el.addEventListener('mouseleave', () => { cursor.style.transform = 'scale(1)'; ring.style.width = '32px'; ring.style.height = '32px'; ring.style.borderColor = 'rgba(126,184,212,0.5)'; });
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="lenis-init.js"></script>
 </body>
 </html>
-

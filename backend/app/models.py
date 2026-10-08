@@ -32,6 +32,8 @@ class UserProgressUpdate(BaseModel):
     rank: str = Field(min_length=1, max_length=32)
     stats: StatsPayload
     survival_streak: int = Field(default=0, ge=0)
+    game_state: Optional[dict] = None
+    game_state_updated_at: Optional[datetime] = None
 
 
 class UserRecord(BaseModel):
@@ -59,6 +61,8 @@ class UserRecord(BaseModel):
     name_change_free_used: bool = False
     name_change_paid_credits: int = 0
     name_change_last_payment_id: Optional[str] = None
+    game_state: Optional[dict] = None
+    game_state_updated_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
 
@@ -94,6 +98,8 @@ class LeaderboardResponse(BaseModel):
     total: int
     entries: list[LeaderboardEntry]
     current_user: Optional[LeaderboardEntry] = None
+    hunters_with_streak: int = 0
+    s_rank_holders: int = 0
 
 
 class ResolveEmailResponse(BaseModel):

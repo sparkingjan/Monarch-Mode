@@ -8,7 +8,7 @@
     "cap:sync": "npx cap sync android",
     "android:open": "npx cap open android",
     "apk:debug": "cd android && gradlew.bat assembleDebug",
-    "test": "echo \"No tests configured\""
+    "test": "node --test tests/data.test.cjs"
   },
   "repository": {
     "type": "git",

@@ -1,17 +1,39 @@
+const PROD_BACKEND_URL = "https://monarch-mode.vercel.app/api/v1";
 const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-const configuredProdBackend = "https://YOUR_RENDER_SERVICE.onrender.com/api/v1";
-const hasCustomProdBackend = !configuredProdBackend.includes("YOUR_RENDER_SERVICE");
-const sameOriginApi = window.location.origin && window.location.origin.startsWith("http")
-  ? `${window.location.origin}/api/v1`
-  : "";
+const capacitorPlatform = (() => {
+  try {
+    return window.Capacitor?.getPlatform?.() || '';
+  } catch (_) {
+    return '';
+  }
+})();
+const isCapacitorNative = (() => {
+  try {
+    if (window.location.protocol === 'capacitor:' || window.location.protocol === 'ionic:') return true;
+    if (window.Capacitor?.isNativePlatform?.()) return true;
+    return ['android', 'ios'].includes(String(capacitorPlatform).toLowerCase());
+  } catch (_) {
+    return false;
+  }
+})();
+const forceLocalBackend = (() => {
+  try {
+    const query = new URLSearchParams(window.location.search || '');
+    if (query.get('localBackend') === '1') return true;
+    return localStorage.getItem('monarch-force-local-backend') === '1';
+  } catch (_) {
+    return false;
+  }
+})();
+const resolvedBackendBaseUrl = (isLocalHost && !isCapacitorNative && forceLocalBackend)
+  ? "http://127.0.0.1:8000/api/v1"
+  : PROD_BACKEND_URL;
 
 window.MONARCH_CONFIG = window.MONARCH_CONFIG || {
-  // Change this to your Vercel API URL after deploy.
-  // Example: https://solo-leveling-api.vercel.app/api/v1
-  backendBaseUrl: isLocalHost
-    ? "http://127.0.0.1:8000/api/v1"
-    : "https://monarch-mode.vercel.app/api/v1",
-  backendHasExplicitProdUrl: hasCustomProdBackend,
+  // Use production backend by default (including Android WebView/Capacitor).
+  // Local backend is used only when explicitly enabled for development.
+  backendBaseUrl: resolvedBackendBaseUrl,
+  backendHasExplicitProdUrl: true,
   firebase: {
     apiKey: "AIzaSyBDeKJtu2WtSy0ezyYIbHM7V7FQ9BZocXg",
     authDomain: "solo-leveling-c38fb.firebaseapp.com",

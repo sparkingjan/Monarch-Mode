@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
@@ -9,198 +9,335 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root{--void:#01020a;--abyss:#040715;--deep:#080e22;--shadow:#0d1535;--ice:#7eb8d4;--ice-bright:#a8d8f0;--ice-glow:#4a9fc8;--silver:#c8d8e8;--white:#f0f4f8;--gold:#c9a96e;--crimson:#8b1a2e;--crimson-soft:rgba(139,26,46,0.3);--green:#4caf82;--panel:rgba(8,14,34,0.85);--border:rgba(126,184,212,0.1);--border-h:rgba(126,184,212,0.25);}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--void)!important;color:var(--silver)!important;font-family:'Rajdhani',sans-serif!important;overflow-x:hidden;min-height:100vh;cursor:none;}
+    .cursor{position:fixed;width:8px;height:8px;background:var(--ice-bright);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s;mix-blend-mode:screen;}
+    .cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(126,184,212,0.5);border-radius:50%;pointer-events:none;z-index:9998;transition:width 0.3s,height 0.3s,border-color 0.3s;}
+    .bg-fixed{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 20% 30%,#080e22 0%,#040715 50%,#01020a 100%);pointer-events:none;}
+    .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(126,184,212,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(126,184,212,0.025) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 100% 100% at 50% 0%,black 0%,transparent 80%);}
+    .scanlines{position:fixed;inset:0;z-index:1000;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);}
+    .vignette{position:fixed;inset:0;z-index:999;pointer-events:none;background:radial-gradient(ellipse 100% 100% at 50% 50%,transparent 50%,rgba(1,2,10,0.7) 100%);}
+    .page{position:relative;z-index:10;padding:36px 40px 60px;max-width:1300px;margin:0 auto;}
+    @keyframes reveal-up{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes draw-line{from{stroke-dashoffset:1000;}to{stroke-dashoffset:0;}}
+    @keyframes pulse-tl{0%,100%{box-shadow:0 0 10px var(--gold);}50%{box-shadow:0 0 20px var(--gold),0 0 40px rgba(201,169,110,0.3);}}
+    .page-header{margin-bottom:40px;animation:reveal-up 0.8s 0.2s both;}
+    .page-eyebrow{font-size:10px;letter-spacing:0.5em;color:var(--ice-glow);margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+    .page-eyebrow::before{content:'';width:24px;height:1px;background:var(--ice-glow);}
+    .page-title{font-family:'Cinzel',serif;font-size:clamp(28px,4vw,48px);font-weight:600;letter-spacing:0.1em;color:var(--white);margin-bottom:8px;}
+    .page-sub{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;font-style:italic;color:rgba(200,216,232,0.45);}
+    .summary-row{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);margin-bottom:36px;animation:reveal-up 0.8s 0.35s both;}
+    .sum-card{background:var(--abyss);padding:22px 20px;text-align:center;cursor:none;transition:background 0.3s;position:relative;overflow:hidden;}
+    .sum-card:hover{background:var(--deep);}
+    .sum-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ice-glow),transparent);opacity:0;transition:opacity 0.3s;}
+    .sum-card:hover::before{opacity:1;}
+    .sum-label{font-size:8px;letter-spacing:0.45em;color:rgba(200,216,232,0.3);margin-bottom:8px;text-transform:uppercase;}
+    .sum-val{font-family:'Cinzel',serif;font-size:26px;font-weight:900;color:var(--white);line-height:1;margin-bottom:3px;}
+    .sum-val span{font-size:13px;color:var(--ice-glow);}
+    .sum-change{font-size:11px;letter-spacing:0.05em;}
+    .sum-change.up{color:var(--green);}
+    .sum-change.down{color:var(--crimson);}
+    .sum-change.neutral{color:rgba(200,216,232,0.3);}
+    .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;}
+    .full-width{grid-column:1/-1;}
+    .panel{background:var(--panel);border:1px solid var(--border);position:relative;overflow:hidden;}
+    .panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-h),transparent);}
+    .panel-head{padding:22px 28px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .panel-tag{font-size:9px;letter-spacing:0.45em;color:var(--ice-glow);text-transform:uppercase;}
+    .panel-title{font-family:'Cinzel',serif;font-size:16px;font-weight:600;letter-spacing:0.12em;color:var(--white);}
+    .panel-body{padding:24px 28px;}
+    .attr-list{display:flex;flex-direction:column;gap:16px;}
+    .attr-row{display:grid;grid-template-columns:100px 1fr 50px;align-items:center;gap:16px;cursor:none;}
+    .attr-row:hover .attr-fill{filter:brightness(1.3);}
+    .attr-row-name{font-size:10px;letter-spacing:0.3em;color:rgba(200,216,232,0.45);text-align:right;text-transform:uppercase;}
+    .attr-track{height:4px;background:rgba(126,184,212,0.06);position:relative;overflow:visible;}
+    .attr-fill{height:100%;position:relative;transition:width 1.5s cubic-bezier(0.16,1,0.3,1);}
+    .attr-fill::after{content:'';position:absolute;right:-3px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;box-shadow:0 0 10px currentColor;}
+    .attr-fill.str{background:linear-gradient(90deg,rgba(74,159,200,0.4),var(--ice));}.attr-fill.str::after{background:var(--ice);color:var(--ice);}
+    .attr-fill.end{background:linear-gradient(90deg,rgba(76,175,130,0.4),var(--green));}.attr-fill.end::after{background:var(--green);color:var(--green);}
+    .attr-fill.agi{background:linear-gradient(90deg,rgba(168,216,240,0.4),var(--ice-bright));}.attr-fill.agi::after{background:var(--ice-bright);color:var(--ice-bright);}
+    .attr-fill.dis{background:linear-gradient(90deg,rgba(201,169,110,0.4),var(--gold));}.attr-fill.dis::after{background:var(--gold);color:var(--gold);}
+    .attr-fill.aur{background:linear-gradient(90deg,rgba(139,26,46,0.4),#c94a5e);}.attr-fill.aur::after{background:#c94a5e;color:#c94a5e;}
+    .attr-fill.rec{background:linear-gradient(90deg,rgba(126,184,212,0.3),var(--ice-glow));}.attr-fill.rec::after{background:var(--ice-glow);color:var(--ice-glow);}
+    .attr-num{font-family:'Cinzel',serif;font-size:18px;font-weight:900;color:var(--white);text-align:right;}
+    #donutWrap{display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
+    .donut-legend{display:flex;flex-direction:column;gap:12px;flex:1;}
+    .legend-item{display:flex;align-items:center;gap:10px;cursor:none;}
+    .legend-dot{width:10px;height:10px;flex-shrink:0;transform:rotate(45deg);}
+    .legend-label{font-size:11px;letter-spacing:0.1em;color:rgba(200,216,232,0.5);flex:1;}
+    .legend-pct{font-family:'Cinzel',serif;font-size:14px;color:var(--white);}
+    .cal-wrap{overflow-x:auto;padding-bottom:8px;}
+    .cal-grid{display:grid;grid-template-rows:repeat(7,1fr);grid-auto-flow:column;gap:4px;width:max-content;}
+    .cal-day{width:14px;height:14px;border:1px solid rgba(126,184,212,0.06);transition:all 0.2s;cursor:none;position:relative;}
+    .cal-day:hover{transform:scale(1.4);z-index:2;border-color:var(--ice);}
+    .cal-day.d0{background:rgba(126,184,212,0.04);}.cal-day.d1{background:rgba(126,184,212,0.15);border-color:rgba(126,184,212,0.2);}
+    .cal-day.d2{background:rgba(126,184,212,0.3);border-color:rgba(126,184,212,0.35);}.cal-day.d3{background:rgba(126,184,212,0.5);border-color:rgba(126,184,212,0.5);}
+    .cal-day.d4{background:var(--ice);border-color:var(--ice);box-shadow:0 0 6px rgba(126,184,212,0.4);}
+    .timeline{display:flex;flex-direction:column;gap:0;position:relative;}
+    .timeline::before{content:'';position:absolute;left:20px;top:0;bottom:0;width:1px;background:linear-gradient(180deg,var(--ice-glow),transparent);}
+    .tl-item{display:grid;grid-template-columns:40px 1fr;gap:20px;padding:16px 0;position:relative;}
+    .tl-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--border);background:var(--abyss);margin-top:4px;position:relative;z-index:1;margin-left:14px;transition:all 0.3s;cursor:none;}
+    .tl-dot.reached{border-color:var(--ice);background:var(--ice);box-shadow:0 0 10px var(--ice);}
+    .tl-dot.current{border-color:var(--gold);background:var(--gold);box-shadow:0 0 14px var(--gold);animation:pulse-tl 2s infinite;}
+    .tl-rank{font-family:'Cinzel',serif;font-size:14px;font-weight:600;letter-spacing:0.15em;color:var(--silver);margin-bottom:2px;}
+    .tl-rank.reached{color:var(--ice-bright);}.tl-rank.current{color:var(--gold);}.tl-rank.locked{color:rgba(200,216,232,0.2);}
+    .tl-date{font-size:10px;color:rgba(200,216,232,0.3);letter-spacing:0.1em;}
+    .tl-xp{font-family:'Cinzel',serif;font-size:11px;color:var(--ice-glow);margin-top:4px;}
+    .chart-x-labels{display:flex;justify-content:space-between;padding:8px 0 0;font-size:9px;letter-spacing:0.2em;color:rgba(200,216,232,0.25);}
+    .info-box{background:rgba(126,184,212,0.04);border:1px solid var(--border);border-left:2px solid var(--ice-glow);padding:14px 20px;margin-top:12px;}
+    .info-box-tag{font-size:9px;letter-spacing:0.3em;color:var(--ice);font-weight:600;text-transform:uppercase;margin-bottom:4px;}
+    .info-box p{font-size:13px;color:rgba(200,216,232,0.55);}
+    .nstat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-bottom:16px;}
+    .nstat-card{background:var(--abyss);padding:20px 24px;cursor:none;transition:background 0.3s;}
+    .nstat-card:hover{background:var(--deep);}
+    .nstat-label{font-size:9px;letter-spacing:0.4em;color:rgba(200,216,232,0.3);margin-bottom:8px;text-transform:uppercase;}
+    .nstat-val{font-family:'Cinzel',serif;font-size:24px;font-weight:900;color:var(--ice-bright);line-height:1;}
+    .diet-lock{border:1px solid rgba(201,169,110,0.2);background:rgba(201,169,110,0.04);padding:18px 24px;position:relative;overflow:hidden;margin-bottom:24px;}
+    .diet-lock::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold);}
+    .diet-lock-title{font-family:'Cinzel',serif;font-size:16px;font-weight:600;letter-spacing:0.12em;color:var(--white);margin-bottom:6px;}
+    .diet-lock-text{font-family:'Cormorant Garamond',serif;font-size:15px;color:rgba(200,216,232,0.45);font-style:italic;}
+    .log-entry{font-size:12px;border-left:2px solid var(--ice-glow);padding:6px 0 6px 14px;color:rgba(200,216,232,0.5);}
+    .modal-overlay{position:fixed;inset:0;z-index:50;background:rgba(1,2,10,0.75);display:flex;align-items:center;justify-content:center;padding:1rem;}
+    .modal-box{background:var(--abyss);border:1px solid var(--crimson-soft);padding:28px;max-width:28rem;width:100%;}
+    .btn-cancel{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.15em;padding:10px 20px;border:1px solid var(--border);background:transparent;color:var(--silver);cursor:none;transition:all 0.3s;}
+    .btn-cancel:hover{border-color:var(--ice);background:rgba(126,184,212,0.06);}
+    .btn-danger{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.15em;padding:10px 20px;border:none;background:var(--crimson);color:var(--white);cursor:none;clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);transition:all 0.3s;}
+    .btn-reset{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.2em;color:var(--crimson);border:1px solid var(--crimson-soft);background:rgba(139,26,46,0.08);padding:8px 18px;cursor:none;clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);transition:all 0.3s;}
+    .btn-reset:hover{background:var(--crimson-soft);color:var(--white);}
+    .page-footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+    .footer-logo{font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.3em;color:rgba(200,216,232,0.2);}
+    .footer-right{font-size:10px;letter-spacing:0.3em;color:rgba(200,216,232,0.15);}
+    a,button{cursor:none;}
+    ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--abyss);}::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--ice-bright),var(--ice-glow));}
+    @media(max-width:1024px){.main-grid{grid-template-columns:1fr;}.summary-row{grid-template-columns:repeat(3,1fr);}.nstat-row{grid-template-columns:1fr;}}
+    @media(max-width:768px){.page{padding:36px 20px 40px;}.summary-row{grid-template-columns:repeat(2,1fr);}.attr-row{grid-template-columns:70px 1fr 40px;gap:10px;}}
+  </style>
 </head>
-<body class="bg-abyss text-slate-100 min-h-screen">
-  <div class="bg-grid"></div>
-  <a class="profile-link" href="login.html" aria-label="Open login">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M20 21a8 8 0 0 0-16 0"></path>
-      <circle cx="12" cy="8" r="4"></circle>
-    </svg>
-  </a>
-  <main x-data="soloLevelingApp()" x-init="init()" class="relative z-10">
-    <div x-show="showResetProgressModal" x-transition.opacity.duration.200ms class="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center px-4">
-      <div class="w-full max-w-md rounded-xl border border-blood/60 bg-slate-900 p-5 shadow-[0_0_30px_rgba(239,68,68,0.25)]">
-        <p class="text-sm uppercase tracking-[0.16em] text-blood">Warning</p>
-        <h3 class="mt-2 title-font text-2xl text-slate-100">Reset all progress?</h3>
-        <p class="mt-2 text-sm text-slate-300">This will reset XP, level, rank, all stats, streaks, diet progress, and related progression data.</p>
-        <div class="mt-5 flex justify-end gap-2">
-          <button @click="cancelResetProgress()" class="px-4 py-2 rounded-lg border border-slate-600 text-slate-200 hover:bg-slate-800 transition">
-            Cancel
-          </button>
-          <button @click="confirmResetProgress()" class="px-4 py-2 rounded-lg bg-blood/90 text-slate-100 hover:bg-blood transition font-semibold">
-            Reset
-          </button>
-        </div>
+<body>
+<div class="bg-fixed"></div><div class="bg-grid"></div><div class="scanlines"></div><div class="vignette"></div>
+<div class="cursor" id="cursor"></div><div class="cursor-ring" id="cursorRing"></div>
+
+<main x-data="soloLevelingApp()" x-effect="buildAllCharts($data)" class="relative z-10">
+
+  <div x-show="showResetProgressModal" x-transition.opacity.duration.200ms class="modal-overlay">
+    <div class="modal-box">
+      <p style="font-size:10px;letter-spacing:0.16em;color:var(--crimson);text-transform:uppercase;">Warning</p>
+      <h3 style="margin-top:8px;font-family:'Cinzel',serif;font-size:22px;color:var(--white);">Reset all progress?</h3>
+      <p style="margin-top:8px;font-size:13px;color:rgba(200,216,232,0.5);">This will reset XP, level, rank, all stats, streaks, diet progress, and related progression data.</p>
+      <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:8px;">
+        <button @click="cancelResetProgress()" class="btn-cancel">Cancel</button>
+        <button @click="confirmResetProgress()" class="btn-danger">Reset</button>
       </div>
     </div>
-    <div class="nav-shell">
-      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      <nav id="primary-nav" class="top-nav">
-        <a href="index.html">Main</a>
-        <a href="quests.html">Quests</a>
-        <a href="diet.html">Diet</a>
-        <a href="fitness.html">Looksmaxxing</a>
-        <a href="progress.html" class="active">Progress</a>
-        <a href="leaderboard.html">Leaderboard</a>
-      </nav>
+  </div>
+
+  <div class="nav-shell">
+      <a href="index.html" class="nav-logo">ASCENDRA</a>
+    <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav"><span></span><span></span><span></span></button>
+    <nav id="primary-nav" class="top-nav">
+      <a href="index.html">Main</a><a href="quests.html">Quests</a><a href="diet.html">Diet</a>
+      <a href="fitness.html">Looksmaxxing</a><a href="progress.html" class="active">Progress</a><a href="leaderboard.html">Leaderboard</a>
+    </nav>
+    <div><a class="profile-link" href="login.html" aria-label="Open login"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="8" r="4"></circle></svg></a></div>
+  </div>
+
+  <div class="page">
+    <div class="page-header">
+      <div class="page-eyebrow">SYSTEM MODULE</div>
+      <h1 class="page-title">PROGRESS SANCTUM</h1>
+      <p class="page-sub">Your ascension visualised. Every stat, every milestone, every shadow conquered.</p>
     </div>
 
-    <section class="max-w-6xl mx-auto px-4 md:px-8 mt-8">
-      <div class="panel p-6 md:p-8 rounded-2xl border border-cyan-400/30">
-        <h1 class="title-font text-3xl md:text-4xl">Hunter Progress</h1>
-        <p class="text-slate-300 mt-2">Track your growth with the same live combat profile used in Quests.</p>
+    <!-- SUMMARY ROW -->
+    <div class="summary-row">
+      <div class="sum-card"><div class="sum-label">TOTAL XP</div><div class="sum-val" x-text="profile.xp"></div><div class="sum-change up">Recorded total</div></div>
+      <div class="sum-card"><div class="sum-label">CURRENT RANK</div><div class="sum-val" style="color:var(--gold);" x-text="profile.rank"></div><div class="sum-change neutral">Level <span x-text="profile.level"></span></div></div>
+      <div class="sum-card"><div class="sum-label">STREAK</div><div class="sum-val"><span x-text="meta.survivalStreak||0"></span><span>d</span></div><div class="sum-change up" x-text="meta.survivalStreak > 0 ? 'Recorded streak' : 'No streak yet'"></div></div>
+      <div class="sum-card"><div class="sum-label">QUESTS DONE</div><div class="sum-val" x-text="quests.filter(q=>q.done).length"></div><div class="sum-change up">Today</div></div>
+      <div class="sum-card"><div class="sum-label">DISCIPLINE</div><div class="sum-val" x-text="profile.stats.discipline"></div><div class="sum-change neutral">Stat</div></div>
+    </div>
 
-        <div class="hunter-card mt-7">
-          <div class="hunter-card-inner">
-            <div class="hunter-id">
-              <div class="hunter-avatar">
-                <span x-text="profile.name.charAt(0).toUpperCase()"></span>
-              </div>
-              <div>
-                <p class="hunter-label">Hunter License</p>
-                <div class="flex items-start justify-between gap-3">
-                  <h2 class="hunter-name" x-text="profile.name"></h2>
-                  <p class="text-xs text-warning whitespace-nowrap mt-1">
-                    &#128293; Survival Streak: <span class="font-bold" x-text="meta.survivalStreak || 0"></span>
-                  </p>
-                </div>
-                <p class="hunter-rank-pill" :class="rankPillClass(profile.rank)" x-text="profile.rank"></p>
-              </div>
-            </div>
-
-            <div class="hunter-metrics">
-              <div class="metric-tile">
-                <p class="metric-label">Level</p>
-                <p class="metric-value" x-text="profile.level"></p>
-              </div>
-              <div class="metric-tile">
-                <p class="metric-label">Quests Cleared</p>
-                <p class="metric-value" x-text="quests.filter((quest) => quest.done).length"></p>
-              </div>
-            </div>
-          </div>
-
-          <div class="hunter-progress-wrap">
-            <div class="hunter-progress-head">
-              <span>XP Progress</span>
-              <span><span x-text="profile.xp"></span> / <span x-text="profile.nextLevelXp"></span></span>
-            </div>
-            <div class="hunter-progress-track">
-              <div class="hunter-progress-fill" :style="`width: ${xpPercent()}%`"></div>
-            </div>
-          </div>
-
-          <div class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
-            <div class="metric-tile relative overflow-hidden">
-              <p class="metric-label">Strength</p>
-              <p class="metric-value" x-text="profile.stats.strength"></p>
-              <p x-show="isDietUnlocked()" class="mt-1 text-[11px] text-cyan-300" x-text="`Diet XP: ${meta.dietStatXp?.strength || 0} (${dietStatProgress('strength')})`"></p>
-              <span x-show="statGainFx.visible" x-transition.opacity.duration.120ms class="stat-gain-fx" x-text="statGainFx.text"></span>
-            </div>
-            <div class="metric-tile">
-              <p class="metric-label">Endurance</p>
-              <p class="metric-value" x-text="profile.stats.endurance"></p>
-              <p x-show="isDietUnlocked()" class="mt-1 text-[11px] text-cyan-300" x-text="`Diet XP: ${meta.dietStatXp?.endurance || 0} (${dietStatProgress('endurance')})`"></p>
-            </div>
-            <div class="metric-tile">
-              <p class="metric-label">Agility</p>
-              <p class="metric-value" x-text="profile.stats.agility"></p>
-            </div>
-            <div class="metric-tile">
-              <p class="metric-label">Discipline</p>
-              <p class="metric-value" x-text="profile.stats.discipline"></p>
-            </div>
-            <div class="metric-tile">
-              <p class="metric-label">Aura</p>
-              <p class="metric-value" x-text="profile.stats.aura"></p>
-            </div>
-            <div class="metric-tile">
-              <p class="metric-label">Recovery</p>
-              <p class="metric-value" x-text="profile.stats.recovery"></p>
-              <p x-show="isDietUnlocked()" class="mt-1 text-[11px] text-cyan-300" x-text="`Diet XP: ${meta.dietStatXp?.recovery || 0} (${dietStatProgress('recovery')})`"></p>
-              <p x-show="isDietUnlocked()" class="text-[11px] text-sky-300" x-text="`Water: ${meta.dietWaterLiters || 0}L / ${waterGoalLiters || 3}L`"></p>
-            </div>
-          </div>
-        </div>
+    <!-- ROW 1: RADAR + XP LINE -->
+    <div class="main-grid" style="animation:reveal-up 0.8s 0.4s both;">
+      <div class="panel"><div class="panel-head"><div><div class="panel-tag">// ATTRIBUTE MAP</div><div class="panel-title">HUNTER STATS RADAR</div></div></div>
+        <div class="panel-body"><div id="radarWrap" style="display:flex;align-items:center;justify-content:center;padding:20px 0;"><svg id="radarChart" width="300" height="300" viewBox="0 0 300 300"></svg></div></div>
       </div>
-    </section>
+      <div class="panel"><div class="panel-head"><div><div class="panel-tag">// XP ACCUMULATION</div><div class="panel-title">EXPERIENCE TIMELINE</div></div><div style="font-family:'Cinzel',serif;font-size:11px;color:var(--ice);letter-spacing:0.1em;" x-text="`${profile.xp} XP`"></div></div>
+        <div class="panel-body"><div id="lineWrap" style="width:100%;overflow:hidden;"><svg id="lineChart" width="100%" height="200" viewBox="0 0 500 200" preserveAspectRatio="none"></svg></div><div class="chart-x-labels" id="xLabels"></div></div>
+      </div>
+    </div>
 
-    <section class="max-w-6xl mx-auto px-4 md:px-8 mt-6">
-      <article x-show="isDietUnlocked()" class="panel rounded-2xl p-6 border border-cyan-400/30" x-data="{ weekly: weeklyNutritionSummary() }" x-effect="weekly = weeklyNutritionSummary()">
-        <h2 class="title-font text-2xl">Weekly Nutrition Intelligence</h2>
-        <p class="mt-1 text-xs text-slate-400">
-          Week: <span class="text-cyan-300 font-semibold" x-text="weekly.weekKey"></span>
-          <span class="text-slate-500">|</span>
-          Tracked Days: <span class="text-cyan-300 font-semibold" x-text="weekly.trackedDays"></span>/7
-        </p>
+    <!-- ROW 2: ATTRIBUTE BARS + DONUT -->
+    <div class="main-grid" style="animation:reveal-up 0.8s 0.5s both;">
+      <div class="panel"><div class="panel-head"><div><div class="panel-tag">// STAT BREAKDOWN</div><div class="panel-title">ATTRIBUTE LEVELS</div></div></div>
+        <div class="panel-body"><div class="attr-list" id="attrList"></div></div>
+      </div>
+      <div class="panel"><div class="panel-head"><div><div class="panel-tag">// QUEST DISTRIBUTION</div><div class="panel-title">COMPLETION BREAKDOWN</div></div></div>
+        <div class="panel-body"><div id="donutWrap"><svg id="donutSvg" width="160" height="160" viewBox="0 0 160 160"></svg><div class="donut-legend" id="donutLegend"></div></div></div>
+      </div>
+    </div>
 
-        <div class="mt-4 grid gap-3 md:grid-cols-3">
-          <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3">
-            <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Protein Target</p>
-            <p class="mt-1 text-lg font-semibold text-rank"><span x-text="weekly.proteinPercent"></span>% achieved</p>
-          </div>
-          <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3">
-            <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Hydration</p>
-            <p class="mt-1 text-lg font-semibold text-rank"><span x-text="weekly.hydrationPercent"></span>%</p>
-          </div>
-          <div class="rounded-xl border border-slate-700 bg-slate-900/70 p-3">
-            <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Consistency</p>
-            <p class="mt-1 text-lg font-semibold text-rank" x-text="weekly.consistencyLabel"></p>
-          </div>
-        </div>
+    <!-- STREAK CALENDAR -->
+    <div class="panel full-width" style="animation:reveal-up 0.8s 0.6s both;margin-bottom:24px;">
+      <div class="panel-head"><div><div class="panel-tag">// CONSISTENCY MATRIX</div><div class="panel-title">ACTIVITY HEATMAP</div></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:9px;color:rgba(200,216,232,0.25);letter-spacing:0.3em;">LESS<div style="width:10px;height:10px;background:rgba(126,184,212,0.04);border:1px solid var(--border);"></div><div style="width:10px;height:10px;background:rgba(126,184,212,0.15);"></div><div style="width:10px;height:10px;background:rgba(126,184,212,0.3);"></div><div style="width:10px;height:10px;background:rgba(126,184,212,0.5);"></div><div style="width:10px;height:10px;background:var(--ice);box-shadow:0 0 6px rgba(126,184,212,0.4);"></div>MORE</div>
+      </div>
+      <div class="panel-body"><p style="margin-bottom:12px;">Only recorded days are shown. Unrecorded days have no activity estimate.</p><div class="cal-wrap"><div class="cal-grid" id="calGrid"></div></div></div>
+    </div>
 
-        <div class="mt-4 rounded-xl border border-cyan-400/35 bg-cyan-500/10 px-4 py-3">
-          <p class="text-xs uppercase tracking-[0.16em] text-cyan-300">System Recommendation</p>
-          <p class="mt-1 text-sm text-slate-100" x-text="`\"${weekly.recommendation}\"`"></p>
-        </div>
-      </article>
-      <article x-show="!isDietUnlocked()" class="panel rounded-2xl p-6 border border-warning/60 bg-warning/10">
-        <h2 class="title-font text-2xl">Weekly Nutrition Intelligence</h2>
-        <p class="mt-2 text-sm text-slate-200">Diet analytics are locked. Select a Build Focus first to enable nutrition tracking and calorie intelligence.</p>
-      </article>
-    </section>
+    <!-- RANK TIMELINE -->
+    <div class="panel full-width" style="animation:reveal-up 0.8s 0.7s both;margin-bottom:24px;">
+      <div class="panel-head"><div><div class="panel-tag">// ASCENSION PATH</div><div class="panel-title">RANK PROGRESSION TIMELINE</div></div></div>
+      <div class="panel-body"><div class="timeline" id="timeline"></div></div>
+    </div>
 
-    <section class="max-w-6xl mx-auto px-4 md:px-8 mt-6 pb-16">
-      <article class="panel rounded-2xl p-6 border border-slate-700">
-        <div class="flex items-center justify-between gap-3 flex-wrap">
-          <h2 class="title-font text-2xl">System Log</h2>
-          <button @click="requestResetProgress()" class="text-sm px-4 py-2 rounded-lg border border-blood/60 text-blood hover:bg-blood/10 transition">Reset Progress</button>
-        </div>
-        <div class="mt-4 max-h-64 overflow-auto space-y-2 pr-2">
-          <template x-for="(log, idx) in logs" :key="idx">
-            <p class="text-sm border-l-2 border-cyan-500 pl-3 text-slate-300" x-text="log"></p>
-          </template>
-          <p x-show="logs.length === 0" class="text-sm text-slate-500">No logs yet. Complete a quest to start.</p>
-        </div>
-      </article>
-    </section>
-  </main>
+    <!-- WEEKLY NUTRITION -->
+    <div x-show="isDietUnlocked()" class="panel" style="margin-bottom:24px;animation:reveal-up 0.8s 0.5s both;" x-data="{weekly:weeklyNutritionSummary()}" x-effect="weekly=weeklyNutritionSummary()">
+      <div class="panel-head"><div><div class="panel-tag">// NUTRITION INTEL</div><div class="panel-title">WEEKLY NUTRITION INTELLIGENCE</div></div>
+        <div style="font-size:11px;color:rgba(200,216,232,0.35);">Week: <span style="color:var(--ice-bright);font-weight:600;" x-text="weekly.weekKey"></span> | Tracked: <span style="color:var(--ice-bright);font-weight:600;" x-text="weekly.trackedDays"></span>/7</div>
+      </div>
+      <div class="panel-body">
+        <div class="nstat-row"><div class="nstat-card"><div class="nstat-label">Protein Target</div><div class="nstat-val"><span x-text="weekly.proteinPercent"></span>%</div></div><div class="nstat-card"><div class="nstat-label">Hydration</div><div class="nstat-val"><span x-text="weekly.hydrationPercent"></span>%</div></div><div class="nstat-card"><div class="nstat-label">Consistency</div><div class="nstat-val" x-text="weekly.consistencyLabel"></div></div></div>
+        <div class="info-box"><div class="info-box-tag">System Recommendation</div><p x-text="`&quot;${weekly.recommendation}&quot;`"></p></div>
+      </div>
+    </div>
+    <div x-show="!isDietUnlocked()" class="diet-lock"><div class="diet-lock-title">WEEKLY NUTRITION INTELLIGENCE</div><div class="diet-lock-text">Diet analytics are locked. Select a Build Focus first.</div></div>
 
-  <script src="web-config.js"></script>
-  <script src="auth-guard.js"></script>
-  <script src="app.js"></script>
-  <script src="nav.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
-  <script defer src="lenis-init.js"></script>
+    <!-- SYSTEM LOG -->
+    <div class="panel" style="margin-bottom:24px;">
+      <div class="panel-head"><div><div class="panel-tag">// ACTIVITY FEED</div><div class="panel-title">SYSTEM LOG</div></div><button @click="requestResetProgress()" class="btn-reset">RESET PROGRESS</button></div>
+      <div class="panel-body" style="max-height:280px;overflow-y:auto;">
+        <template x-for="(log,idx) in logs" :key="idx"><p class="log-entry" x-text="log"></p></template>
+        <p x-show="logs.length===0" style="font-size:12px;color:rgba(200,216,232,0.2);">No logs yet. Complete a quest to start.</p>
+      </div>
+    </div>
+
+    <div class="page-footer"><div class="footer-logo">ASCENDRA</div><div class="footer-right"><span x-text="dataStatusLabel()"></span></div></div>
+  </div>
+</main>
+
+<script>
+/* CURSOR */
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx-4+'px';cursor.style.top=my-4+'px';});
+(function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx-16+'px';ring.style.top=ry-16+'px';requestAnimationFrame(animRing);})();
+document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('a,button,.sum-card,.attr-row,.tl-item,.cal-day,.legend-item,.panel,.nstat-card').forEach(el=>{el.addEventListener('mouseenter',()=>{cursor.style.transform='scale(2)';ring.style.width='44px';ring.style.height='44px';ring.style.borderColor='rgba(126,184,212,0.8)';});el.addEventListener('mouseleave',()=>{cursor.style.transform='scale(1)';ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(126,184,212,0.5)';});});});
+
+function buildAllCharts(d){
+  const stats={strength:d.profile.stats.strength||0,endurance:d.profile.stats.endurance||0,agility:d.profile.stats.agility||0,discipline:d.profile.stats.discipline||0,aura:d.profile.stats.aura||0,recovery:d.profile.stats.recovery||0};
+  const xp=d.profile.xp||0;const rank=d.profile.rank||'E-Rank';
+  const doneCount=Array.isArray(d.quests)?d.quests.filter(q=>q.done).length:0;
+  const totalCount=Array.isArray(d.quests)?d.quests.length:0;
+  const streak=d.meta.survivalStreak||0;
+
+  buildRadar(stats);
+  buildLine(d.meta.progressHistory || {});
+  buildAttrs(stats);
+  buildDonut(doneCount,totalCount);
+  buildCal(d.meta.progressHistory || {});
+  buildTimeline(d.rankTiers(), d.profile.level);
+}
+
+/* RADAR */
+function buildRadar(stats){
+  const svg=document.getElementById('radarChart');if(!svg)return;svg.innerHTML='';
+  const cx=150,cy=150,r=100;
+  const s=[{name:'STRENGTH',val:stats.strength,color:'#7eb8d4'},{name:'ENDURANCE',val:stats.endurance,color:'#4caf82'},{name:'AGILITY',val:stats.agility,color:'#a8d8f0'},{name:'DISCIPLINE',val:stats.discipline,color:'#c9a96e'},{name:'AURA',val:stats.aura,color:'#c94a5e'},{name:'RECOVERY',val:stats.recovery,color:'#4a9fc8'}];
+  const n=s.length,maxV=Math.max(...s.map(x=>x.val),1);
+  const angle=i=>(Math.PI*2*i/n)-Math.PI/2;
+  const pt=(i,rad)=>[cx+Math.cos(angle(i))*rad,cy+Math.sin(angle(i))*rad];
+  const ns='http://www.w3.org/2000/svg';
+  [0.25,0.5,0.75,1].forEach(f=>{const p=s.map((_,i)=>pt(i,r*f).join(',')).join(' ');const e=document.createElementNS(ns,'polygon');e.setAttribute('points',p);e.setAttribute('fill','none');e.setAttribute('stroke',`rgba(126,184,212,${f===1?0.15:0.07})`);e.setAttribute('stroke-width','1');svg.appendChild(e);});
+  s.forEach((_,i)=>{const[x,y]=pt(i,r);const l=document.createElementNS(ns,'line');l.setAttribute('x1',cx);l.setAttribute('y1',cy);l.setAttribute('x2',x);l.setAttribute('y2',y);l.setAttribute('stroke','rgba(126,184,212,0.08)');svg.appendChild(l);});
+  const dataR=s.map((st,i)=>pt(i,r*(st.val/maxV)));const dataPts=dataR.map(p=>p.join(',')).join(' ');
+  const dp=document.createElementNS(ns,'polygon');dp.setAttribute('points',dataPts);dp.setAttribute('fill','rgba(126,184,212,0.08)');dp.setAttribute('stroke','rgba(126,184,212,0.5)');dp.setAttribute('stroke-width','1.5');dp.style.opacity='0';setTimeout(()=>{dp.style.transition='opacity 1s 0.5s';dp.style.opacity='1';},100);svg.appendChild(dp);
+  s.forEach((st,i)=>{const[x,y]=pt(i,r*(st.val/maxV));const c=document.createElementNS(ns,'circle');c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r','4');c.setAttribute('fill',st.color);c.setAttribute('filter',`drop-shadow(0 0 4px ${st.color})`);c.style.opacity='0';setTimeout(()=>{c.style.transition='opacity 0.5s '+(0.8+i*0.1)+'s';c.style.opacity='1';},100);svg.appendChild(c);});
+  s.forEach((st,i)=>{const[x,y]=pt(i,r*1.22);const t=document.createElementNS(ns,'text');t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','middle');t.setAttribute('font-size','9');t.setAttribute('fill','rgba(200,216,232,0.4)');t.setAttribute('font-family','Rajdhani');t.setAttribute('letter-spacing','1.5');t.textContent=st.name;svg.appendChild(t);const v=document.createElementNS(ns,'text');v.setAttribute('x',x);v.setAttribute('y',y+14);v.setAttribute('text-anchor','middle');v.setAttribute('font-size','11');v.setAttribute('fill',st.color);v.setAttribute('font-family','Cinzel,serif');v.setAttribute('font-weight','700');v.textContent=st.val;svg.appendChild(v);});
+}
+
+/* LINE CHART */
+function buildLine(history){
+  document.getElementById('xLabels')?.replaceChildren();
+  const svg=document.getElementById('lineChart');if(!svg)return;svg.innerHTML='';
+  const W=500,H=200,pad={top:20,right:20,bottom:20,left:40};
+  const samples=Object.entries(history).filter(([,v])=>Number.isFinite(v.xp)).sort(([a],[b])=>a.localeCompare(b)).slice(-30);
+  const data=samples.map(([,v])=>v.xp);
+  if(!data.length){const text=document.createElementNS('http://www.w3.org/2000/svg','text');text.setAttribute('x','40');text.setAttribute('y','100');text.setAttribute('fill','var(--silver)');text.textContent='No recorded XP history yet';svg.appendChild(text);return;}
+  const ns='http://www.w3.org/2000/svg';
+  const minV=0,maxV=Math.max(...data,1);
+  const scX=i=>(i/Math.max(1,data.length-1))*(W-pad.left-pad.right)+pad.left;
+  const scY=v=>H-pad.bottom-((v-minV)/(maxV-minV))*(H-pad.top-pad.bottom);
+  [0,0.25,0.5,0.75,1].forEach(f=>{const y=H-pad.bottom-f*(H-pad.top-pad.bottom);const l=document.createElementNS(ns,'line');l.setAttribute('x1',pad.left);l.setAttribute('y1',y);l.setAttribute('x2',W-pad.right);l.setAttribute('y2',y);l.setAttribute('stroke','rgba(126,184,212,0.05)');svg.appendChild(l);const t=document.createElementNS(ns,'text');t.setAttribute('x',pad.left-8);t.setAttribute('y',y+4);t.setAttribute('text-anchor','end');t.setAttribute('font-size','8');t.setAttribute('fill','rgba(200,216,232,0.2)');t.setAttribute('font-family','Rajdhani');t.textContent=Math.round(minV+f*(maxV-minV));if(maxV>=1000)t.textContent=Math.round((minV+f*(maxV-minV))/1000)+'k';svg.appendChild(t);});
+  const area='M'+scX(0)+','+scY(data[0])+data.slice(1).map((v,i)=>` L${scX(i+1)},${scY(v)}`).join('')+` L${scX(data.length-1)},${H-pad.bottom} L${scX(0)},${H-pad.bottom} Z`;
+  const defs=document.createElementNS(ns,'defs');const grad=document.createElementNS(ns,'linearGradient');grad.id='lineGrad';grad.setAttribute('x1','0');grad.setAttribute('y1','0');grad.setAttribute('x2','0');grad.setAttribute('y2','1');const s1=document.createElementNS(ns,'stop');s1.setAttribute('offset','0%');s1.setAttribute('stop-color','rgba(126,184,212,0.25)');const s2=document.createElementNS(ns,'stop');s2.setAttribute('offset','100%');s2.setAttribute('stop-color','rgba(126,184,212,0)');grad.appendChild(s1);grad.appendChild(s2);defs.appendChild(grad);svg.appendChild(defs);
+  const ap=document.createElementNS(ns,'path');ap.setAttribute('d',area);ap.setAttribute('fill','url(#lineGrad)');svg.appendChild(ap);
+  const lp='M'+scX(0)+','+scY(data[0])+data.slice(1).map((v,i)=>` L${scX(i+1)},${scY(v)}`).join('');const line=document.createElementNS(ns,'path');line.setAttribute('d',lp);line.setAttribute('fill','none');line.setAttribute('stroke','rgba(126,184,212,0.7)');line.setAttribute('stroke-width','2');line.setAttribute('stroke-linecap','round');const len=line.getTotalLength?line.getTotalLength():800;line.style.strokeDasharray=len;line.style.strokeDashoffset=len;setTimeout(()=>{line.style.transition=`stroke-dashoffset 2s 0.5s cubic-bezier(0.16,1,0.3,1)`;line.style.strokeDashoffset='0';},200);svg.appendChild(line);
+  const lx=scX(data.length-1),ly=scY(data[data.length-1]);const dot=document.createElementNS(ns,'circle');dot.setAttribute('cx',lx);dot.setAttribute('cy',ly);dot.setAttribute('r','5');dot.setAttribute('fill','var(--ice-bright)');dot.setAttribute('filter','drop-shadow(0 0 6px #a8d8f0)');svg.appendChild(dot);
+  const xEl=document.getElementById('xLabels');if(xEl){xEl.innerHTML='';const labels=samples.map(([day],i)=>i===0||i===samples.length-1||i%Math.ceil(samples.length/5)===0?day.slice(5):'');labels.forEach(l=>{const sp=document.createElement('span');sp.textContent=l;xEl.appendChild(sp);});}
+}
+
+/* ATTRIBUTE BARS */
+function buildAttrs(stats){
+  const list=document.getElementById('attrList');if(!list)return;list.innerHTML='';
+  const attrs=[{name:'STRENGTH',val:stats.strength,cls:'str'},{name:'ENDURANCE',val:stats.endurance,cls:'end'},{name:'AGILITY',val:stats.agility,cls:'agi'},{name:'DISCIPLINE',val:stats.discipline,cls:'dis'},{name:'AURA',val:stats.aura,cls:'aur'},{name:'RECOVERY',val:stats.recovery,cls:'rec'}];
+  const maxV=Math.max(...attrs.map(a=>a.val),1);
+  attrs.forEach((a,i)=>{const row=document.createElement('div');row.className='attr-row';row.innerHTML=`<div class="attr-row-name">${a.name}</div><div class="attr-track"><div class="attr-fill ${a.cls}" style="width:0%;"></div></div><div class="attr-num">${a.val}</div>`;list.appendChild(row);setTimeout(()=>{row.querySelector('.attr-fill').style.width=(a.val/maxV*100)+'%';},400+i*100);});
+}
+
+/* DONUT */
+function buildDonut(done,total){
+  const svg=document.getElementById('donutSvg');if(!svg)return;svg.innerHTML='';
+  const cx=80,cy=80,outerR=70,innerR=48,ns='http://www.w3.org/2000/svg';
+  if(!total){document.getElementById('donutLegend')?.replaceChildren();const text=document.createElementNS(ns,'text');text.setAttribute('x','80');text.setAttribute('y','80');text.setAttribute('text-anchor','middle');text.setAttribute('fill','var(--silver)');text.setAttribute('font-size','11');text.textContent='No quests assigned';svg.appendChild(text);return;}
+  const undone=Math.max(total-done,0);
+  const data=[{label:'Completed',pct:total?Math.round(done/total*100):0,color:'#7eb8d4'},{label:'Remaining',pct:total?Math.round(undone/total*100):100,color:'rgba(126,184,212,0.12)'}];
+  if(data[0].pct+data[1].pct!==100)data[1].pct=100-data[0].pct;
+  let cumAngle=-Math.PI/2;const legend=document.getElementById('donutLegend');if(legend)legend.innerHTML='';
+  data.forEach((d,i)=>{if(d.pct===0)return;const angle=Math.PI*2*(d.pct/100);const x1=cx+Math.cos(cumAngle)*outerR,y1=cy+Math.sin(cumAngle)*outerR;const x2=cx+Math.cos(cumAngle+angle)*outerR,y2=cy+Math.sin(cumAngle+angle)*outerR;const ix1=cx+Math.cos(cumAngle)*innerR,iy1=cy+Math.sin(cumAngle)*innerR;const ix2=cx+Math.cos(cumAngle+angle)*innerR,iy2=cy+Math.sin(cumAngle+angle)*innerR;const large=angle>Math.PI?1:0;
+    const path=document.createElementNS(ns,'path');path.setAttribute('d',`M${x1},${y1} A${outerR},${outerR} 0 ${large} 1 ${x2},${y2} L${ix2},${iy2} A${innerR},${innerR} 0 ${large} 0 ${ix1},${iy1} Z`);if(d.pct===100)path.setAttribute('d',`M${cx-outerR},${cy} a${outerR},${outerR} 0 1 0 ${outerR*2},0 a${outerR},${outerR} 0 1 0 ${-outerR*2},0 M${cx-innerR},${cy} a${innerR},${innerR} 0 1 1 ${innerR*2},0 a${innerR},${innerR} 0 1 1 ${-innerR*2},0`);path.setAttribute('fill',d.color);path.setAttribute('opacity','0.8');path.setAttribute('stroke','rgba(1,2,10,0.8)');path.setAttribute('stroke-width','2');path.style.opacity='0';setTimeout(()=>{path.style.transition='opacity 0.5s '+(i*0.15)+'s';path.style.opacity='0.8';},300);svg.appendChild(path);cumAngle+=angle;
+    if(legend){const item=document.createElement('div');item.className='legend-item';item.innerHTML=`<div class="legend-dot" style="background:${d.color};"></div><div class="legend-label">${d.label}</div><div class="legend-pct">${d.pct}%</div>`;legend.appendChild(item);}
+  });
+  const t1=document.createElementNS(ns,'text');t1.setAttribute('x',cx);t1.setAttribute('y',cy-8);t1.setAttribute('text-anchor','middle');t1.setAttribute('font-family','Cinzel,serif');t1.setAttribute('font-size','18');t1.setAttribute('font-weight','900');t1.setAttribute('fill','rgba(240,244,248,0.9)');t1.textContent=done;
+  const t2=document.createElementNS(ns,'text');t2.setAttribute('x',cx);t2.setAttribute('y',cy+10);t2.setAttribute('text-anchor','middle');t2.setAttribute('font-family','Rajdhani');t2.setAttribute('font-size','8');t2.setAttribute('letter-spacing','2');t2.setAttribute('fill','rgba(200,216,232,0.3)');t2.textContent='QUESTS';svg.appendChild(t1);svg.appendChild(t2);
+}
+
+/* HEATMAP */
+function buildCal(history){
+  const grid=document.getElementById('calGrid');if(!grid)return;grid.innerHTML='';
+  const today=new Date();
+  for(let daysAgo=153;daysAgo>=0;daysAgo--){
+    const date=new Date(today);date.setDate(date.getDate()-daysAgo);
+    const key=[date.getFullYear(),String(date.getMonth()+1).padStart(2,'0'),String(date.getDate()).padStart(2,'0')].join('-');
+    const record=history[key];const completed=record?.completed||0;
+    const intensity=record&&record.total?Math.ceil(completed/record.total*4):0;
+    const cell=document.createElement('div');cell.className='cal-day d'+Math.min(4,intensity);
+    cell.title=key+': '+(record?completed+' / '+record.total+' quests completed':'No recorded data');grid.appendChild(cell);
+  }
+}
+
+/* RANK TIMELINE */
+function buildTimeline(tiers,level){
+  const tl=document.getElementById('timeline');if(!tl)return;tl.innerHTML='';
+  const current=tiers.filter(t=>level>=t.level).at(-1);
+  tiers.forEach(tier=>{
+    const state=tier.level<current.level?'reached':tier.level===current.level?'current':'locked';
+    const item=document.createElement('div');item.className='tl-item';
+    item.innerHTML='<div class="tl-dot '+state+'"></div><div><div class="tl-rank '+state+'">'+tier.name.toUpperCase()+'</div><div class="tl-date">Level '+tier.level+' · '+(state==='locked'?'Not reached':state==='current'?'Current rank':'Threshold reached')+'</div><div class="tl-xp">'+tier.xp.toLocaleString()+' XP</div></div>';
+    tl.appendChild(item);
+  });
+}
+
+</script>
+<script src="web-config.js"></script>
+<script src="auth-guard.js"></script>
+<script src="app.js"></script>
+<script src="nav.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+<script defer src="lenis-init.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-

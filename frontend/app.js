@@ -490,12 +490,6 @@ function soloLevelingApp() {
       { name: 'Saturday', workout: 'Long walk/run + light calisthenics' },
       { name: 'Sunday', workout: 'Rest + meal prep + progress review' }
     ],
-    systemNotifications: [
-      { title: '🟦 System Alert', message: 'You are falling behind your potential.' },
-      { title: '🟦 System Notice', message: 'Hidden Quest Available.' },
-      { title: '🟦 System Alert', message: 'Your discipline curve is dropping.' },
-      { title: '🟦 System Notice', message: 'A rank-up opportunity has been detected.' }
-    ],
     hiddenQuest: {
       active: false,
       completed: false,
@@ -519,6 +513,30 @@ function soloLevelingApp() {
     activeQuestTutorial: null,
     showResetProgressModal: false,
     logs: [],
+    dataStatus: 'loading',
+    lastSyncedAt: null,
+
+    rankTiers() {
+      return [[1, 'E-Rank'], [7, 'D-Rank'], [14, 'C-Rank'], [22, 'B-Rank'],
+        [32, 'A-Rank'], [45, 'S-Rank'], [60, 'S++ Rank']].map(([level, name]) => ({
+          level, name, xp: this.xpThresholdForLevel(level)
+        }));
+    },
+
+    recordProgressSnapshot() {
+      const history = this.meta.progressHistory || {};
+      const day = this.todayDateKey();
+      history[day] = { xp: this.profile.xp, completed: this.quests.filter(q => q.done).length,
+        total: this.quests.length };
+      this.meta.progressHistory = Object.fromEntries(Object.entries(history).sort().slice(-366));
+    },
+
+    dataStatusLabel() {
+      if (this.dataStatus === 'synced') return 'Synced with your account';
+      if (this.dataStatus === 'loading') return 'Loading account data…';
+      if (this.dataStatus === 'pending') return 'Local changes — waiting to sync';
+      return 'Offline — showing saved data';
+    },
     backendSyncTimer: null,
     backendRefreshTimer: null,
     backendSyncPending: false,
@@ -534,6 +552,8 @@ function soloLevelingApp() {
     questReminderAppListenerBound: false,
 
     init() {
+      if (this._initialized) return;
+      this._initialized = true;
       if (typeof window !== 'undefined') {
         window.__soloLevelingApp = this;
       }
@@ -541,13 +561,6 @@ function soloLevelingApp() {
       this.initializeQuestReminderNotifications();
       const stateKey = this.stateStorageKey();
       let saved = localStorage.getItem(stateKey);
-      if (!saved && stateKey !== 'monarch-mode-state') {
-        const legacyState = localStorage.getItem('monarch-mode-state');
-        if (legacyState) {
-          saved = legacyState;
-          localStorage.setItem(stateKey, legacyState);
-        }
-      }
       if (saved) {
         try {
           const state = JSON.parse(saved);
@@ -587,7 +600,7 @@ function soloLevelingApp() {
       this.initializeEditorFields();
       this.save({ skipBackendSync: true, preserveGameStateUpdatedAt: true });
       this.syncFromBackend().catch(() => {
-        // Keep local-mode behavior if backend is unavailable.
+        this.dataStatus = 'offline';
       });
       this.startBackendRefreshLoop();
     },
@@ -631,8 +644,9 @@ function soloLevelingApp() {
     },
 
     localGameStatePayload() {
+      const { progressSyncPending, ...syncedMeta } = this.meta;
       return {
-        meta: { ...this.meta },
+        meta: syncedMeta,
         quests: Array.isArray(this.quests) ? this.quests : [],
         raidTasks: Array.isArray(this.raidTasks) ? this.raidTasks : [],
         hiddenQuest: this.hiddenQuest && typeof this.hiddenQuest === 'object'
@@ -644,7 +658,8 @@ function soloLevelingApp() {
     applyBackendGameState(gameState, updatedAt = null) {
       if (!gameState || typeof gameState !== 'object') return;
       if (gameState.meta && typeof gameState.meta === 'object') {
-        this.meta = { ...this.meta, ...gameState.meta };
+        const { progressSyncPending, ...syncedMeta } = gameState.meta;
+        this.meta = { ...this.meta, ...syncedMeta };
       }
       if (Array.isArray(gameState.quests)) {
         this.quests = gameState.quests;
@@ -671,6 +686,11 @@ function soloLevelingApp() {
 
     save(options = {}) {
       const skipBackendSync = Boolean(options.skipBackendSync);
+      if (!skipBackendSync) {
+        this.recordProgressSnapshot();
+        this.meta.progressSyncPending = true;
+        this.dataStatus = 'pending';
+      }
       const preserveGameStateUpdatedAt = Boolean(options.preserveGameStateUpdatedAt);
       if (!preserveGameStateUpdatedAt) {
         this.meta.gameStateUpdatedAt = new Date().toISOString();
@@ -1000,11 +1020,11 @@ function soloLevelingApp() {
         name: user.name || this.profile.name,
         rank: user.rank || this.profile.rank,
         level: Number.isFinite(user.level) ? user.level : this.profile.level,
-        xp: Number.isFinite(user.xp) ? user.xp : this.profile.xp,
+        xp: applyProgressFields && Number.isFinite(user.xp) ? user.xp : this.profile.xp,
         isAdmin: Boolean(user.is_admin || user.isAdmin),
         stats: {
           ...this.profile.stats,
-          ...(user.stats || {})
+          ...(applyProgressFields ? (user.stats || {}) : {})
         }
       };
       this.hunterProfile = {
@@ -1065,8 +1085,10 @@ function soloLevelingApp() {
     },
 
     async syncFromBackend() {
+      if (this.backendSyncPending) return;
+      if (this.meta.progressSyncPending) { this.scheduleBackendSync(); return; }
       const response = await this.backendRequest('/users/me', { method: 'GET' });
-      if (!response) return;
+      if (!response) { this.dataStatus = 'offline'; return; }
       const user = await response.json();
       const localGameStateTimestamp = this.timestampMs(this.meta?.gameStateUpdatedAt);
       const backendGameStateTimestamp = this.timestampMs(user?.game_state_updated_at);
@@ -1083,7 +1105,15 @@ function soloLevelingApp() {
       if (shouldApplyBackendGameState) {
         this.applyBackendGameState(user.game_state, user.game_state_updated_at || null);
       }
+      this.recomputeProgressFromCurrentXp();
+      this.recordProgressSnapshot();
+      this.dataStatus = 'synced';
+      this.lastSyncedAt = new Date().toISOString();
       this.save({ skipBackendSync: true, preserveGameStateUpdatedAt: true });
+      if (hasBackendGameState && !shouldApplyBackendGameState) {
+        this.meta.progressSyncPending = true;
+        this.scheduleBackendSync();
+      }
     },
 
     async syncProgressToBackend() {
@@ -1098,11 +1128,13 @@ function soloLevelingApp() {
         game_state: this.localGameStatePayload(),
         game_state_updated_at: gameStateUpdatedAt
       };
-      await this.backendRequest('/users/me/progress', {
+      const response = await this.backendRequest('/users/me/progress', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
+      if (!response) throw new Error('Progress has not synced.');
+      return response.json();
     },
 
     async syncProfileToBackend() {
@@ -1127,17 +1159,30 @@ function soloLevelingApp() {
     },
 
     scheduleBackendSync() {
-      if (!this.firebaseIdToken()) return;
+      if (!this.firebaseIdToken()) { this.dataStatus = 'offline'; return; }
+      this.dataStatus = 'pending';
       if (this.backendSyncTimer) {
         clearTimeout(this.backendSyncTimer);
       }
       this.backendSyncTimer = setTimeout(() => {
         if (this.backendSyncPending) return;
         this.backendSyncPending = true;
+        const sentAt = this.meta.gameStateUpdatedAt;
         Promise.all([this.syncProfileToBackend(), this.syncProgressToBackend()])
-          .catch(() => {})
+          .then(([, user]) => {
+            if (this.meta.gameStateUpdatedAt !== sentAt) return;
+            if (this.timestampMs(user.game_state_updated_at) > this.timestampMs(sentAt)) {
+              this.applyBackendUser(user);
+              this.applyBackendGameState(user.game_state, user.game_state_updated_at);
+            }
+            this.meta.progressSyncPending = false;
+            this.dataStatus = 'synced'; this.lastSyncedAt = new Date().toISOString();
+            this.save({skipBackendSync: true, preserveGameStateUpdatedAt: true});
+          })
+          .catch(() => { this.dataStatus = 'offline'; })
           .finally(() => {
             this.backendSyncPending = false;
+            if (this.meta.progressSyncPending && this.dataStatus !== 'offline') this.scheduleBackendSync();
           });
       }, 900);
     },
@@ -1253,10 +1298,11 @@ function soloLevelingApp() {
     },
 
     xpPercent() {
-      const xp = Number(this.profile?.xp);
-      const next = Number(this.profile?.nextLevelXp);
+      const start = this.xpThresholdForLevel(this.profile.level);
+      const xp = Number(this.profile?.xp) - start;
+      const next = Number(this.profile?.nextLevelXp) - start;
       if (!Number.isFinite(xp) || !Number.isFinite(next) || next <= 0) return 0;
-      return Math.min(100, (xp / next) * 100);
+      return Math.max(0, Math.min(100, (xp / next) * 100));
     },
 
     loadHunterProfileFromRegistration() {
@@ -3519,19 +3565,14 @@ function soloLevelingApp() {
       if (this.profile.level > oldLevel) {
         this.log(`Level up! You reached level ${this.profile.level}.`);
       }
-      // Push XP changes to backend immediately so leaderboard reflects updates quickly.
-      this.syncProgressToBackend().catch(() => {});
+      // Mark changes from daily resets as well as quest rewards for synchronization.
+      this.meta.progressSyncPending = true;
+      this.meta.gameStateUpdatedAt = new Date().toISOString();
+      // The caller saves the completed quest and XP together after all rewards.
     },
 
     updateRank() {
-      const lvl = this.profile.level;
-      if (lvl >= 60) this.profile.rank = 'S++ Rank';
-      else if (lvl >= 45) this.profile.rank = 'S-Rank';
-      else if (lvl >= 32) this.profile.rank = 'A-Rank';
-      else if (lvl >= 22) this.profile.rank = 'B-Rank';
-      else if (lvl >= 14) this.profile.rank = 'C-Rank';
-      else if (lvl >= 7) this.profile.rank = 'D-Rank';
-      else this.profile.rank = 'E-Rank';
+      this.profile.rank = this.rankTiers().filter(tier => this.profile.level >= tier.level).pop().name;
     },
 
     rankKey(rank = '') {
@@ -3820,11 +3861,20 @@ function soloLevelingApp() {
 
     rollSystemNotification(force = false) {
       if (this.activeSystemNotification) return;
-      if (!force && Math.random() > 0.35) return;
-      const idx = Math.floor(Math.random() * this.systemNotifications.length);
+      if (this.dataStatus === 'loading') return;
+      let message = null;
+      if (this.hiddenQuest.active && !this.hiddenQuest.completed) {
+        message = this.hiddenQuest.objective;
+      } else if (this.meta.fatigueDebuffActive) {
+        message = 'Fatigue debuff is active. Complete your daily directives to remove it.';
+      } else if (this.isDailyModeSelected()) {
+        const remaining = this.quests.filter(quest => !quest.done).length;
+        if (remaining) message = `${remaining} daily quests remaining.`;
+      }
+      if (!message) return;
       this.activeSystemNotification = {
         id: Date.now(),
-        ...this.systemNotifications[idx]
+        title: '🟦 System Notice', message
       };
     },
 

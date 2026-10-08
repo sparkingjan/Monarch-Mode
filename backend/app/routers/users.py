@@ -9,6 +9,7 @@ from app.deps import get_current_user
 from app.firebase import get_firestore_client
 from app.models import PublicUserRecord, UserProfileUpdate, UserProgressUpdate, UserRecord
 from app.user_seed import ensure_visible_admin_records, is_visible_admin_email
+from app.progression import progression_for_xp
 
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -198,6 +199,7 @@ def _sanitize_user_record(data: dict, claims: Optional[dict] = None) -> dict:
             sanitized["game_state_updated_at"] = None
     else:
         sanitized["game_state_updated_at"] = None
+    sanitized.update(progression_for_xp(sanitized["xp"]))
     return sanitized
 
 
@@ -278,7 +280,7 @@ def get_public_profile(uid: str):
             snapshot = _user_doc_ref(uid).get(timeout=8)
         if not snapshot.exists:
             raise HTTPException(status_code=404, detail="User not found")
-        data = snapshot.to_dict() or {}
+        data = _sanitize_user_record(snapshot.to_dict() or {})
         return PublicUserRecord(
             uid=data.get("uid", uid),
             gallery_urls=data.get("gallery_urls") or data.get("galleryUrls") or [],
@@ -340,6 +342,7 @@ def update_me_profile(payload: UserProfileUpdate, claims: dict = Depends(get_cur
         if "phone" in update_data:
             update_data["phone"] = _normalize_phone(update_data["phone"])
         current.update(update_data)
+        current.update(progression_for_xp(current.get("xp")))
         current["is_admin"] = bool(current.get("is_admin")) or is_visible_admin_email(current.get("email"))
         current["updated_at"] = datetime.now(timezone.utc)
 
@@ -377,6 +380,7 @@ def update_me_progress(payload: UserProgressUpdate, claims: dict = Depends(get_c
             progress_data["game_state"] = current.get("game_state")
             progress_data["game_state_updated_at"] = current.get("game_state_updated_at")
         current.update(progress_data)
+        current.update(progression_for_xp(current.get("xp")))
         current["updated_at"] = datetime.now(timezone.utc)
         if not snapshot.exists:
             current["created_at"] = current["updated_at"]

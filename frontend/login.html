@@ -1,336 +1,542 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ascendra - Login</title>
-  <link rel="icon" type="image/png" href="logo.png" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ascendra - Login</title>
+<link rel="icon" type="image/png" href="logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #01020a;
+    --abyss: #040715;
+    --deep: #080e22;
+    --ice: #7eb8d4;
+    --ice-bright: #a8d8f0;
+    --ice-glow: #4a9fc8;
+    --silver: #c8d8e8;
+    --white: #f0f4f8;
+    --gold: #c9a96e;
+    --crimson: #8b1a2e;
+    --border: rgba(126,184,212,0.12);
+    --border-h: rgba(126,184,212,0.28);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--void);color:var(--silver);font-family:'Rajdhani',sans-serif;overflow-x:hidden;min-height:100svh;height:auto;padding:24px 16px;cursor:none;display:flex;align-items:center;justify-content:center;}
+
+  .cursor{position:fixed;width:8px;height:8px;background:var(--ice-bright);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s;mix-blend-mode:screen;}
+  .cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(126,184,212,0.5);border-radius:50%;pointer-events:none;z-index:9998;transition:width 0.3s,height 0.3s,border-color 0.3s;}
+
+  /* BG */
+  .bg-fixed{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 100% 100% at 50% 50%,#080e22 0%,#040715 45%,#01020a 100%);}
+  .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(126,184,212,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(126,184,212,0.025) 1px,transparent 1px);background-size:60px 60px;}
+  .scanlines{position:fixed;inset:0;z-index:1000;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);}
+  .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 100% 100% at 50% 50%,transparent 30%,rgba(1,2,10,0.92) 100%);}
+
+  /* RUNE RINGS */
+  .rune-field{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:1;}
+  .rune-ring{position:absolute;border-radius:50%;top:50%;left:50%;}
+  .r1{width:800px;height:800px;margin:-400px 0 0 -400px;border:1px dashed rgba(126,184,212,0.04);animation:spin 90s linear infinite;}
+  .r2{width:560px;height:560px;margin:-280px 0 0 -280px;border:1px solid rgba(126,184,212,0.06);animation:spin-r 60s linear infinite;}
+  .r3{width:340px;height:340px;margin:-170px 0 0 -170px;border:1px dashed rgba(126,184,212,0.09);animation:spin 40s linear infinite;}
+  @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  @keyframes spin-r{from{transform:rotate(0deg);}to{transform:rotate(-360deg);}}
+
+  /* PARTICLES */
+  .particle{position:fixed;border-radius:50%;pointer-events:none;z-index:1;opacity:0;animation:float-p var(--dur) var(--delay) infinite ease-in;}
+  @keyframes float-p{0%{opacity:0;transform:translateY(0);}15%{opacity:var(--op);}85%{opacity:var(--op);}100%{opacity:0;transform:translateY(-80px);}}
+
+  @keyframes reveal-up{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+  /* CARD */
+  .login-card{position:relative;z-index:10;width:100%;max-width:460px;background:rgba(8,14,34,0.9);border:1px solid var(--border);backdrop-filter:blur(24px);animation:reveal-up 1s 0.2s both;overflow:hidden;}
+  .login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ice),rgba(201,169,110,0.4),transparent);}
+  .login-card::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(126,184,212,0.04) 0%,transparent 60%);pointer-events:none;}
+
+  /* LOGO TOP */
+  .card-logo{padding:32px 40px 0;display:flex;align-items:center;justify-content:space-between;}
+  .logo-mark{font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:0.4em;color:var(--ice);text-decoration:none;}
+  .logo-back{font-size:9px;letter-spacing:0.3em;color:rgba(200,216,232,0.25);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color 0.3s;}
+  .logo-back:hover{color:var(--ice);}
+  .logo-back svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;}
+
+  /* HEADER */
+  .card-header{padding:24px 40px 28px;}
+  .card-eyebrow{font-size:9px;letter-spacing:0.5em;color:var(--ice-glow);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+  .card-eyebrow::before{content:'';width:16px;height:1px;background:var(--ice-glow);}
+  .card-title{font-family:'Cinzel',serif;font-size:38px;font-weight:600;letter-spacing:0.08em;color:var(--white);margin-bottom:8px;line-height:1;}
+  .card-sub{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:300;font-style:italic;color:rgba(200,216,232,0.4);}
+
+  /* FORM */
+  .card-form{padding:0 40px 36px;display:flex;flex-direction:column;gap:14px;}
+
+  .input-wrap{position:relative;}
+  .input-label{font-size:9px;letter-spacing:0.4em;color:rgba(200,216,232,0.3);margin-bottom:6px;display:block;}
+  .input-field{width:100%;background:rgba(4,7,21,0.7);border:1px solid var(--border);color:var(--silver);font-family:'Rajdhani',sans-serif;font-size:14px;letter-spacing:0.08em;padding:14px 18px;outline:none;transition:border-color 0.3s,box-shadow 0.3s;-webkit-appearance:none;}
+  .input-field::placeholder{color:rgba(200,216,232,0.18);}
+  .input-field:focus{border-color:var(--ice-glow);box-shadow:0 0 0 1px rgba(74,159,200,0.15),inset 0 0 20px rgba(126,184,212,0.03);}
+  .input-field.error{border-color:rgba(139,26,46,0.6);box-shadow:0 0 0 1px rgba(139,26,46,0.2);}
+
+  .pw-wrap{position:relative;}
+  .pw-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(200,216,232,0.25);cursor:none;transition:color 0.3s;padding:4px;}
+  .pw-toggle:hover{color:var(--ice);}
+  .pw-toggle svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.5;}
+
+  .forgot{font-size:11px;color:rgba(200,216,232,0.3);letter-spacing:0.05em;text-decoration:none;align-self:flex-start;transition:color 0.3s;margin-top:-4px;background:none;border:none;font-family:'Rajdhani',sans-serif;cursor:none;}
+  .forgot:hover{color:var(--ice);}
+
+  /* ERROR / INFO MSG */
+  .error-msg{font-size:10px;color:rgba(139,26,46,0.8);letter-spacing:0.1em;display:none;align-items:center;gap:6px;padding:10px 14px;border:1px solid rgba(139,26,46,0.25);background:rgba(139,26,46,0.06);}
+  .error-msg.show{display:flex;}
+  .error-msg::before{content:'⚠';font-size:11px;}
+  .info-msg{font-size:10px;color:var(--ice-glow);letter-spacing:0.1em;display:none;align-items:center;gap:6px;padding:10px 14px;border:1px solid rgba(74,159,200,0.25);background:rgba(74,159,200,0.06);}
+  .info-msg.show{display:flex;}
+
+  /* BUTTONS */
+  .btn-primary{font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:0.3em;color:var(--void);background:var(--ice-bright);border:none;padding:16px;cursor:none;position:relative;overflow:hidden;transition:transform 0.2s,opacity 0.3s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);width:100%;}
+  .btn-primary::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent);transition:left 0.5s;}
+  .btn-primary:hover::after{left:100%;}
+  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-primary:active{transform:scale(0.98);}
+  .btn-primary.loading{opacity:0.7;pointer-events:none;}
+
+  .divider-row{display:flex;align-items:center;gap:14px;margin:2px 0;}
+  .divider-line{flex:1;height:1px;background:var(--border);}
+  .divider-text{font-size:9px;letter-spacing:0.35em;color:rgba(200,216,232,0.2);}
+
+  .btn-google{font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:0.2em;color:rgba(200,216,232,0.6);background:transparent;border:1px solid var(--border);padding:15px;cursor:none;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:12px;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);width:100%;}
+  .btn-google:hover{border-color:var(--border-h);color:var(--white);background:rgba(126,184,212,0.04);transform:translateY(-2px);}
+  .btn-google svg{width:16px;height:16px;}
+
+  /* FOOTER LINKS */
+  .card-footer{padding:0 40px 28px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(126,184,212,0.06);padding-top:20px;}
+  .footer-link-text{font-size:11px;color:rgba(200,216,232,0.3);letter-spacing:0.05em;}
+  .footer-link{color:var(--ice-glow);text-decoration:none;transition:color 0.3s;}
+  .footer-link:hover{color:var(--ice-bright);}
+
+  a,button{cursor:none;}
+  @media(max-width:480px){.card-logo,.card-header,.card-form,.card-footer{padding-left:20px;padding-right:20px;}.card-logo,.card-footer{flex-wrap:wrap;gap:12px;}.card-title{font-size:30px;}.input-field{min-width:0;font-size:16px;}.input-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}.goal-grid{grid-template-columns:1fr;}}
+</style>
 </head>
-<body class="bg-abyss text-slate-100 min-h-screen">
-  <div class="bg-grid"></div>
+<body>
 
-  <main class="auth-shell relative z-10">
-    <section class="auth-card">
-      <p class="text-cyan-300 tracking-[0.2em] uppercase text-xs">Hunter Access</p>
-      <h1 class="title-font text-3xl mt-2">Login</h1>
-      <p class="text-slate-400 mt-1 text-sm">Enter your credentials to continue your rank-up journey.</p>
+<div class="bg-fixed"></div>
+<div class="bg-grid"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="rune-field">
+  <div class="rune-ring r1"></div>
+  <div class="rune-ring r2"></div>
+  <div class="rune-ring r3"></div>
+</div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
-      <form id="login-form" class="mt-5 space-y-3" action="#" method="post">
-        <input class="auth-input" type="email" name="email" placeholder="Email" required />
-        <input class="auth-input" type="password" name="password" placeholder="Password" required />
-        <button type="submit" class="hero-cta w-full">LOGIN</button>
-      </form>
-      <button id="forgot-password-btn" type="button" class="auth-link mt-3 text-sm">Forgot password?</button>
-      <button id="google-login-btn" type="button" class="hero-cta w-full mt-3">CONTINUE WITH GOOGLE</button>
-      <p id="login-error" class="text-sm text-rose-300 mt-3 hidden"></p>
-      <p id="login-info" class="text-sm text-cyan-300 mt-2 hidden"></p>
+<div class="login-card">
 
-      <p class="text-sm text-slate-300 mt-4">
-        New hunter? <a class="auth-link" href="signup.html">Sign up</a>
-      </p>
-      <p class="text-sm text-slate-400 mt-2">
-        <a class="auth-link" href="index.html">Back to Main</a>
-      </p>
-    </section>
-  </main>
-  <script src="web-config.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script>
-    (function () {
-      const form = document.getElementById('login-form');
-      const forgotBtn = document.getElementById('forgot-password-btn');
-      const googleBtn = document.getElementById('google-login-btn');
-      const errorEl = document.getElementById('login-error');
-      const infoEl = document.getElementById('login-info');
-      if (!form) return;
+  <div class="card-logo">
+    <a href="index.html" class="logo-mark">ASCENDRA</a>
+    <a href="index.html" class="logo-back">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      BACK TO MAIN
+    </a>
+  </div>
 
-      const cfg = window.MONARCH_CONFIG || {};
-      const firebaseCfg = cfg.firebase || {};
-      const hasFirebaseCfg = Boolean(firebaseCfg.apiKey && firebaseCfg.authDomain && firebaseCfg.projectId);
+  <div class="card-header">
+    <div class="card-eyebrow">HUNTER ACCESS</div>
+    <div class="card-title">LOGIN</div>
+    <div class="card-sub">Enter your credentials to continue your rank-up journey.</div>
+  </div>
 
-      function showError(message) {
-        if (!errorEl) return;
-        if (infoEl) infoEl.classList.add('hidden');
-        errorEl.textContent = message;
-        errorEl.classList.remove('hidden');
+  <div class="card-form">
+    <div class="error-msg" id="login-error"></div>
+    <div class="info-msg" id="login-info"></div>
+
+    <form id="login-form" style="display:contents;" action="#" method="post">
+      <div class="input-wrap">
+        <label class="input-label">EMAIL</label>
+        <input class="input-field" type="email" name="email" placeholder="hunter@ascendra.com" autocomplete="email" required>
+      </div>
+
+      <div class="input-wrap">
+        <label class="input-label">PASSWORD</label>
+        <div class="pw-wrap">
+          <input class="input-field" type="password" name="password" placeholder="••••••••••" autocomplete="current-password" style="padding-right:48px;" required>
+          <button type="button" class="pw-toggle" id="pwToggle">
+            <svg id="eyeIcon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="forgot" id="forgot-password-btn">Forgot password?</button>
+
+      <button type="submit" class="btn-primary" id="loginBtn">LOGIN</button>
+    </form>
+
+    <div class="divider-row">
+      <div class="divider-line"></div>
+      <div class="divider-text">OR</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <button class="btn-google" id="google-login-btn" type="button">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      CONTINUE WITH GOOGLE
+    </button>
+
+  </div>
+
+  <div class="card-footer">
+    <div class="footer-link-text">New hunter? <a href="signup.html" class="footer-link">Sign up</a></div>
+    <a href="index.html" class="footer-link" style="font-size:11px;color:rgba(200,216,232,0.25);letter-spacing:0.05em;">Back to Main</a>
+  </div>
+
+</div>
+
+<!-- EXTERNAL SCRIPTS -->
+<script src="web-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+<!-- PASSWORD TOGGLE -->
+<script>
+  (function() {
+    const pwToggle = document.getElementById('pwToggle');
+    if (!pwToggle) return;
+    pwToggle.addEventListener('click', function() {
+      const inp = document.querySelector('#login-form input[name="password"]');
+      const icon = document.getElementById('eyeIcon');
+      if (!inp || !icon) return;
+      const shown = inp.type === 'text';
+      inp.type = shown ? 'password' : 'text';
+      icon.innerHTML = shown
+        ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+        : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    });
+  })();
+</script>
+
+<!-- FIREBASE AUTH LOGIC (PRESERVED) -->
+<script>
+  (function () {
+    const form = document.getElementById('login-form');
+    const forgotBtn = document.getElementById('forgot-password-btn');
+    const googleBtn = document.getElementById('google-login-btn');
+    const errorEl = document.getElementById('login-error');
+    const infoEl = document.getElementById('login-info');
+    if (!form) return;
+
+    const cfg = window.MONARCH_CONFIG || {};
+    const firebaseCfg = cfg.firebase || {};
+    const hasFirebaseCfg = Boolean(firebaseCfg.apiKey && firebaseCfg.authDomain && firebaseCfg.projectId);
+
+    function showError(message) {
+      if (!errorEl) return;
+      if (infoEl) { infoEl.classList.remove('show'); }
+      errorEl.textContent = message;
+      errorEl.classList.add('show');
+    }
+
+    function showInfo(message) {
+      if (!infoEl) return;
+      if (errorEl) { errorEl.classList.remove('show'); }
+      infoEl.textContent = message;
+      infoEl.classList.add('show');
+    }
+
+    function initFirebase() {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseCfg);
       }
+      return firebase.auth();
+    }
 
-      function showInfo(message) {
-        if (!infoEl) return;
-        if (errorEl) errorEl.classList.add('hidden');
-        infoEl.textContent = message;
-        infoEl.classList.remove('hidden');
+    function createSessionId() {
+      const randomPart = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+        ? crypto.randomUUID().replace(/-/g, '')
+        : (Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
+      return `sess_${Date.now().toString(36)}_${randomPart}`;
+    }
+
+    function isNativeCapacitor() {
+      try {
+        return Boolean(window.Capacitor?.isNativePlatform?.());
+      } catch (_) {
+        return false;
       }
+    }
 
-      function initFirebase() {
-        if (!firebase.apps.length) {
-          firebase.initializeApp(firebaseCfg);
-        }
-        return firebase.auth();
+    function nativeFirebaseAuthPlugin() {
+      return window.Capacitor?.Plugins?.FirebaseAuthentication || null;
+    }
+
+    function isPopupFallbackError(code) {
+      return code === 'auth/popup-blocked'
+        || code === 'auth/popup-closed-by-user'
+        || code === 'auth/cancelled-popup-request'
+        || code === 'auth/operation-not-supported-in-this-environment';
+    }
+
+    function googleErrorMessage(error) {
+      const code = error?.code || '';
+      const message = String(error?.message || '');
+      const details = `${code} ${message}`.toLowerCase();
+      if (details.includes('developer error') || details.includes('error 10') || details.includes(' 10')) {
+        return 'Android Google Sign-In is misconfigured for this APK. Add this debug SHA1 to Firebase/Google OAuth for package com.monarchmode.app: CF:A8:93:34:2B:10:58:C3:8A:41:5B:03:C9:FA:97:58:99:BC:65:DA';
       }
-
-      function createSessionId() {
-        const randomPart = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
-          ? crypto.randomUUID().replace(/-/g, '')
-          : (Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
-        return `sess_${Date.now().toString(36)}_${randomPart}`;
+      if (code === 'auth/unauthorized-domain') {
+        return 'This domain is not authorized in Firebase Auth. Add it under Firebase Console -> Authentication -> Settings -> Authorized domains.';
       }
-
-      function isNativeCapacitor() {
-        try {
-          return Boolean(window.Capacitor?.isNativePlatform?.());
-        } catch (_) {
-          return false;
-        }
+      if (code === 'auth/operation-not-allowed') {
+        return 'Google provider is disabled. Enable Google in Firebase Console -> Authentication -> Sign-in method.';
       }
-
-      function nativeFirebaseAuthPlugin() {
-        return window.Capacitor?.Plugins?.FirebaseAuthentication || null;
+      if (window.location.protocol === 'file:') {
+        return 'Google login is not supported from file:// pages. Run via http://localhost instead.';
       }
+      return message || 'Google login failed.';
+    }
 
-      function isPopupFallbackError(code) {
-        return code === 'auth/popup-blocked'
-          || code === 'auth/popup-closed-by-user'
-          || code === 'auth/cancelled-popup-request'
-          || code === 'auth/operation-not-supported-in-this-environment';
+    function isAndroidCapacitor() {
+      try {
+        return isNativeCapacitor() && String(window.Capacitor?.getPlatform?.() || '').toLowerCase() === 'android';
+      } catch (_) {
+        return false;
       }
+    }
 
-      function googleErrorMessage(error) {
-        const code = error?.code || '';
-        const message = String(error?.message || '');
-        const details = `${code} ${message}`.toLowerCase();
-        if (details.includes('developer error') || details.includes('error 10') || details.includes(' 10')) {
-          return 'Android Google Sign-In is misconfigured for this APK. Add this debug SHA1 to Firebase/Google OAuth for package com.monarchmode.app: CF:A8:93:34:2B:10:58:C3:8A:41:5B:03:C9:FA:97:58:99:BC:65:DA';
-        }
-        if (code === 'auth/unauthorized-domain') {
-          return 'This domain is not authorized in Firebase Auth. Add it under Firebase Console -> Authentication -> Settings -> Authorized domains.';
-        }
-        if (code === 'auth/operation-not-allowed') {
-          return 'Google provider is disabled. Enable Google in Firebase Console -> Authentication -> Sign-in method.';
-        }
-        if (window.location.protocol === 'file:') {
-          return 'Google login is not supported from file:// pages. Run via http://localhost instead.';
-        }
-        return message || 'Google login failed.';
-      }
+    function shouldRetryNativeGoogleWithoutCredentialManager(error) {
+      if (!isAndroidCapacitor()) return false;
+      const details = `${error?.code || ''} ${error?.message || ''}`.toLowerCase();
+      return details.includes('no credentials')
+        || details.includes('credential')
+        || details.includes('getcredentialexception');
+    }
 
-      function isAndroidCapacitor() {
-        try {
-          return isNativeCapacitor() && String(window.Capacitor?.getPlatform?.() || '').toLowerCase() === 'android';
-        } catch (_) {
-          return false;
-        }
-      }
-
-      function shouldRetryNativeGoogleWithoutCredentialManager(error) {
-        if (!isAndroidCapacitor()) return false;
-        const details = `${error?.code || ''} ${error?.message || ''}`.toLowerCase();
-        return details.includes('no credentials')
-          || details.includes('credential')
-          || details.includes('getcredentialexception');
-      }
-
-      async function signInWithNativeGoogle(nativeAuth) {
-        try {
-          return await nativeAuth.signInWithGoogle({
-            skipNativeAuth: true,
-            useCredentialManager: true
-          });
-        } catch (error) {
-          if (!shouldRetryNativeGoogleWithoutCredentialManager(error)) {
-            throw error;
-          }
-          showInfo('No saved Google credential found. Opening account chooser...');
-          return await nativeAuth.signInWithGoogle({
-            skipNativeAuth: true,
-            useCredentialManager: false
-          });
-        }
-      }
-
-      async function ensureBackendProfile(idToken, sessionId, claimSession) {
-        const baseUrl = cfg.backendBaseUrl || 'https://monarch-mode.vercel.app/api/v1';
-        const headers = {
-          Authorization: 'Bearer ' + idToken
-        };
-        if (sessionId) {
-          headers['X-Monarch-Session'] = sessionId;
-        }
-        if (claimSession) {
-          headers['X-Monarch-Claim-Session'] = '1';
-        }
-        const response = await fetch(baseUrl + '/users/me', {
-          method: 'GET',
-          headers
+    async function signInWithNativeGoogle(nativeAuth) {
+      try {
+        return await nativeAuth.signInWithGoogle({
+          skipNativeAuth: true,
+          useCredentialManager: true
         });
-        if (!response.ok) {
-          let detail = '';
-          try {
-            const payload = await response.json();
-            detail = payload?.detail ? String(payload.detail) : '';
-          } catch (_) {}
-          throw new Error(detail || ('Backend auth failed (' + response.status + ').'));
+      } catch (error) {
+        if (!shouldRetryNativeGoogleWithoutCredentialManager(error)) {
+          throw error;
         }
-        return await response.json();
+        showInfo('No saved Google credential found. Opening account chooser...');
+        return await nativeAuth.signInWithGoogle({
+          skipNativeAuth: true,
+          useCredentialManager: false
+        });
+      }
+    }
+
+    async function ensureBackendProfile(idToken, sessionId, claimSession) {
+      const baseUrl = cfg.backendBaseUrl || 'https://monarch-mode.vercel.app/api/v1';
+      const headers = {
+        Authorization: 'Bearer ' + idToken
+      };
+      if (sessionId) {
+        headers['X-Monarch-Session'] = sessionId;
+      }
+      if (claimSession) {
+        headers['X-Monarch-Claim-Session'] = '1';
+      }
+      const response = await fetch(baseUrl + '/users/me', {
+        method: 'GET',
+        headers
+      });
+      if (!response.ok) {
+        let detail = '';
+        try {
+          const payload = await response.json();
+          detail = payload?.detail ? String(payload.detail) : '';
+        } catch (_) {}
+        throw new Error(detail || ('Backend auth failed (' + response.status + ').'));
+      }
+      return await response.json();
+    }
+
+    async function completeLogin(user) {
+      const idToken = await user.getIdToken(true);
+      const sessionId = createSessionId();
+      localStorage.setItem('firebase-id-token', idToken);
+      localStorage.setItem('monarch-session-id', sessionId);
+      let profileWithDob = null;
+      try {
+        profileWithDob = await ensureBackendProfile(idToken, sessionId, true);
+      } catch (error) {
+        profileWithDob = null;
+        localStorage.setItem('monarch-backend-sync-warning', String(error?.message || 'Backend profile sync failed.'));
+      }
+      localStorage.setItem('hunter-account-profile', JSON.stringify({
+        uid: profileWithDob?.uid || user.uid || null,
+        name: profileWithDob?.name || user.displayName || 'Player Hunter',
+        email: profileWithDob?.email || user.email || null,
+        galleryUrls: Array.isArray(profileWithDob?.gallery_urls)
+          ? profileWithDob.gallery_urls
+          : (Array.isArray(profileWithDob?.galleryUrls) ? profileWithDob.galleryUrls : []),
+        heightCm: Number.isFinite(profileWithDob?.height_cm) ? profileWithDob.height_cm : null,
+        weightKg: Number.isFinite(profileWithDob?.weight_kg) ? profileWithDob.weight_kg : null,
+        dob: typeof profileWithDob?.dob === 'string' ? profileWithDob.dob : null,
+        goal: ['cut', 'maintain', 'bulk'].includes(profileWithDob?.goal) ? profileWithDob.goal : 'maintain',
+        isAdmin: Boolean(profileWithDob?.is_admin || profileWithDob?.isAdmin),
+        createdAt: profileWithDob?.created_at || profileWithDob?.createdAt || null,
+        syncedAt: new Date().toISOString()
+      }));
+      if (!profileWithDob) {
+        window.location.href = 'index.html';
+        return;
+      }
+      const needsSetup = !profileWithDob.height_cm || !profileWithDob.weight_kg || !profileWithDob.goal || !profileWithDob.dob;
+      window.location.href = needsSetup ? 'profile-setup.html' : 'index.html';
+    }
+
+    async function handleGoogleAuthResult() {
+      if (isNativeCapacitor()) return;
+      if (!hasFirebaseCfg) return;
+      try {
+        const auth = initFirebase();
+        const redirectResult = await auth.getRedirectResult();
+        if (redirectResult?.user) {
+          await completeLogin(redirectResult.user);
+        }
+      } catch (error) {
+        showError(googleErrorMessage(error));
+      }
+    }
+
+    handleGoogleAuthResult();
+
+    form.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      if (errorEl) errorEl.classList.remove('show');
+      if (infoEl) infoEl.classList.remove('show');
+
+      if (!hasFirebaseCfg) {
+        showError('Firebase config missing: apiKey/authDomain/projectId in web-config.js');
+        return;
       }
 
-      async function completeLogin(user) {
-        const idToken = await user.getIdToken(true);
-        const sessionId = createSessionId();
-        localStorage.setItem('firebase-id-token', idToken);
-        localStorage.setItem('monarch-session-id', sessionId);
-        let profileWithDob = null;
-        try {
-          profileWithDob = await ensureBackendProfile(idToken, sessionId, true);
-        } catch (error) {
-          // Allow login even when backend profile sync is temporarily unavailable.
-          profileWithDob = null;
-          localStorage.setItem('monarch-backend-sync-warning', String(error?.message || 'Backend profile sync failed.'));
-        }
-        localStorage.setItem('hunter-account-profile', JSON.stringify({
-          uid: profileWithDob?.uid || user.uid || null,
-          name: profileWithDob?.name || user.displayName || 'Player Hunter',
-          email: profileWithDob?.email || user.email || null,
-          galleryUrls: Array.isArray(profileWithDob?.gallery_urls)
-            ? profileWithDob.gallery_urls
-            : (Array.isArray(profileWithDob?.galleryUrls) ? profileWithDob.galleryUrls : []),
-          heightCm: Number.isFinite(profileWithDob?.height_cm) ? profileWithDob.height_cm : null,
-          weightKg: Number.isFinite(profileWithDob?.weight_kg) ? profileWithDob.weight_kg : null,
-          dob: typeof profileWithDob?.dob === 'string' ? profileWithDob.dob : null,
-          goal: ['cut', 'maintain', 'bulk'].includes(profileWithDob?.goal) ? profileWithDob.goal : 'maintain',
-          isAdmin: Boolean(profileWithDob?.is_admin || profileWithDob?.isAdmin),
-          createdAt: profileWithDob?.created_at || profileWithDob?.createdAt || null,
-          syncedAt: new Date().toISOString()
-        }));
-        if (!profileWithDob) {
-          window.location.href = 'index.html';
+      try {
+        const auth = initFirebase();
+        const email = (form.elements.email?.value || '').trim().toLowerCase();
+        const password = form.elements.password?.value || '';
+        const cred = await auth.signInWithEmailAndPassword(email, password);
+        await completeLogin(cred.user);
+      } catch (error) {
+        if (error?.code === 'auth/user-not-found' || error?.code === 'auth/wrong-password' || error?.code === 'auth/invalid-credential') {
+          showError('Invalid credentials.');
           return;
         }
-        const needsSetup = !profileWithDob.height_cm || !profileWithDob.weight_kg || !profileWithDob.goal || !profileWithDob.dob;
-        window.location.href = needsSetup ? 'profile-setup.html' : 'index.html';
+        showError(error?.message || 'Login failed.');
       }
+    });
 
-      async function handleGoogleAuthResult() {
-        if (isNativeCapacitor()) return;
-        if (!hasFirebaseCfg) return;
-        try {
-          const auth = initFirebase();
-          const redirectResult = await auth.getRedirectResult();
-          if (redirectResult?.user) {
-            await completeLogin(redirectResult.user);
-          }
-        } catch (error) {
-          showError(googleErrorMessage(error));
-        }
-      }
-
-      handleGoogleAuthResult();
-
-      form.addEventListener('submit', async function (event) {
-        event.preventDefault();
-        if (errorEl) errorEl.classList.add('hidden');
-        if (infoEl) infoEl.classList.add('hidden');
-
+    if (googleBtn) {
+      googleBtn.addEventListener('click', async function () {
+        if (errorEl) errorEl.classList.remove('show');
+        if (infoEl) infoEl.classList.remove('show');
         if (!hasFirebaseCfg) {
           showError('Firebase config missing: apiKey/authDomain/projectId in web-config.js');
           return;
         }
+        try {
+          const auth = initFirebase();
+          const nativeAuth = nativeFirebaseAuthPlugin();
+          if (isNativeCapacitor() && nativeAuth?.signInWithGoogle) {
+            const nativeResult = await signInWithNativeGoogle(nativeAuth);
+            const idToken = nativeResult?.credential?.idToken || '';
+            if (!idToken) {
+              throw new Error('Google sign-in did not return an ID token.');
+            }
+            const googleCredential = firebase.auth.GoogleAuthProvider.credential(idToken);
+            const cred = await auth.signInWithCredential(googleCredential);
+            await completeLogin(cred.user);
+            return;
+          }
+          const provider = new firebase.auth.GoogleAuthProvider();
+          try {
+            const cred = await auth.signInWithPopup(provider);
+            await completeLogin(cred.user);
+          } catch (error) {
+            if (isPopupFallbackError(error?.code)) {
+              await auth.signInWithRedirect(provider);
+              return;
+            }
+            throw error;
+          }
+        } catch (error) {
+          showError(googleErrorMessage(error));
+        }
+      });
+    }
 
+    if (forgotBtn) {
+      forgotBtn.addEventListener('click', async function () {
+        if (errorEl) errorEl.classList.remove('show');
+        if (infoEl) infoEl.classList.remove('show');
+        if (!hasFirebaseCfg) {
+          showError('Firebase config missing: apiKey/authDomain/projectId in web-config.js');
+          return;
+        }
         try {
           const auth = initFirebase();
           const email = (form.elements.email?.value || '').trim().toLowerCase();
-          const password = form.elements.password?.value || '';
-          const cred = await auth.signInWithEmailAndPassword(email, password);
-          await completeLogin(cred.user);
-        } catch (error) {
-          if (error?.code === 'auth/user-not-found' || error?.code === 'auth/wrong-password' || error?.code === 'auth/invalid-credential') {
-            showError('Invalid credentials.');
+          if (!email) {
+            showError('Enter your email first.');
             return;
           }
-          showError(error?.message || 'Login failed.');
+          await auth.sendPasswordResetEmail(email);
+          showInfo('Password reset email sent. Check your inbox.');
+        } catch (error) {
+          if (error?.code === 'auth/user-not-found') {
+            showError('No user found for this account.');
+            return;
+          }
+          showError(error?.message || 'Failed to send reset email.');
         }
       });
+    }
+  }());
+</script>
 
-      if (googleBtn) {
-        googleBtn.addEventListener('click', async function () {
-          if (errorEl) errorEl.classList.add('hidden');
-          if (infoEl) infoEl.classList.add('hidden');
-          if (!hasFirebaseCfg) {
-            showError('Firebase config missing: apiKey/authDomain/projectId in web-config.js');
-            return;
-          }
-          try {
-            const auth = initFirebase();
-            const nativeAuth = nativeFirebaseAuthPlugin();
-            if (isNativeCapacitor() && nativeAuth?.signInWithGoogle) {
-              const nativeResult = await signInWithNativeGoogle(nativeAuth);
-              const idToken = nativeResult?.credential?.idToken || '';
-              if (!idToken) {
-                throw new Error('Google sign-in did not return an ID token.');
-              }
-              const googleCredential = firebase.auth.GoogleAuthProvider.credential(idToken);
-              const cred = await auth.signInWithCredential(googleCredential);
-              await completeLogin(cred.user);
-              return;
-            }
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try {
-              const cred = await auth.signInWithPopup(provider);
-              await completeLogin(cred.user);
-            } catch (error) {
-              if (isPopupFallbackError(error?.code)) {
-                await auth.signInWithRedirect(provider);
-                return;
-              }
-              throw error;
-            }
-          } catch (error) {
-            showError(googleErrorMessage(error));
-          }
-        });
-      }
+<!-- CURSOR + PARTICLES -->
+<script>
+  (function() {
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    if (!cursor || !ring) return;
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx - 4 + 'px';
+      cursor.style.top  = my - 4 + 'px';
+    });
+    (function animRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx - 16 + 'px';
+      ring.style.top  = ry - 16 + 'px';
+      requestAnimationFrame(animRing);
+    })();
+    document.querySelectorAll('a,button,.input-field').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.transform = 'scale(2)'; ring.style.width = '44px'; ring.style.height = '44px'; ring.style.borderColor = 'rgba(126,184,212,0.8)'; });
+      el.addEventListener('mouseleave', () => { cursor.style.transform = 'scale(1)'; ring.style.width = '32px'; ring.style.height = '32px'; ring.style.borderColor = 'rgba(126,184,212,0.5)'; });
+    });
 
-      if (forgotBtn) {
-        forgotBtn.addEventListener('click', async function () {
-          if (errorEl) errorEl.classList.add('hidden');
-          if (infoEl) infoEl.classList.add('hidden');
-          if (!hasFirebaseCfg) {
-            showError('Firebase config missing: apiKey/authDomain/projectId in web-config.js');
-            return;
-          }
-          try {
-            const auth = initFirebase();
-            const email = (form.elements.email?.value || '').trim().toLowerCase();
-            if (!email) {
-              showError('Enter your email first.');
-              return;
-            }
-            await auth.sendPasswordResetEmail(email);
-            showInfo('Password reset email sent. Check your inbox.');
-          } catch (error) {
-            if (error?.code === 'auth/user-not-found') {
-              showError('No user found for this account.');
-              return;
-            }
-            showError(error?.message || 'Failed to send reset email.');
-          }
-        });
-      }
-    }());
-  </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
-  <script defer src="lenis-init.js"></script>
+    // particles
+    for (let i = 0; i < 25; i++) {
+      const p = document.createElement('div'); p.className = 'particle';
+      p.style.cssText = `left:${Math.random()*100}%;bottom:${Math.random()*40}%;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;background:var(--ice);--dur:${6+Math.random()*10}s;--delay:${Math.random()*8}s;--op:${0.08+Math.random()*0.2};`;
+      document.body.appendChild(p);
+    }
+  })();
+</script>
 </body>
 </html>
-
-
-
-
-
-

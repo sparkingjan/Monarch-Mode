@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
@@ -14,15 +14,11 @@
 </head>
 <body class="bg-abyss text-slate-100 min-h-screen">
   <div class="bg-grid"></div>
-  <a class="profile-link" href="profile.html" aria-label="Back to profile">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M20 21a8 8 0 0 0-16 0"></path>
-      <circle cx="12" cy="8" r="4"></circle>
-    </svg>
-  </a>
+
 
   <main x-data="soloLevelingApp()" x-init="init()" class="relative z-10 pb-12">
     <div class="nav-shell">
+      <a href="index.html" class="nav-logo">ASCENDRA</a>
       <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
         <span></span>
         <span></span>
@@ -37,8 +33,10 @@
         <a href="leaderboard.html">Leaderboard</a>
         <a href="profile.html">Profile</a>
       </nav>
+      <div><a class="profile-link" href="profile.html" aria-label="Back to profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="8" r="4"></circle></svg></a></div>
     </div>
 
+<p class="account-data-status" role="status" x-text="dataStatusLabel()" style="padding:12px 20px;color:var(--ice);"></p>
     <section class="w-[92%] lg:w-[70%] max-w-none mx-auto px-4 md:px-8 mt-8">
       <article class="panel rounded-2xl p-6 md:p-8 border border-cyan-400/30 space-y-6">
         <div class="flex items-center justify-between gap-3 flex-wrap">

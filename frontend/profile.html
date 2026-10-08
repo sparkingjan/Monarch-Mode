@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
@@ -9,20 +9,244 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── PAGE HEADER ── */
+    .page-header { margin-bottom: 36px; animation: reveal-up 0.8s 0.2s both; }
+    .page-eyebrow {
+      font-size: 10px; letter-spacing: 0.5em; color: var(--ice-glow);
+      margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
+    }
+    .page-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--ice-glow); }
+    .page-title {
+      font-family: 'Cinzel', serif; font-size: clamp(28px, 4vw, 52px);
+      font-weight: 600; letter-spacing: 0.1em; color: var(--white); margin-bottom: 6px;
+    }
+    .page-sub {
+      font-family: 'Cormorant Garamond', serif; font-size: 17px;
+      font-weight: 300; font-style: italic; color: rgba(200,216,232,0.4);
+    }
+
+    /* ── HERO CARD ── */
+    .hero-card-profile {
+      position: relative; overflow: hidden;
+      background: var(--panel, rgba(8,14,34,0.85));
+      border: 1px solid rgba(126,184,212,0.1);
+      margin-bottom: 28px; animation: reveal-up 0.8s 0.3s both;
+    }
+    .hero-card-profile::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--ice), rgba(201,169,110,0.5), transparent);
+    }
+    .hero-card-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 100% at 80% 50%, rgba(126,184,212,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-inner { padding: 36px 40px; display: flex; align-items: flex-start; justify-content: space-between; gap: 32px; flex-wrap: wrap; position: relative; z-index: 1; }
+    .hero-left { display: flex; align-items: flex-start; gap: 28px; }
+
+    /* ── AVATAR ── */
+    .avatar-wrap { position: relative; flex-shrink: 0; }
+    .avatar-profile {
+      width: 88px; height: 88px; display: flex; align-items: center; justify-content: center;
+      background: rgba(126,184,212,0.06); border: 1px solid rgba(126,184,212,0.25);
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); position: relative;
+    }
+    .avatar-profile span { font-family: 'Cinzel', serif; font-size: 38px; font-weight: 900; color: var(--ice-bright); }
+    .avatar-ring {
+      position: absolute; inset: -8px; border: 1px solid rgba(126,184,212,0.1);
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%); pointer-events: none;
+    }
+    .online-dot {
+      position: absolute; bottom: 4px; right: -4px; width: 10px; height: 10px;
+      background: #4caf82; border-radius: 50%; border: 2px solid var(--void);
+      animation: pulse-dot 2s infinite;
+    }
+
+    /* ── HUNTER INFO ── */
+    .hunter-label-profile { font-size: 9px; letter-spacing: 0.5em; color: var(--ice-glow); margin-bottom: 6px; }
+    .hunter-name-profile {
+      font-family: 'Cinzel', serif; font-size: clamp(22px, 3vw, 36px); font-weight: 600;
+      letter-spacing: 0.08em; color: var(--white); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .badge-admin {
+      font-size: 8px; letter-spacing: 0.25em; color: var(--crimson);
+      border: 1px solid rgba(139,26,46,0.5); padding: 3px 10px;
+      background: rgba(139,26,46,0.1);
+      clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+    }
+    .hunter-badges-profile { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .badge-rank {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.2em; color: var(--gold);
+      border: 1px solid rgba(201,169,110,0.4); padding: 4px 14px; background: rgba(201,169,110,0.08);
+      clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+    }
+    .badge-streak { font-size: 11px; color: var(--gold); display: flex; align-items: center; gap: 6px; }
+    .streak-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: pulse-dot 2s infinite; }
+    .hunter-uid { font-size: 10px; color: rgba(200,216,232,0.2); letter-spacing: 0.08em; font-family: 'Rajdhani', monospace; }
+
+    /* ── XP (RIGHT SIDE) ── */
+    .hero-right-profile { text-align: right; flex-shrink: 0; }
+    .xp-big {
+      font-family: 'Cinzel', serif; font-size: clamp(28px, 3vw, 44px); font-weight: 900;
+      color: var(--white); line-height: 1; margin-bottom: 6px;
+      text-shadow: 0 0 30px rgba(126,184,212,0.3);
+    }
+    .xp-big span { color: var(--ice); }
+    .xp-to-next { font-size: 11px; color: rgba(200,216,232,0.35); letter-spacing: 0.1em; margin-bottom: 12px; }
+    .xp-progress-wrap { width: 180px; margin-left: auto; }
+    .xp-progress-label { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.3em; color: rgba(200,216,232,0.25); margin-bottom: 6px; }
+    .xp-track { height: 3px; background: rgba(126,184,212,0.08); }
+    .xp-fill { height: 100%; background: linear-gradient(90deg, var(--ice-glow), var(--ice-bright)); box-shadow: 0 0 8px var(--ice); transition: width 1.5s cubic-bezier(0.16,1,0.3,1); }
+
+    /* ── STAT GRID ── */
+    .stat-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1px; background: rgba(126,184,212,0.07); border-top: 1px solid rgba(126,184,212,0.1);
+    }
+    .stat-cell {
+      background: var(--abyss); padding: 20px 18px; transition: background 0.3s;
+      cursor: none; position: relative; overflow: hidden;
+    }
+    .stat-cell:hover { background: var(--deep); }
+    .stat-cell::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--ice-glow), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .stat-cell:hover::before { opacity: 1; }
+    .stat-cell-label { font-size: 8px; letter-spacing: 0.45em; color: rgba(200,216,232,0.25); margin-bottom: 8px; }
+    .stat-cell-val { font-family: 'Cinzel', serif; font-size: clamp(18px, 2vw, 26px); font-weight: 900; color: var(--white); line-height: 1; margin-bottom: 2px; }
+    .stat-cell-unit { font-size: 10px; color: rgba(200,216,232,0.3); letter-spacing: 0.1em; }
+    .stat-cell-val.goal { font-size: clamp(14px, 1.5vw, 18px); color: var(--ice-bright); }
+
+    /* ── THEMED PANELS ── */
+    .profile-panel {
+      background: rgba(8,14,34,0.85); border: 1px solid rgba(126,184,212,0.1);
+      position: relative; overflow: hidden; animation: reveal-up 0.8s var(--delay, 0.4s) both;
+    }
+    .profile-panel::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(126,184,212,0.25), transparent);
+    }
+    .panel-head-profile {
+      padding: 20px 28px 16px; border-bottom: 1px solid rgba(126,184,212,0.1);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel-tag { font-size: 9px; letter-spacing: 0.45em; color: var(--ice-glow); margin-bottom: 4px; }
+    .panel-title-profile { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 600; letter-spacing: 0.12em; color: var(--white); }
+    .panel-body-profile { padding: 24px 28px; }
+
+    /* ── STATUS ROWS (THEMED) ── */
+    .themed-status-rows { display: flex; flex-direction: column; gap: 0; }
+    .themed-status-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 14px 0; border-bottom: 1px solid rgba(126,184,212,0.04);
+      transition: padding-left 0.3s; cursor: none;
+    }
+    .themed-status-row:hover { padding-left: 8px; }
+    .themed-status-row:last-child { border-bottom: none; }
+    .themed-status-key { font-size: 9px; letter-spacing: 0.35em; color: rgba(200,216,232,0.4); text-transform: uppercase; }
+    .themed-status-val { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 900; color: var(--white); }
+    .themed-status-val.is-goal { font-size: 14px; color: var(--ice-bright); text-transform: capitalize; }
+
+    /* ── MEMBERSHIP SECTION ── */
+    .membership-panel {
+      background: rgba(8,14,34,0.85); border: 1px solid rgba(126,184,212,0.1);
+      position: relative; overflow: hidden; animation: reveal-up 0.8s 0.6s both;
+      margin-top: 28px;
+    }
+    .membership-panel::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,169,110,0.4), transparent);
+    }
+    .plan-card {
+      border: 1px solid rgba(126,184,212,0.1); background: rgba(4,7,21,0.6);
+      padding: 20px; transition: all 0.3s; cursor: none; position: relative; overflow: hidden;
+    }
+    .plan-card:hover { border-color: rgba(126,184,212,0.25); background: var(--deep); }
+    .plan-card-premium { border-color: rgba(201,169,110,0.25); background: rgba(201,169,110,0.03); }
+    .plan-card-premium:hover { border-color: rgba(201,169,110,0.4); }
+    .plan-card-premium::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: var(--gold); opacity: 0.4;
+    }
+    .plan-item { font-size: 13px; color: rgba(200,216,232,0.5); padding: 6px 0; border-bottom: 1px solid rgba(126,184,212,0.04); }
+    .plan-item:last-child { border-bottom: none; }
+
+    /* ── BUTTONS ── */
+    .btn-edit {
+      font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.2em; color: var(--ice); background: transparent;
+      border: 1px solid rgba(126,184,212,0.3); padding: 9px 24px;
+      text-decoration: none; transition: border-color 0.3s, background 0.3s;
+      clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+      cursor: none; text-transform: uppercase;
+    }
+    .btn-edit:hover { border-color: var(--ice); background: rgba(126,184,212,0.08); }
+    .btn-premium {
+      font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.2em; color: var(--gold); background: transparent;
+      border: 1px solid rgba(201,169,110,0.4); padding: 10px 28px;
+      transition: border-color 0.3s, background 0.3s;
+      clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+      cursor: none; text-transform: uppercase; margin-top: 16px;
+    }
+    .btn-premium:hover { border-color: var(--gold); background: rgba(201,169,110,0.08); }
+    .btn-logout {
+      font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.2em; color: var(--crimson); background: transparent;
+      border: 1px solid rgba(139,26,46,0.4); padding: 10px 28px;
+      transition: border-color 0.3s, background 0.3s;
+      clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+      cursor: none; text-transform: uppercase;
+    }
+    .btn-logout:hover { border-color: var(--crimson); background: rgba(139,26,46,0.08); }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(126,184,212,0.1);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-logo { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 0.3em; color: rgba(200,216,232,0.2); }
+    .footer-right { font-size: 10px; letter-spacing: 0.3em; color: rgba(200,216,232,0.15); }
+
+    /* ── PAGE WRAPPER ── */
+    .page { position: relative; z-index: 10; padding: 36px 40px 80px; max-width: 1300px; margin: 0 auto; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .page { padding: 36px 20px 60px; }
+      .hero-inner { padding: 24px 20px; flex-direction: column; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .panel-body-profile { padding: 16px 18px; }
+      .panel-head-profile { padding: 16px 18px 12px; }
+      .avatar-profile { width: 64px; height: 64px; }
+      .avatar-profile span { font-size: 28px; }
+    }
+    @media (max-width: 480px) {
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .avatar-profile { width: 56px; height: 56px; }
+      .avatar-profile span { font-size: 24px; }
+    }
+
+    a, button { cursor: none; }
+  </style>
 </head>
 <body class="bg-abyss text-slate-100 min-h-screen">
+  <div class="bg-fixed" style="position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 20% 30%,#080e22 0%,#040715 50%,#01020a 100%);pointer-events:none;"></div>
   <div class="bg-grid"></div>
-  <a class="profile-link" href="profile.html" aria-label="Open profile">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M20 21a8 8 0 0 0-16 0"></path>
-      <circle cx="12" cy="8" r="4"></circle>
-    </svg>
-  </a>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
 
   <main x-data="soloLevelingApp()" x-init="init()" class="relative z-10">
     <div class="nav-shell">
+      <a href="index.html" class="nav-logo">ASCENDRA</a>
       <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
         <span></span>
         <span></span>
@@ -36,149 +260,201 @@
         <a href="progress.html">Progress</a>
         <a href="leaderboard.html">Leaderboard</a>
       </nav>
+      <div><a class="profile-link" href="profile.html" aria-label="Open profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="8" r="4"></circle></svg></a></div>
     </div>
 
-    <section class="w-[92%] lg:w-[70%] max-w-none mx-auto px-4 md:px-8 mt-8 pb-16">
-      <article class="panel rounded-2xl p-6 md:p-8 border border-cyan-400/30">
-        <h1 class="title-font text-3xl md:text-4xl">Hunter Profile</h1>
-        <p class="text-slate-300 mt-2">Your account and progression details.</p>
-        <div class="mt-5 flex items-center justify-end">
-          <a href="edit-profile.html" class="rounded-lg px-4 py-2 text-sm font-semibold border border-cyan-400/70 text-cyan-200 hover:bg-cyan-400/10 transition">
-            Edit
-          </a>
-        </div>
-        <div class="hunter-card mt-7">
-          <div class="hunter-card-inner">
-            <div class="hunter-id">
-              <div class="hunter-avatar">
+    <div class="page"><p class="account-data-status" role="status" x-text="dataStatusLabel()" style="padding:12px 20px;color:var(--ice);"></p>
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div class="page-eyebrow">HUNTER RECORD</div>
+        <h1 class="page-title">HUNTER PROFILE</h1>
+        <p class="page-sub">Your account and progression details.</p>
+      </div>
+
+      <!-- HERO CARD -->
+      <div class="hero-card-profile">
+        <div class="hero-card-bg"></div>
+        <div class="hero-inner">
+          <div class="hero-left">
+            <div class="avatar-wrap">
+              <div class="avatar-profile">
                 <span x-text="profile.name.charAt(0).toUpperCase()"></span>
               </div>
-              <div>
-                <p class="hunter-label">Hunter License</p>
-                <div class="flex items-center gap-2">
-                  <h2 class="hunter-name" x-text="profile.name"></h2>
-                  <span x-show="profile.isAdmin" class="px-2 py-0.5 rounded-full border border-rose-300/70 bg-rose-500/20 text-rose-100 text-[10px] uppercase tracking-[0.1em]">Admin</span>
-                </div>
-                <p class="hunter-rank-pill" :class="rankPillClass(profile.rank)" x-text="profile.rank"></p>
-              </div>
+              <div class="avatar-ring"></div>
+              <div class="online-dot"></div>
             </div>
-            <div class="hunter-metrics">
-              <div class="metric-tile">
-                <p class="metric-label">Level</p>
-                <p class="metric-value" x-text="profile.level"></p>
+            <div>
+              <div class="hunter-label-profile">HUNTER</div>
+              <div class="hunter-name-profile">
+                <span x-text="profile.name"></span>
+                <span x-show="profile.isAdmin" class="badge-admin">ADMIN</span>
               </div>
-              <div class="metric-tile">
-                <p class="metric-label">XP</p>
-                <p class="metric-value" x-text="profile.xp"></p>
+              <div class="hunter-badges-profile">
+                <div class="badge-rank" x-text="profile.rank"></div>
               </div>
             </div>
           </div>
-        <div class="hunter-progress-wrap">
-            <div class="hunter-progress-head">
-              <span>XP Progress</span>
-              <span><span x-text="profile.xp"></span> / <span x-text="profile.nextLevelXp"></span></span>
-            </div>
-            <div class="hunter-progress-track">
-              <div class="hunter-progress-fill" :style="`width: ${xpPercent()}%`"></div>
+          <div class="hero-right-profile">
+            <div class="xp-big"><span x-text="profile.xp"></span> <span>XP</span></div>
+            <div class="xp-to-next"><span x-text="profile.nextLevelXp - profile.xp"></span> XP to next level</div>
+            <div class="xp-progress-wrap">
+              <div class="xp-progress-label"><span x-text="'LV.' + profile.level"></span><span x-text="'LV.' + (profile.level + 1)"></span></div>
+              <div class="xp-track"><div class="xp-fill" :style="'width:' + xpPercent() + '%'"></div></div>
             </div>
           </div>
         </div>
 
-        <div class="status-board mt-6">
-          <div class="status-board-grid">
-            <section class="status-block">
-              <p class="status-block-title">Body Profile</p>
-              <div class="status-rows">
-                <div class="status-row">
-                  <span class="status-key">Height</span>
-                  <span class="status-val"><span x-text="hunterProfile.heightCm || '-'"></span> cm</span>
-                </div>
-                <div class="status-row">
-                  <span class="status-key">Weight</span>
-                  <span class="status-val"><span x-text="hunterProfile.weightKg || '-'"></span> kg</span>
-                </div>
-                <div class="status-row">
-                  <span class="status-key">Age</span>
-                  <span class="status-val" x-text="calculateAgeFromDob(hunterProfile.dob) ?? '-'"></span>
-                </div>
-                <div class="status-row">
-                  <span class="status-key">Goal</span>
-                  <span class="status-val status-goal" x-text="hunterProfile.goal || 'maintain'"></span>
-                </div>
+        <!-- STAT GRID -->
+        <div class="stat-grid">
+          <div class="stat-cell">
+            <div class="stat-cell-label">LEVEL</div>
+            <div class="stat-cell-val" x-text="profile.level"></div>
+            <div class="stat-cell-unit">Hunter</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-cell-label">STRENGTH</div>
+            <div class="stat-cell-val" x-text="profile.stats.strength"></div>
+            <div class="stat-cell-unit">Pts</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-cell-label">ENDURANCE</div>
+            <div class="stat-cell-val" x-text="profile.stats.endurance"></div>
+            <div class="stat-cell-unit">Pts</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-cell-label">RECOVERY</div>
+            <div class="stat-cell-val" x-text="profile.stats.recovery"></div>
+            <div class="stat-cell-unit">Pts</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-cell-label">HEIGHT</div>
+            <div class="stat-cell-val" x-text="hunterProfile.heightCm || '-'"></div>
+            <div class="stat-cell-unit">CM</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-cell-label">WEIGHT</div>
+            <div class="stat-cell-val" x-text="hunterProfile.weightKg || '-'"></div>
+            <div class="stat-cell-unit">KG</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BODY PROFILE + STATS PANELS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
+        <div class="profile-panel" style="--delay:0.45s;">
+          <div class="panel-head-profile">
+            <div><div class="panel-tag">// PHYSICAL DATA</div><div class="panel-title-profile">BODY PROFILE</div></div>
+          </div>
+          <div class="panel-body-profile">
+            <div class="themed-status-rows">
+              <div class="themed-status-row">
+                <span class="themed-status-key">HEIGHT</span>
+                <span class="themed-status-val"><span x-text="hunterProfile.heightCm || '-'"></span> cm</span>
               </div>
-            </section>
-            <section class="status-block">
-              <p class="status-block-title">Current Stats</p>
-              <div class="status-rows">
-                <div class="status-row">
-                  <span class="status-key">Strength</span>
-                  <span class="status-val" x-text="profile.stats.strength"></span>
-                </div>
-                <div class="status-row">
-                  <span class="status-key">Endurance</span>
-                  <span class="status-val" x-text="profile.stats.endurance"></span>
-                </div>
-                <div class="status-row">
-                  <span class="status-key">Recovery</span>
-                  <span class="status-val" x-text="profile.stats.recovery"></span>
-                </div>
+              <div class="themed-status-row">
+                <span class="themed-status-key">WEIGHT</span>
+                <span class="themed-status-val"><span x-text="hunterProfile.weightKg || '-'"></span> kg</span>
               </div>
-            </section>
+              <div class="themed-status-row">
+                <span class="themed-status-key">AGE</span>
+                <span class="themed-status-val" x-text="calculateAgeFromDob(hunterProfile.dob) ?? '-'"></span>
+              </div>
+              <div class="themed-status-row">
+                <span class="themed-status-key">GOAL</span>
+                <span class="themed-status-val is-goal" x-text="hunterProfile.goal || 'maintain'"></span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="mt-8 rounded-2xl border border-cyan-400/40 bg-cyan-500/5 p-5">
-          <p class="text-xs uppercase tracking-[0.14em] text-cyan-300">Membership</p>
-          <h2 class="title-font text-2xl mt-2">Premium</h2>
-          <p class="mt-2 text-slate-300">Price: <span class="text-rank font-semibold" x-text="premiumMembershipPriceLabel()"></span></p>
-          <p class="mt-1 text-sm text-slate-400">Required to access Diet and Looksmaxxing sections.</p>
-          <div class="mt-5 grid gap-4 md:grid-cols-2">
-            <section class="rounded-xl border border-slate-700 bg-slate-900/55 p-4">
-              <div class="flex items-center justify-between gap-3">
-                <p class="title-font text-lg text-slate-100">Free Plan</p>
-                <span x-show="!hasPremiumMembership()" class="rounded-full border border-cyan-400/50 bg-cyan-400/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] text-cyan-200">Current</span>
-              </div>
-              <ul class="mt-3 space-y-2 text-sm text-slate-300">
-                <li>Quest board and daily directives</li>
-                <li>Progress tracking, XP, and stat growth</li>
-                <li>Leaderboard access and profile management</li>
-                <li>Build selection and base training systems</li>
-              </ul>
-            </section>
-            <section class="rounded-xl border border-cyan-400/35 bg-cyan-950/25 p-4">
-              <div class="flex items-center justify-between gap-3">
-                <p class="title-font text-lg text-cyan-100">Premium Plan</p>
-                <span x-show="hasPremiumMembership()" class="rounded-full border border-rank/50 bg-rank/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] text-rank">Current</span>
-              </div>
-              <ul class="mt-3 space-y-2 text-sm text-slate-200">
-                <li>Everything in Free</li>
-                <li>Diet section access</li>
-                <li>Looksmaxxing section access</li>
-                <li>AI diet plan generation and adaptive nutrition tools</li>
-              </ul>
-            </section>
+        <div class="profile-panel" style="--delay:0.5s;">
+          <div class="panel-head-profile">
+            <div><div class="panel-tag">// STAT BREAKDOWN</div><div class="panel-title-profile">CURRENT STATS</div></div>
           </div>
-          <p x-show="hasPremiumMembership()" class="mt-3 text-sm text-rank">
+          <div class="panel-body-profile">
+            <div class="themed-status-rows">
+              <div class="themed-status-row">
+                <span class="themed-status-key">STRENGTH</span>
+                <span class="themed-status-val" x-text="profile.stats.strength"></span>
+              </div>
+              <div class="themed-status-row">
+                <span class="themed-status-key">ENDURANCE</span>
+                <span class="themed-status-val" x-text="profile.stats.endurance"></span>
+              </div>
+              <div class="themed-status-row">
+                <span class="themed-status-key">RECOVERY</span>
+                <span class="themed-status-val" x-text="profile.stats.recovery"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EDIT BUTTON -->
+      <div style="display:flex;justify-content:flex-end;margin-bottom:28px;">
+        <a href="edit-profile.html" class="btn-edit">EDIT PROFILE</a>
+      </div>
+
+      <!-- MEMBERSHIP SECTION -->
+      <div class="membership-panel">
+        <div class="panel-head-profile">
+          <div><div class="panel-tag">// ACCESS TIER</div><div class="panel-title-profile">MEMBERSHIP</div></div>
+        </div>
+        <div class="panel-body-profile">
+          <p style="font-family:'Cinzel',serif;font-size:20px;font-weight:600;letter-spacing:0.1em;color:var(--white);margin-bottom:6px;">Premium</p>
+          <p style="font-size:13px;color:rgba(200,216,232,0.5);margin-bottom:4px;">Price: <span style="color:var(--gold);" x-text="premiumMembershipPriceLabel()"></span></p>
+          <p style="font-size:11px;color:rgba(200,216,232,0.3);letter-spacing:0.05em;">Required to access Diet and Looksmaxxing sections.</p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;">
+            <div class="plan-card">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <span style="font-family:'Cinzel',serif;font-size:13px;font-weight:600;letter-spacing:0.1em;color:var(--white);">Free Plan</span>
+                <span x-show="!hasPremiumMembership()" style="font-size:8px;letter-spacing:0.25em;color:var(--ice);border:1px solid rgba(126,184,212,0.4);padding:3px 10px;background:rgba(126,184,212,0.08);">CURRENT</span>
+              </div>
+              <div class="plan-item">Quest board and daily directives</div>
+              <div class="plan-item">Progress tracking, XP, and stat growth</div>
+              <div class="plan-item">Leaderboard access and profile management</div>
+              <div class="plan-item">Build selection and base training systems</div>
+            </div>
+            <div class="plan-card plan-card-premium">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <span style="font-family:'Cinzel',serif;font-size:13px;font-weight:600;letter-spacing:0.1em;color:var(--gold);">Premium Plan</span>
+                <span x-show="hasPremiumMembership()" style="font-size:8px;letter-spacing:0.25em;color:var(--gold);border:1px solid rgba(201,169,110,0.4);padding:3px 10px;background:rgba(201,169,110,0.08);">CURRENT</span>
+              </div>
+              <div class="plan-item" style="color:rgba(200,216,232,0.6);">Everything in Free</div>
+              <div class="plan-item" style="color:rgba(200,216,232,0.6);">Diet section access</div>
+              <div class="plan-item" style="color:rgba(200,216,232,0.6);">Looksmaxxing section access</div>
+              <div class="plan-item" style="color:rgba(200,216,232,0.6);">AI diet plan generation and adaptive nutrition tools</div>
+            </div>
+          </div>
+
+          <p x-show="hasPremiumMembership()" style="margin-top:14px;font-size:11px;color:var(--gold);letter-spacing:0.1em;">
             Active
             <span x-show="meta.premiumMembershipSince" x-text="`since ${meta.premiumMembershipSince}`"></span>
           </p>
-          <p x-show="hasPremiumMembership() && meta.premiumMembershipUntil" class="mt-1 text-xs text-slate-300" x-text="`Valid until: ${meta.premiumMembershipUntil}`"></p>
+          <p x-show="hasPremiumMembership() && meta.premiumMembershipUntil" style="margin-top:4px;font-size:10px;color:rgba(200,216,232,0.35);letter-spacing:0.05em;" x-text="`Valid until: ${meta.premiumMembershipUntil}`"></p>
           <button
             x-show="!hasPremiumMembership()"
             @click="startPremiumCheckout()"
-            class="mt-4 rounded-lg px-4 py-2 text-sm font-semibold border border-cyan-400/70 text-cyan-200 hover:bg-cyan-400/10 transition">
+            class="btn-premium">
             Buy Premium (Pay 99/month)
           </button>
         </div>
+      </div>
 
-        <div class="mt-10 border-t border-slate-700 pt-6">
-          <button id="logout-btn" class="w-full md:w-auto px-5 py-2.5 rounded-lg border border-blood/60 text-blood hover:bg-blood/10 transition">
-            Log Out
-          </button>
-        </div>
-      </article>
-    </section>
+      <!-- LOGOUT -->
+      <div style="margin-top:36px;padding-top:24px;border-top:1px solid rgba(126,184,212,0.08);">
+        <button id="logout-btn" class="btn-logout">LOG OUT</button>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="page-footer">
+        <div class="footer-logo">ASCENDRA</div>
+        <div class="footer-right">HUNTER PROFILE · PUBLIC</div>
+      </div>
+    </div>
   </main>
+
   <script src="web-config.js"></script>
   <script src="auth-guard.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -209,9 +485,18 @@
       });
     }());
   </script>
+  <!-- Custom cursor -->
+  <script>
+    const cursor = document.getElementById('cursor'), ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx - 4 + 'px'; cursor.style.top = my - 4 + 'px'; });
+    (function animRing() { rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12; ring.style.left = rx - 16 + 'px'; ring.style.top = ry - 16 + 'px'; requestAnimationFrame(animRing); })();
+    document.querySelectorAll('a,button,.stat-cell,.themed-status-row,.plan-card').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.transform = 'scale(2)'; ring.style.width = '44px'; ring.style.height = '44px'; ring.style.borderColor = 'rgba(126,184,212,0.8)'; });
+      el.addEventListener('mouseleave', () => { cursor.style.transform = 'scale(1)'; ring.style.width = '32px'; ring.style.height = '32px'; ring.style.borderColor = 'rgba(126,184,212,0.5)'; });
+    });
+  </script>
   <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
   <script defer src="lenis-init.js"></script>
 </body>
 </html>
-
-
