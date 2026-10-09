@@ -52,6 +52,7 @@ test('local pending flag never becomes shared account data; failed saves reject'
 test('notices describe an existing condition, never a fabricated trend or rank-up', () => {
   const app = createApp();
   app.dataStatus = 'synced';
+  app.accountReady = true;
   app.isDailyModeSelected = () => false;
   app.rollSystemNotification(true);
   assert.equal(app.activeSystemNotification, null);

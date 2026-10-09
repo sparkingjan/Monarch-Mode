@@ -149,7 +149,11 @@
     @media(max-width:1024px){.bottom-grid{grid-template-columns:1fr;}}
     @media(max-width:768px){.page{padding:36px 20px 40px;}.license-top{flex-direction:column;align-items:flex-start;}.hstat-row{width:100%;}.attr-grid{grid-template-columns:repeat(2,1fr);}.bottom-grid{grid-template-columns:1fr;}}
     @media(max-width:480px){.attr-grid{grid-template-columns:1fr;}}
-  </style>
+    .training-settings {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px;}
+  .training-settings label {display:grid;gap:6px;}
+  .quest-item:disabled {cursor:default;}
+  @media(max-width:480px){.training-settings{grid-template-columns:1fr;}}
+</style>
 </head>
 <body>
 
@@ -174,11 +178,11 @@
   <div x-show="showAbandonModal" x-transition.opacity.duration.200ms class="modal-overlay">
     <div class="modal-box danger">
       <p style="font-size:10px;letter-spacing:0.16em;color:var(--crimson);text-transform:uppercase;">System Prompt</p>
-      <h3 style="margin-top:8px;font-family:'Cinzel',serif;font-size:22px;color:var(--white);">Abandon mission?</h3>
-      <p style="margin-top:8px;font-size:13px;color:rgba(200,216,232,0.5);">If you quit now, all XP gained today will be removed and an extra 500 XP penalty will be applied.</p>
+      <h3 style="margin-top:8px;font-family:'Cinzel',serif;font-size:22px;color:var(--white);">Take the rest of today off?</h3>
+      <p style="margin-top:8px;font-size:13px;color:rgba(200,216,232,0.5);">Your completed work and earned XP stay. Remaining tasks pause until tomorrow, and the routine does not advance.</p>
       <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:8px;">
-        <button @click="cancelAbandonMission()" class="mode-btn">No</button>
-        <button @click="confirmAbandonMission()" class="quit-btn" style="background:var(--crimson);color:var(--white);">Yes</button>
+        <button @click="cancelAbandonMission()" class="mode-btn">Keep training</button>
+        <button @click="confirmAbandonMission()" class="quit-btn" style="background:var(--crimson);color:var(--white);">Log rest day</button>
       </div>
     </div>
   </div>
@@ -289,14 +293,14 @@
           <div class="q-panel-eyebrow">// Daily Assignments</div>
           <div class="q-panel-title" style="justify-content:space-between;"><span>HUNTER GROWTH ASSIGNMENTS</span></div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
-            <div class="q-panel-warning">Complete quests to gain XP. Failure results in penalty.</div>
-            <button @click="requestAbandonMission()" class="quit-btn">QUIT QUEST</button>
+            <div class="q-panel-warning">Complete what you can. Missed tasks never remove earned XP.</div>
+            <button @click="requestAbandonMission()" class="quit-btn" :disabled="!accountReady || allDailyQuestsComplete() || meta.sessionRestDay === todayDateKey()">REST TODAY</button>
           </div>
         </div>
         <div class="q-panel-body">
           <!-- Protocol banner -->
           <div class="info-box" style="margin-top:0;">
-            <p class="hl" x-text="currentProtocol().banner"></p>
+            <p class="hl" x-text="currentProtocol().banner"></p><p style="margin-top:6px;" x-text="sessionEstimate()"></p><p style="margin-top:6px;">The next session opens tomorrow only after you finish this one. Missing days does not skip the routine.</p>
             <p x-show="currentProtocol().primaryFocus" style="font-size:11px;margin-top:4px;">Primary Focus: <span class="hl" x-text="currentProtocol().primaryFocus"></span></p>
             <p x-show="currentProtocol().targetMuscles" style="font-size:11px;">Target Muscles: <span class="hl" x-text="currentProtocol().targetMuscles"></span></p>
           </div>
@@ -304,21 +308,35 @@
           <div class="info-box" :style="isFinalHourBeforeReset()?'border-left-color:var(--crimson)':''">
             <p style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;" :style="isFinalHourBeforeReset()?'color:var(--crimson)':'color:var(--ice)'">Daily Reset In: <span style="font-weight:700;" x-text="resetCountdownText"></span></p>
           </div>
-          <!-- System notice -->
-          <div x-show="!allDailyQuestsComplete()" class="warn-box">
-            <p><span class="text-blood">&#10060; System Notice</span></p>
-            <p style="margin-top:4px;">Daily directive incomplete. Penalty will be applied at 23:59.</p>
+          <div class="info-box" x-show="meta.sessionRestDay === todayDateKey()"><p class="hl">Rest day recorded. Your XP is safe; this session resumes tomorrow.</p></div>
+          <div class="info-box" x-show="allDailyQuestsComplete()"><p class="hl">Session complete. Recover now; the next session opens tomorrow.</p></div>
+          <div class="info-box">
+            <div class="info-box-title">Your training settings</div>
+            <p>Choose what fits you. Settings are saved to your account and can be changed before the first task of a session.</p>
+            <div class="training-settings">
+              <label>Experience
+                <select class="auth-input" :value="meta.trainingExperience" @change="updateTrainingSetting('trainingExperience', $event.target.value)" :disabled="sessionStarted() || !accountReady">
+                  <option value="beginner">Starting out / returning</option><option value="regular">Some experience</option><option value="experienced">Experienced</option>
+                </select>
+              </label>
+              <label>Time available
+                <select class="auth-input" :value="meta.sessionMinutes" @change="updateTrainingSetting('sessionMinutes', $event.target.value)" :disabled="sessionStarted() || !accountReady">
+                  <option value="15">15 minutes</option><option value="20">20 minutes</option><option value="25">25 minutes</option><option value="30">30 minutes</option><option value="40">40 minutes</option>
+                </select>
+              </label>
+            </div>
+            <p style="margin-top:10px;">Start with a few minutes of easy movement. Use the easier variation, fewer repetitions, or full rest when needed; stop an exercise if it hurts. There is no race or penalty.</p>
           </div>
           <!-- BUILD FOCUS -->
           <div class="info-box">
-            <div class="info-box-title">Choose Build Focus</div>
-            <p>Diet adaptation: <span class="hl">Aesthetic = slight deficit</span> | <span class="hl">Strength = surplus</span> | <span class="hl">Athletic = balanced macros</span> | <span class="hl">Monarch = strict high protein</span></p>
-            <p style="margin-top:6px;font-size:11px;">AI Recommendation: <span class="hl" x-text="focusBuildLabel(aiBuildRecommendation().build)"></span> <span style="color:rgba(200,216,232,0.3);">-</span> <span x-text="aiBuildRecommendation().reason"></span></p>
+            <div class="info-box-title">Optional Build Focus</div>
+            <p>Choose a theme for your goal. It does not multiply exercise targets or block training.</p>
+
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
-              <button @click="selectFocusBuild('aesthetic')" :disabled="isFocusBuildSelected()" class="mode-btn" :class="meta.focusBuild==='aesthetic'?'selected':''">&#10024; Aesthetic</button>
-              <button @click="selectFocusBuild('strength')" :disabled="isFocusBuildSelected()" class="mode-btn" :class="meta.focusBuild==='strength'?'selected':''">&#128170; Strength</button>
-              <button @click="selectFocusBuild('athletic')" :disabled="isFocusBuildSelected()" class="mode-btn" :class="meta.focusBuild==='athletic'?'selected':''">&#127939; Athletic</button>
-              <button @click="selectFocusBuild('monarch')" :disabled="isFocusBuildSelected()" class="mode-btn" :class="meta.focusBuild==='monarch'?'selected':''">&#128081; Monarch</button>
+              <button @click="selectFocusBuild('aesthetic')"  class="mode-btn" :class="meta.focusBuild==='aesthetic'?'selected':''">&#10024; Aesthetic</button>
+              <button @click="selectFocusBuild('strength')"  class="mode-btn" :class="meta.focusBuild==='strength'?'selected':''">&#128170; Strength</button>
+              <button @click="selectFocusBuild('athletic')"  class="mode-btn" :class="meta.focusBuild==='athletic'?'selected':''">&#127939; Athletic</button>
+              <button @click="selectFocusBuild('monarch')"  class="mode-btn" :class="meta.focusBuild==='monarch'?'selected':''">&#128081; Monarch</button>
             </div>
             <p style="margin-top:8px;font-size:11px;" :style="isFocusBuildSelected()?'color:var(--ice-bright)':'color:var(--gold)'">
               <span x-show="!isFocusBuildSelected()">Build not selected. Daily mode lock is disabled.</span>
@@ -327,51 +345,36 @@
           </div>
           <!-- MODE SELECT -->
           <div class="info-box">
-            <div class="info-box-title">Choose Mode Before Daily Directives</div>
+            <div class="info-box-title">Choose your effort</div>
             <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
-              <button @click="selectDailyMode('normal')" :disabled="!isFocusBuildSelected()||isDailyModeSelected()" class="mode-btn" :class="meta.dailyMode==='normal'?'selected':''">Normal (1x XP)</button>
-              <button @click="selectDailyMode('hard')" :disabled="!isFocusBuildSelected()||isDailyModeSelected()" class="mode-btn" :class="meta.dailyMode==='hard'?'selected':''">Hard (2x XP)</button>
-              <button @click="selectDailyMode('extreme')" :disabled="!isFocusBuildSelected()||isDailyModeSelected()" class="mode-btn" :class="meta.dailyMode==='extreme'?'selected':''">Extreme (3x XP)</button>
+              <button @click="selectDailyMode('normal')" :disabled="sessionStarted() || !accountReady" class="mode-btn" :class="meta.dailyMode==='normal'?'selected':''">Comfortable (1x XP)</button>
+              <button @click="selectDailyMode('hard')" :disabled="sessionStarted() || !accountReady" class="mode-btn" :class="meta.dailyMode==='hard'?'selected':''">Steady (1.1x XP)</button>
+              <button @click="selectDailyMode('extreme')" :disabled="sessionStarted() || !accountReady" class="mode-btn" :class="meta.dailyMode==='extreme'?'selected':''">Challenging (1.2x XP)</button>
             </div>
             <p style="margin-top:8px;font-size:11px;" :style="isDailyModeSelected()?'color:var(--ice-bright)':'color:var(--gold)'">
               <span x-show="!isDailyModeSelected()">Mode not selected. Quest clicks are locked.</span>
               <span x-show="isDailyModeSelected()">Active: <span style="font-weight:700;" x-text="modeLabel()"></span></span>
             </p>
-            <p style="margin-top:6px;font-size:11px;color:rgba(200,216,232,0.45);">Streak Bonus: <span class="hl" x-text="`${streakMultiplier()}x`"></span> | Full Clear Bonus: <span style="color:var(--gold);font-weight:700;">+50% XP</span></p>
-            <p style="font-size:11px;color:rgba(200,216,232,0.3);margin-top:4px;">Mind Discipline quests unlock only in Hard and Extreme mode.</p>
-          </div>
-          <!-- HIDDEN QUEST -->
-          <div x-show="hiddenQuest.active" class="info-box">
-            <p class="hl" x-text="hiddenQuest.title"></p>
-            <p style="margin-top:4px;" x-text="hiddenQuest.objective"></p>
-            <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;font-size:11px;">
-              <p style="color:var(--ice-bright);">Reward: +<span x-text="hiddenQuest.rewardXp"></span> XP</p>
-              <p style="color:var(--crimson);">Failure: -<span x-text="hiddenQuest.penaltyXp"></span> XP</p>
-            </div>
-            <button x-show="!hiddenQuest.completed" @click="completeHiddenQuest()" class="mode-btn selected" style="margin-top:10px;">Mark Hidden Quest Complete</button>
-            <p x-show="hiddenQuest.completed" style="margin-top:8px;font-size:11px;color:var(--ice-bright);">Hidden quest completed for today.</p>
-          </div>
-          <!-- LOCKED NOTICE -->
-          <div x-show="!isFocusBuildSelected()||!isDailyModeSelected()" style="border:1px solid var(--border);background:rgba(4,7,21,0.8);padding:14px 20px;margin-top:12px;">
-            <p style="font-size:13px;color:rgba(200,216,232,0.45);">Select build focus first, then choose Normal, Hard, or Extreme mode to reveal daily quests.</p>
+            <p style="margin-top:6px;font-size:11px;color:rgba(200,216,232,0.45);">Streak Bonus: <span class="hl" x-text="`${streakMultiplier()}x`"></span> | Full Clear Bonus: <span style="color:var(--gold);font-weight:700;">+25% XP</span></p>
+            <p style="font-size:11px;color:rgba(200,216,232,0.3);margin-top:4px;">Effort adjusts the same tasks slightly. It never adds mandatory chores or scales sleep requirements.</p>
           </div>
           <!-- QUEST LIST -->
-          <div x-show="isFocusBuildSelected()&&isDailyModeSelected()" x-transition.opacity.duration.180ms style="margin-top:16px;">
+          <div x-show="accountReady" x-transition.opacity.duration.180ms style="margin-top:16px;">
             <template x-for="quest in quests" :key="quest.id">
-              <div class="quest-item" @click="completeQuest(quest.id)" style="cursor:none;">
+              <button type="button" class="quest-item" @click="completeQuest(quest.id)" :disabled="quest.done || meta.sessionRestDay === todayDateKey()" style="width:100%;text-align:left;background:transparent;">
                 <div class="quest-marker" :class="quest.done?'done':''"></div>
                 <div style="flex:1;">
                   <span class="quest-text" :class="quest.done?'':'active-q'" :style="quest.done?'color:var(--ice-bright)':''" x-text="quest.title"></span>
                   <span class="quest-note" x-text="questNoteForDisplay(quest)"></span>
                 </div>
                 <span class="quest-xp" :style="!quest.done?'color:var(--gold)':''" x-text="`+${questPreviewXp(quest)} XP`"></span>
-              </div>
+              </button>
             </template>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT: DUNGEON MODE -->
+      <!-- RIGHT: WEEKLY CONSISTENCY -->
       <div class="q-panel">
         <div class="q-panel-header">
           <div class="q-panel-eyebrow">// Weekly Challenge</div>
@@ -379,40 +382,38 @@
             <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
             DUNGEON MODE
           </div>
-          <div style="margin-top:8px;"><span class="arc-badge">Arc: Week <span x-text="meta.dungeonArcWeek||1"></span></span></div>
+          <div style="margin-top:8px;"><span class="arc-badge">Optional weekly bonus</span></div>
         </div>
         <div class="q-panel-body">
-          <div class="dungeon-info-row"><div class="dinfo-label">Current Dungeon</div><div class="dinfo-val"><strong x-text="currentDungeon().name"></strong></div></div>
-          <div class="dungeon-info-row"><div class="dinfo-label">Unlock Condition</div><div class="dinfo-val">75% daily directive tasks completed this week.</div></div>
-          <div class="dungeon-info-row"><div class="dinfo-label">Dungeon Tier</div><div class="dinfo-val tier" x-text="currentDungeon().descriptor"></div></div>
-          <div class="dungeon-info-row"><div class="dinfo-label">Dungeon Difficulty</div><div class="dinfo-val tier" x-text="dungeonDifficultyRank()"></div></div>
-          <div class="dungeon-info-row"><div class="dinfo-label">Estimated Survival Rate</div><div class="dinfo-val"><strong x-text="`${estimatedSurvivalRate()}%`"></strong></div></div>
+          <div class="dungeon-info-row"><div class="dinfo-label">Challenge</div><div class="dinfo-val"><strong x-text="currentDungeon().name"></strong></div></div>
+          <div class="dungeon-info-row"><div class="dinfo-label">Unlock Condition</div><div class="dinfo-val">Complete 3 sessions this calendar week. Recovery sessions count.</div></div>
+          <div class="dungeon-info-row"><div class="dinfo-label">Workload</div><div class="dinfo-val tier" x-text="currentDungeon().descriptor"></div></div>
           <div class="dungeon-progress-wrap">
-            <div class="dungeon-prog-header"><div class="dungeon-prog-label">Directive Progress</div><div class="dungeon-prog-pct" x-text="`${directiveCompletionPercent()}%`"></div></div>
+            <div class="dungeon-prog-header"><div class="dungeon-prog-label">Session Progress</div><div class="dungeon-prog-pct" x-text="`${directiveCompletionPercent()}%`"></div></div>
             <div class="prog-track"><div class="prog-fill" :style="`width:${directiveCompletionPercent()}%`"></div></div>
           </div>
           <div class="unlock-notice" style="margin-top:16px;">
             <div class="unlock-text">
-              <span x-show="!canEnterDungeonRaid()" style="color:var(--crimson);">Locked: Reach 75% daily directive task completion this week.</span>
-              <span x-show="canEnterDungeonRaid()&&!isRaidBonusClaimedThisWeek()" style="color:var(--ice-bright);">Unlocked: Weekly dungeon access granted.</span>
-              <span x-show="canEnterDungeonRaid()&&isRaidBonusClaimedThisWeek()" style="color:var(--ice-glow);">Weekly dungeon cleared. Resets next week.</span>
+              <span x-show="!canEnterDungeonRaid()" style="color:var(--crimson);">Complete 3 sessions to unlock the optional weekly check-in.</span>
+              <span x-show="canEnterDungeonRaid()&&!isRaidBonusClaimedThisWeek()" style="color:var(--ice-bright);">Unlocked: Log recovery and finish your weekly check-in.</span>
+              <span x-show="canEnterDungeonRaid()&&isRaidBonusClaimedThisWeek()" style="color:var(--ice-glow);">Weekly bonus claimed. Resets Monday.</span>
             </div>
           </div>
-          <p style="font-size:11px;color:var(--crimson);margin-top:12px;">Entering dungeon without preparation may result in regression.</p>
+          <p style="font-size:11px;color:var(--crimson);margin-top:12px;">Daily sessions already count. No extra workout is needed and there is no missed-week penalty.</p>
           <!-- Raid tasks -->
           <div style="margin-top:16px;">
             <template x-for="raid in raidTasks" :key="raid.id">
               <label class="raid-label" :style="canEnterDungeonRaid()?'':'opacity:0.4;cursor:not-allowed;'">
                 <span style="display:flex;align-items:center;gap:8px;">
-                  <input type="checkbox" :checked="raid.done" :disabled="!canEnterDungeonRaid()||isRaidBonusClaimedThisWeek()" @change="toggleRaid(raid.id)" />
+                  <input type="checkbox" :checked="raid.done" :disabled="raid.id !== 3 || !canEnterDungeonRaid() || isRaidBonusClaimedThisWeek()" @change="toggleRaid(raid.id)" />
                   <span :style="raid.done?'text-decoration:line-through;color:rgba(200,216,232,0.25)':'color:var(--silver)'" x-text="raid.title"></span>
                 </span>
-                <span class="raid-xp" x-text="`+${raid.xp} XP`"></span>
+                <span class="raid-xp" x-text="raid.id === 3 ? 'Check in' : 'Tracked automatically'"></span>
               </label>
             </template>
           </div>
-          <button @click="claimRaidBonus()" :disabled="!canEnterDungeonRaid()||isRaidBonusClaimedThisWeek()" class="claim-btn" :class="canEnterDungeonRaid()&&!isRaidBonusClaimedThisWeek()?'active':'disabled'">
-            Claim Raid Bonus (+<span x-text="raidBonusXp"></span> XP)
+          <button @click="claimRaidBonus()" :disabled="!accountReady || !canEnterDungeonRaid() || !raidTasks.every(task => task.done) || isRaidBonusClaimedThisWeek()" class="claim-btn" :class="accountReady && canEnterDungeonRaid() && raidTasks.every(task => task.done) && !isRaidBonusClaimedThisWeek()?'active':'disabled'">
+            Claim Weekly Bonus (+<span x-text="raidBonusXp"></span> XP)
           </button>
         </div>
       </div>

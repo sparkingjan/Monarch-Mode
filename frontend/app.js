@@ -4,8 +4,8 @@ function soloLevelingApp() {
       level2Requirement: 10000,
       perLevelGrowth: 1.061
     },
-    dailyFailurePenaltyXp: 500,
-    extremeModeFailurePenaltyXp: 500,
+    dailyFailurePenaltyXp: 0,
+    extremeModeFailurePenaltyXp: 0,
     premiumMembershipMonthlyPrice: 99,
     nameChangePriceInr: 100,
     dietStatPointThresholdXp: 1000,
@@ -107,77 +107,182 @@ function soloLevelingApp() {
     },
     quests: [],
     weeklyProtocols: [
+  {
+    "day": 1,
+    "banner": "Session 1 · Strength A",
+    "type": "strength",
+    "tasks": [
       {
-        day: 1,
-        banner: '🟥 Day 1 - Chest & Triceps Protocol',
-        tasks: [
-          { key: 'pushups_main', title: 'Push-ups (standard / decline)', note: 'Controlled tempo. Full range.', xp: 320 },
-          { key: 'dips', title: 'Dips', note: 'Use chair/bench support if needed.', xp: 280 },
-          { key: 'diamond_pushups', title: 'Diamond push-ups', note: 'Short sets with strict form.', xp: 300 },
-          { key: 'plank_hold', title: 'Plank hold', note: 'Core braced throughout hold.', xp: 220 }
-        ]
+        "key": "pushups_main",
+        "title": "Wall, incline or floor push-ups",
+        "xp": 180,
+        "note": ""
       },
       {
-        day: 2,
-        banner: '🟦 Day 2 - Back & Biceps Protocol',
-        tasks: [
-          { key: 'pullups', title: 'Pull-ups / Assisted pull-ups', note: 'Use assistance band if required.', xp: 340 },
-          { key: 'rows', title: 'Inverted rows', note: 'Pause at top for control.', xp: 280 },
-          { key: 'band_curls', title: 'Resistance band curls', note: 'Slow negative reps.', xp: 240 },
-          { key: 'dead_hangs', title: 'Dead hangs', note: 'Grip endurance focus.', xp: 210 }
-        ]
+        "key": "squats",
+        "title": "Chair sit-to-stands or comfortable squats",
+        "xp": 180,
+        "note": ""
       },
       {
-        day: 3,
-        banner: '🟩 Day 3 - Legs & Glutes Protocol',
-        tasks: [
-          { key: 'squats', title: 'Squats', note: 'Depth and posture over speed.', xp: 340 },
-          { key: 'lunges', title: 'Lunges', note: 'Alternating legs with balance.', xp: 300 },
-          { key: 'wall_sit', title: 'Wall sit', note: 'Steady breathing under tension.', xp: 240 },
-          { key: 'calf_raises', title: 'Calf raises', note: 'Controlled full stretch each rep.', xp: 200 }
-        ]
-      },
-      {
-        day: 4,
-        banner: '🟨 Day 4 - Shoulders & Core Protocol',
-        tasks: [
-          { key: 'pike_pushups', title: 'Pike push-ups', note: 'Shoulder-dominant pressing pattern.', xp: 320 },
-          { key: 'lateral_raises', title: 'Lateral raises (bands)', note: 'Do not swing the torso.', xp: 240 },
-          { key: 'plank_variations', title: 'Plank variations', note: 'Front/side transitions.', xp: 250 },
-          { key: 'leg_raises', title: 'Leg raises', note: 'Core control, no momentum.', xp: 260 }
-        ]
-      },
-      {
-        day: 5,
-        banner: '🟪 Day 5 - Conditioning Trial',
-        tasks: [
-          { key: 'burpees', title: 'Burpees', note: 'Maintain sustainable pace.', xp: 360 },
-          { key: 'jump_squats', title: 'Jump squats', note: 'Soft landings and posture.', xp: 280 },
-          { key: 'mountain_climbers', title: 'Mountain climbers', note: 'Drive knees with rhythm.', xp: 270 },
-          { key: 'sprint_intervals', title: 'Sprint intervals', note: 'Short bursts, full recovery.', xp: 360 }
-        ]
-      },
-      {
-        day: 6,
-        banner: '🟫 Day 6 - Active Recovery Directive',
-        tasks: [
-          { key: 'mobility_work', title: 'Mobility work', note: 'Focus hips, thoracic spine, ankles.', xp: 180 },
-          { key: 'stretching', title: 'Stretching', note: 'At least 20 minutes.', xp: 170 },
-          { key: 'light_cardio', title: 'Light cardio', note: 'Keep intensity low and steady.', xp: 180 },
-          { key: 'sleep_requirement', title: '8h sleep requirement', note: 'Protect full recovery window.', xp: 200 }
-        ]
-      },
-      {
-        day: 7,
-        banner: '🩸 Day 7 - Dungeon Boss (Full Body Test)',
-        tasks: [
-          { key: 'boss_pushups', title: 'Timed Circuit: Push-ups', note: 'Part of full-body timed test.', xp: 340 },
-          { key: 'boss_squats', title: 'Timed Circuit: Squats', note: 'Part of full-body timed test.', xp: 340 },
-          { key: 'boss_pullups', title: 'Timed Circuit: Pull-ups', note: 'Part of full-body timed test.', xp: 360 },
-          { key: 'boss_burpees', title: 'Timed Circuit: Burpees', note: 'Part of full-body timed test.', xp: 380 }
-        ]
+        "key": "prone_w",
+        "title": "Prone W raises or light band rows",
+        "xp": 180,
+        "note": ""
       }
-    ],
+    ]
+  },
+  {
+    "day": 2,
+    "banner": "Session 2 · Easy movement",
+    "type": "movement",
+    "tasks": [
+      {
+        "key": "light_cardio",
+        "title": "Comfortable walk or seated cardio",
+        "xp": 180,
+        "note": ""
+      },
+      {
+        "key": "mobility_work",
+        "title": "Gentle mobility",
+        "xp": 180,
+        "note": ""
+      },
+      {
+        "key": "balance",
+        "title": "Supported balance practice",
+        "xp": 180,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "day": 3,
+    "banner": "Session 3 · Strength B",
+    "type": "strength",
+    "tasks": [
+      {
+        "key": "glute_bridge",
+        "title": "Glute bridges",
+        "xp": 180,
+        "note": ""
+      },
+      {
+        "key": "prone_w",
+        "title": "Prone W raises or light band rows",
+        "xp": 180,
+        "note": ""
+      },
+      {
+        "key": "dead_bug",
+        "title": "Dead bugs or seated marches",
+        "xp": 180,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "day": 4,
+    "banner": "Session 4 · Recovery",
+    "type": "recovery",
+    "tasks": [
+      {
+        "key": "mobility_work",
+        "title": "Comfortable mobility",
+        "xp": 180,
+        "note": ""
+      },
+      {
+        "key": "stretching",
+        "title": "Gentle stretch or breathing break",
+        "xp": 180,
+        "note": ""
+      },
+      {
+        "key": "recovery_check",
+        "title": "Recovery check-in",
+        "xp": 180,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "day": 5,
+    "banner": "Session 5 · Strength C",
+    "type": "strength",
+    "tasks": [
+      {
+        "key": "pushups_main",
+        "title": "Wall, incline or floor push-ups",
+        "xp": 180,
+        "note": ""
+      },
+      {
+        "key": "lunges",
+        "title": "Supported split squats or chair sit-to-stands",
+        "xp": 180,
+        "note": ""
+      },
+      {
+        "key": "bird_dog",
+        "title": "Bird dogs or seated opposite arm and leg lifts",
+        "xp": 180,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "day": 6,
+    "banner": "Session 6 · Easy movement",
+    "type": "movement",
+    "tasks": [
+      {
+        "key": "light_cardio",
+        "title": "Comfortable walk or seated cardio",
+        "xp": 180,
+        "note": ""
+      },
+      {
+        "key": "mobility_work",
+        "title": "Gentle mobility",
+        "xp": 180,
+        "note": ""
+      },
+      {
+        "key": "balance",
+        "title": "Supported balance practice",
+        "xp": 180,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "day": 7,
+    "banner": "Session 7 · Rest and review",
+    "type": "recovery",
+    "tasks": [
+      {
+        "key": "recovery_check",
+        "title": "Rest and recovery check-in",
+        "xp": 180,
+        "note": ""
+      },
+      {
+        "key": "stretching",
+        "title": "Optional comfortable movement or quiet rest",
+        "xp": 180,
+        "note": ""
+      },
+      {
+        "key": "weekly_review",
+        "title": "Review the week and plan your next session",
+        "xp": 180,
+        "note": ""
+      }
+    ]
+  }
+],
     mindDisciplineQuestTemplates: [
       { id: 21, title: '📵 Mind Discipline: Social Silence', xp: 170 },
       { id: 22, title: '📖 Mind Discipline: Focus Reading', xp: 150 },
@@ -514,6 +619,8 @@ function soloLevelingApp() {
     showResetProgressModal: false,
     logs: [],
     dataStatus: 'loading',
+    accountReady: false,
+    accountHydrating: false,
     lastSyncedAt: null,
 
     rankTiers() {
@@ -551,7 +658,7 @@ function soloLevelingApp() {
     questReminderSyncSignature: '',
     questReminderAppListenerBound: false,
 
-    init() {
+    async init() {
       if (this._initialized) return;
       this._initialized = true;
       if (typeof window !== 'undefined') {
@@ -575,10 +682,15 @@ function soloLevelingApp() {
           this.logs = Array.isArray(state.logs) ? state.logs : this.logs;
         } catch (error) {
           localStorage.removeItem(stateKey);
+          saved = null;
           this.log('Corrupted save detected. State reset.');
         }
       }
       this.loadHunterProfileFromRegistration();
+      this.accountReady = Boolean(saved);
+      this.accountHydrating = true;
+      try { await this.syncFromBackend({initial:true}); } catch (_) { this.dataStatus = 'offline'; }
+      this.accountHydrating = false;
       this.normalizeQuestAndRaidXp();
       this.ensureProfileStats();
       this.ensureHiddenQuestState();
@@ -598,10 +710,8 @@ function soloLevelingApp() {
       this.recordDailyNutritionSnapshot();
       this.profileNameDraft = this.profile.name || this.hunterProfile.name || 'Player Hunter';
       this.initializeEditorFields();
-      this.save({ skipBackendSync: true, preserveGameStateUpdatedAt: true });
-      this.syncFromBackend().catch(() => {
-        this.dataStatus = 'offline';
-      });
+      if (this.accountReady) this.save({ skipBackendSync: true, preserveGameStateUpdatedAt: true });
+      if (this.accountReady && this.meta.progressSyncPending) this.scheduleBackendSync();
       this.startBackendRefreshLoop();
     },
 
@@ -657,6 +767,8 @@ function soloLevelingApp() {
 
     applyBackendGameState(gameState, updatedAt = null) {
       if (!gameState || typeof gameState !== 'object') return;
+      // A legacy server save must be migrated even if this device initialized v2 defaults offline.
+      this.meta.questRulesVersion = gameState.meta?.questRulesVersion;
       if (gameState.meta && typeof gameState.meta === 'object') {
         const { progressSyncPending, ...syncedMeta } = gameState.meta;
         this.meta = { ...this.meta, ...syncedMeta };
@@ -685,6 +797,8 @@ function soloLevelingApp() {
     },
 
     save(options = {}) {
+      // Never persist placeholder progress before the account has loaded.
+      if (!this.accountReady) return;
       const skipBackendSync = Boolean(options.skipBackendSync);
       if (!skipBackendSync) {
         this.recordProgressSnapshot();
@@ -978,16 +1092,11 @@ function soloLevelingApp() {
     },
 
     setAccountQuestAnchor(dateKey) {
-      if (typeof dateKey !== 'string' || !dateKey.trim()) return false;
-      const normalized = dateKey.trim();
-      const changed = this.meta.accountCreatedDateKey !== normalized || this.meta.rotationAnchorDate !== normalized;
-      this.meta.accountCreatedDateKey = normalized;
-      this.meta.rotationAnchorDate = normalized;
-      if (changed) {
-        this.meta.questRotationDate = null;
-      }
-      return changed;
+      // Account age is not training experience and must never move the routine.
+      if (typeof dateKey === 'string') this.meta.accountCreatedDateKey = dateKey;
+      return false;
     },
+
 
     calculateAgeFromDob(dobValue) {
       const normalizedDob = this.normalizeDobValue(dobValue);
@@ -1084,33 +1193,40 @@ function soloLevelingApp() {
       this.recomputeProgressFromCurrentXp();
     },
 
-    async syncFromBackend() {
+    async syncFromBackend(options = {}) {
       if (this.backendSyncPending) return;
-      if (this.meta.progressSyncPending) { this.scheduleBackendSync(); return; }
+      if (this.accountReady && this.meta.progressSyncPending && !options.initial) { this.scheduleBackendSync(); return; }
       const response = await this.backendRequest('/users/me', { method: 'GET' });
       if (!response) { this.dataStatus = 'offline'; return; }
       const user = await response.json();
-      const localGameStateTimestamp = this.timestampMs(this.meta?.gameStateUpdatedAt);
+      const hadAccountData = this.accountReady;
+      this.accountReady = true;
+      const localGameStateTimestamp = hadAccountData ? this.timestampMs(this.meta?.gameStateUpdatedAt) : null;
+      const hasPendingLocalProgress = hadAccountData && this.meta.progressSyncPending;
       const backendGameStateTimestamp = this.timestampMs(user?.game_state_updated_at);
-      const hasBackendGameState = user?.game_state && typeof user.game_state === 'object';
+      const hasBackendGameState = Boolean(user?.game_state && typeof user.game_state === 'object');
       const shouldApplyBackendGameState = (
         hasBackendGameState
         && (
           localGameStateTimestamp === null
-          || backendGameStateTimestamp === null
-          || backendGameStateTimestamp >= localGameStateTimestamp
+          || (backendGameStateTimestamp === null && !hasPendingLocalProgress)
+          || (backendGameStateTimestamp !== null && backendGameStateTimestamp >= localGameStateTimestamp)
         )
       );
-      this.applyBackendUser(user, { applyProgressFields: !hasBackendGameState || shouldApplyBackendGameState });
+      this.applyBackendUser(user, { applyProgressFields: (!hasBackendGameState && !hasPendingLocalProgress) || shouldApplyBackendGameState });
       if (shouldApplyBackendGameState) {
+        this.meta.progressSyncPending = false;
         this.applyBackendGameState(user.game_state, user.game_state_updated_at || null);
       }
+      this.ensureProfileStats();
+      this.ensureMetaDefaults();
+      this.applyDailyResets();
       this.recomputeProgressFromCurrentXp();
       this.recordProgressSnapshot();
       this.dataStatus = 'synced';
       this.lastSyncedAt = new Date().toISOString();
       this.save({ skipBackendSync: true, preserveGameStateUpdatedAt: true });
-      if (hasBackendGameState && !shouldApplyBackendGameState) {
+      if (this.meta.progressSyncPending || (hasBackendGameState && !shouldApplyBackendGameState)) {
         this.meta.progressSyncPending = true;
         this.scheduleBackendSync();
       }
@@ -1159,6 +1275,7 @@ function soloLevelingApp() {
     },
 
     scheduleBackendSync() {
+      if (this.accountHydrating || this.accountReady === false) return;
       if (!this.firebaseIdToken()) { this.dataStatus = 'offline'; return; }
       this.dataStatus = 'pending';
       if (this.backendSyncTimer) {
@@ -1592,13 +1709,9 @@ function soloLevelingApp() {
     },
 
     weekKeyFromDateKey(dateKey) {
-      const date = new Date(`${dateKey}T00:00:00`);
+      const date = new Date(`${dateKey}T00:00:00Z`);
       if (Number.isNaN(date.getTime())) return this.currentWeekKey();
-      const jan1 = new Date(date.getFullYear(), 0, 1);
-      const dayMs = 24 * 60 * 60 * 1000;
-      const dayOfYear = Math.floor((date - jan1) / dayMs) + 1;
-      const week = Math.ceil(dayOfYear / 7);
-      return `${date.getFullYear()}-W${String(week).padStart(2, '0')}`;
+      return this.currentWeekKey(dateKey);
     },
 
     activeBuildForDate(dateKey) {
@@ -1976,29 +2089,24 @@ function soloLevelingApp() {
     },
 
     modeMultiplier(mode = null) {
-      const activeMode = mode || this.meta.dailyMode;
-      if (activeMode === 'hard') return 2;
-      if (activeMode === 'extreme') return 3;
-      return 1;
+      return ({normal: 1, hard: 1.1, extreme: 1.2})[mode || this.meta.dailyMode] || 1;
     },
+
 
     modeDifficultyMultiplier(mode = null) {
-      const activeMode = mode || this.meta.dailyMode;
-      if (activeMode === 'hard') return 1.2;
-      if (activeMode === 'extreme') return 1.4;
-      return 1;
+      return ({normal: 1, hard: 1.1, extreme: 1.15})[mode || this.meta.dailyMode] || 1;
     },
+
 
     modeLabel(mode = null) {
-      const activeMode = mode || this.meta.dailyMode;
-      if (activeMode === 'hard') return 'Hard Mode';
-      if (activeMode === 'extreme') return 'Extreme Mode';
-      return 'Normal Mode';
+      return ({normal: 'Comfortable', hard: 'Steady', extreme: 'Challenging'})[mode || this.meta.dailyMode] || 'Comfortable';
     },
 
+
     isFocusBuildSelected() {
-      return this.meta.focusBuildDayKey === this.todayDateKey() && !!this.meta.focusBuild;
+      return !!this.focusBuildProfiles[this.meta.focusBuild];
     },
+
 
     focusBuildLabel(build = null) {
       const activeBuild = build || this.meta.focusBuild;
@@ -2012,20 +2120,14 @@ function soloLevelingApp() {
 
     selectFocusBuild(build) {
       this.applyDailyResets();
-      const allowed = ['aesthetic', 'strength', 'athletic', 'monarch'];
-      if (!allowed.includes(build)) return;
-      if (this.meta.focusBuildDayKey === this.todayDateKey() && this.meta.focusBuild && this.meta.focusBuild !== build) {
-        this.log(`Build already locked: ${this.focusBuildLabel(this.meta.focusBuild)}.`);
-        return;
-      }
+      if (!this.focusBuildProfiles[build]) return;
       this.meta.focusBuild = build;
       this.meta.focusBuildDayKey = this.todayDateKey();
       this.applyDietMealTemplate();
       this.recordDailyNutritionSnapshot();
-      this.log(`Build selected: ${this.focusBuildLabel(build)}.`);
-      this.log(`Nutrition planner updated: ${this.nutritionGoalLabel()}.`);
       this.save();
     },
+
 
     aiBuildRecommendation() {
       const stats = this.profile?.stats || {};
@@ -2080,46 +2182,21 @@ function soloLevelingApp() {
       return profile.categoryModifiers[category] || 1;
     },
 
-    buildXpMultiplier(quest) {
-      const profile = this.activeFocusProfile();
-      if (!profile) return 1;
-      return profile.xpMultiplier * this.buildCategoryMultiplier(quest);
+    buildXpMultiplier() {
+      // A cosmetic build choice does not change physical capacity or quest rewards.
+      return 1;
     },
+
 
     selectDailyMode(mode) {
       this.applyDailyResets();
-      if (!this.isFocusBuildSelected()) {
-        this.log('Select a build before locking daily mode.');
-        return;
-      }
-      const allowed = ['normal', 'hard', 'extreme'];
-      if (!allowed.includes(mode)) return;
-      if (this.meta.dailyModeDayKey === this.todayDateKey() && this.meta.dailyMode && this.meta.dailyMode !== mode) {
-        this.log(`Daily mode already locked: ${this.modeLabel(this.meta.dailyMode)}.`);
-        return;
-      }
+      if (!['normal','hard','extreme'].includes(mode) || this.sessionStarted()) return;
       this.meta.dailyMode = mode;
       this.meta.dailyModeDayKey = this.todayDateKey();
-      if (mode === 'extreme') {
-        const projectedExtremeStreak = (this.meta.extremeModeStreak || 0) + 1;
-        if (projectedExtremeStreak >= 3 && this.meta.lastExtremeRiskAlertDayKey !== this.todayDateKey()) {
-          this.activeSystemNotification = {
-            id: Date.now(),
-            title: '⚠ System Alert',
-            message: 'Recovery risk detected. Performance penalty possible.'
-          };
-          this.log('System Alert: Recovery risk detected. Performance penalty possible.');
-          this.meta.lastExtremeRiskAlertDayKey = this.todayDateKey();
-          if (!this.meta.fatigueDebuffActive && Math.random() < 0.35) {
-            this.meta.fatigueDebuffActive = true;
-            this.log('Performance penalty applied: Fatigue Debuff activated.');
-          }
-        }
-      }
-      this.syncModeSpecificQuests();
-      this.log(`Daily mode selected: ${this.modeLabel(mode)} (${this.modeMultiplier(mode)}x XP).`);
+      this.log('Effort selected: ' + this.modeLabel(mode) + '.');
       this.save();
     },
+
 
     isDailyModeSelected() {
       return this.meta.dailyModeDayKey === this.todayDateKey() && !!this.meta.dailyMode;
@@ -2175,8 +2252,9 @@ function soloLevelingApp() {
     },
 
     questPreviewXp(quest) {
-      return this.questReward(quest);
+      return quest.done && Number.isFinite(quest.earnedXp) ? quest.earnedXp : this.questReward(quest);
     },
+
 
     scaledInteger(base) {
       return Math.ceil(base * this.modeDifficultyMultiplier());
@@ -2191,136 +2269,24 @@ function soloLevelingApp() {
 
     questNoteForDisplay(quest) {
       if (!quest) return '';
-      const idx = this.modeIndex();
-      const buildScale = this.buildCategoryMultiplier(quest, this.isFocusBuildSelected() ? this.meta.focusBuild : 'monarch');
-      const scaleCount = (value) => Math.max(1, Math.round(value * buildScale));
-      if (quest.key === 'pushups_main') {
-        const reps = scaleCount(this.pushupTargetReps() + (idx * 10));
-        const sets = [4, 5, 6][idx];
-        return `Objective: ${reps} push-ups | Requirement: minimum ${sets} sets | Stat Gain: +2 Strength`;
+      const minutes = this.meta.sessionMinutes || 20;
+      const sets = minutes <= 20 ? 1 : minutes <= 30 ? 2 : 3;
+      const base = {beginner:6, regular:8, experienced:10}[this.meta.trainingExperience] || 6;
+      const reps = Math.round(base * this.modeDifficultyMultiplier());
+      const strength = ['pushups_main','squats','prone_w','glute_bridge','dead_bug','lunges','bird_dog'];
+      if (strength.includes(quest.key)) {
+        const perSide = ['dead_bug','lunges','bird_dog'].includes(quest.key) ? ' per side' : '';
+        return 'Up to ' + sets + ' × ' + reps + ' reps' + perSide + '. Rest 60–90s between sets. Use an easier variation or fewer reps as needed.';
       }
-      if (quest.key === 'dips') {
-        const reps = scaleCount([24, 30, 36][idx]);
-        return `Objective: ${reps} total reps | Controlled form`;
-      }
-      if (quest.key === 'diamond_pushups') {
-        const reps = scaleCount([16, 20, 24][idx]);
-        return `Objective: ${reps} total reps | Strict lockout`;
-      }
-      if (quest.key === 'plank_hold') {
-        const seconds = scaleCount([120, 180, 240][idx]);
-        return `Objective: ${seconds}s total plank hold`;
-      }
-      if (quest.key === 'pullups') {
-        const reps = scaleCount(this.trainingLoadTargets().pullups);
-        return `Objective: ${reps} total pull-up reps (assisted allowed)`;
-      }
-      if (quest.key === 'rows') {
-        const reps = scaleCount([30, 40, 50][idx]);
-        return `Objective: ${reps} inverted row reps`;
-      }
-      if (quest.key === 'band_curls') {
-        const reps = scaleCount([36, 48, 60][idx]);
-        return `Objective: ${reps} curl reps`;
-      }
-      if (quest.key === 'dead_hangs') {
-        const seconds = scaleCount([90, 120, 150][idx]);
-        return `Objective: ${seconds}s total hang time`;
-      }
-      if (quest.key === 'squats') {
-        const reps = scaleCount(this.trainingLoadTargets().squats);
-        return `Objective: ${reps} squats`;
-      }
-      if (quest.key === 'lunges') {
-        const reps = scaleCount([40, 50, 60][idx]);
-        return `Objective: ${reps} lunges total`;
-      }
-      if (quest.key === 'wall_sit') {
-        const seconds = scaleCount([120, 180, 240][idx]);
-        return `Objective: ${seconds}s wall sit`;
-      }
-      if (quest.key === 'calf_raises') {
-        const reps = scaleCount([60, 80, 100][idx]);
-        return `Objective: ${reps} calf raises`;
-      }
-      if (quest.key === 'pike_pushups') {
-        const reps = scaleCount([20, 28, 36][idx]);
-        return `Objective: ${reps} pike push-ups`;
-      }
-      if (quest.key === 'lateral_raises') {
-        const reps = scaleCount([36, 48, 60][idx]);
-        return `Objective: ${reps} band lateral raise reps`;
-      }
-      if (quest.key === 'plank_variations') {
-        const seconds = scaleCount([150, 210, 270][idx]);
-        return `Objective: ${seconds}s mixed plank variations`;
-      }
-      if (quest.key === 'leg_raises') {
-        const reps = scaleCount([24, 32, 40][idx]);
-        return `Objective: ${reps} leg raises`;
-      }
-      if (quest.key === 'burpees') {
-        const reps = scaleCount([30, 40, 50][idx]);
-        return `Objective: ${reps} burpees`;
-      }
-      if (quest.key === 'jump_squats') {
-        const reps = scaleCount([30, 40, 50][idx]);
-        return `Objective: ${reps} jump squats`;
-      }
-      if (quest.key === 'mountain_climbers') {
-        const reps = scaleCount([80, 100, 120][idx]);
-        return `Objective: ${reps} total climber reps`;
-      }
-      if (quest.key === 'sprint_intervals') {
-        const rounds = scaleCount([6, 8, 10][idx]);
-        return `Objective: ${rounds} sprint rounds (20s on / 70s off) | Stat Gain: +1 Endurance`;
-      }
-      if (quest.key === 'mobility_work') {
-        const minutes = scaleCount([20, 25, 30][idx]);
-        return `Objective: ${minutes} min mobility`;
-      }
-      if (quest.key === 'stretching') {
-        const minutes = scaleCount([20, 25, 30][idx]);
-        return `Objective: ${minutes} min stretching`;
-      }
-      if (quest.key === 'light_cardio') {
-        const minutes = scaleCount([25, 35, 45][idx]);
-        return `Objective: ${minutes} min light cardio | Stat Gain: +1 Endurance`;
-      }
-      if (quest.key === 'sleep_requirement') {
-        const sleepHours = [8.0, 8.5, 9.0][idx] * buildScale;
-        return `Objective: ${sleepHours.toFixed(1)}h sleep minimum | Stat Gain: +1 Recovery`;
-      }
-      if (quest.key === 'boss_pushups') {
-        const reps = scaleCount(this.pushupTargetReps() + (idx * 10));
-        return `Timed Circuit Objective: ${reps} push-ups`;
-      }
-      if (quest.key === 'boss_squats') {
-        const reps = scaleCount(this.trainingLoadTargets().squats);
-        return `Timed Circuit Objective: ${reps} squats`;
-      }
-      if (quest.key === 'boss_pullups') {
-        const reps = scaleCount(this.trainingLoadTargets().pullups);
-        return `Timed Circuit Objective: ${reps} pull-ups`;
-      }
-      if (quest.key === 'boss_burpees') {
-        const reps = scaleCount([24, 30, 36][idx]);
-        return `Timed Circuit Objective: ${reps} burpees`;
-      }
-      if (quest.id === 21) {
-        const hours = scaleCount([6, 7, 8][idx]);
-        return `No social media for ${hours} hours`;
-      }
-      if (quest.id === 22) {
-        const minutes = scaleCount([30, 40, 50][idx]);
-        return `${minutes} min reading`;
-      }
-      if (quest.id === 23) {
-        const minutes = scaleCount([10, 15, 20][idx]);
-        return `${minutes} min meditation`;
-      }
+      if (quest.key === 'light_cardio') return Math.round(minutes * 0.55) + ' min at a pace where conversation is comfortable. Split into shorter blocks if needed.';
+      if (quest.key === 'mobility_work') return '3–5 min of comfortable, unforced movement. Stay within a comfortable range.';
+      if (quest.key === 'balance') return '2 min total near a stable support, or seated weight shifts.';
+      if (quest.key === 'stretching') return '3–5 min of easy stretching or quiet breathing. Full rest is a valid option.';
+      if (quest.key === 'recovery_check') return 'Check how you feel and choose rest or light movement. No extra workout required.';
+      if (quest.key === 'weekly_review') return '2 min: note what felt manageable and choose your next session settings.';
       return quest.note || '';
     },
+
 
     questTutorialQuery(quest) {
       if (!quest) return '';
@@ -2386,27 +2352,9 @@ function soloLevelingApp() {
     },
 
     syncModeSpecificQuests() {
-      if (!Array.isArray(this.quests)) this.quests = [];
-      const hasMindMode = this.meta.dailyMode === 'hard' || this.meta.dailyMode === 'extreme';
-
-      if (!hasMindMode) {
-        this.quests = this.quests.filter((quest) => !this.mindDisciplineQuestTemplates.some((tpl) => tpl.id === quest.id));
-        return;
-      }
-
-      this.mindDisciplineQuestTemplates.forEach((template) => {
-        const exists = this.quests.some((quest) => quest.id === template.id);
-        if (!exists) {
-          this.quests.push({
-            id: template.id,
-            title: template.title,
-            note: this.questNoteForDisplay(template),
-            xp: template.xp,
-            done: false
-          });
-        }
-      });
+      // Effort changes the existing session, never adds mandatory chores.
     },
+
 
     streakMultiplier() {
       const streak = this.meta.dailyStreak || 0;
@@ -2430,16 +2378,17 @@ function soloLevelingApp() {
 
     ensureHiddenQuestState() {
       if (!this.hiddenQuest || typeof this.hiddenQuest !== 'object') return;
-      this.hiddenQuest.active = Boolean(this.hiddenQuest.active);
+      this.hiddenQuest.active = false;
       this.hiddenQuest.completed = Boolean(this.hiddenQuest.completed);
       this.hiddenQuest.dayKey = typeof this.hiddenQuest.dayKey === 'string' ? this.hiddenQuest.dayKey : null;
       this.hiddenQuest.title = this.hiddenQuest.title || '🟦 System Alert: Hidden Quest Detected';
-      this.hiddenQuest.objective = this.hiddenQuest.objective || 'Complete 50 push-ups today instead of 25.';
-      this.hiddenQuest.rewardXp = Number.isFinite(this.hiddenQuest.rewardXp) ? this.hiddenQuest.rewardXp : 900;
-      this.hiddenQuest.penaltyXp = Number.isFinite(this.hiddenQuest.penaltyXp) ? this.hiddenQuest.penaltyXp : 700;
+      this.hiddenQuest.objective = '';
+      this.hiddenQuest.rewardXp = 0;
+      this.hiddenQuest.penaltyXp = 0;
     },
 
     ensureMetaDefaults() {
+      this.ensureTrainingSettings();
       this.meta.pushupConsistencyDays = Number.isFinite(this.meta.pushupConsistencyDays) ? this.meta.pushupConsistencyDays : 0;
       this.meta.pushupTier = Number.isFinite(this.meta.pushupTier) ? this.meta.pushupTier : 0;
       this.meta.gameStateUpdatedAt = this.normalizeIsoTimestamp(this.meta.gameStateUpdatedAt);
@@ -2548,13 +2497,15 @@ function soloLevelingApp() {
         const weekEntry = nutritionHistory[weekKey];
         if (!weekEntry || typeof weekEntry !== 'object') return;
         const days = weekEntry.days && typeof weekEntry.days === 'object' ? weekEntry.days : {};
-        this.meta.weeklyNutritionHistory[weekKey] = { days: {} };
         Object.keys(days).forEach((dayKey) => {
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(dayKey) || Number.isNaN(Date.parse(dayKey))) return;
+          const calendarWeek = this.weekKeyFromDateKey(dayKey);
+          if (!this.meta.weeklyNutritionHistory[calendarWeek]) this.meta.weeklyNutritionHistory[calendarWeek] = { days: {} };
           const snapshot = days[dayKey] || {};
           const proteinPercent = Number.isFinite(snapshot.proteinPercent) ? Math.max(0, Math.min(100, Math.round(snapshot.proteinPercent))) : 0;
           const hydrationPercent = Number.isFinite(snapshot.hydrationPercent) ? Math.max(0, Math.min(100, Math.round(snapshot.hydrationPercent))) : 0;
           const consistencyPercent = Number.isFinite(snapshot.consistencyPercent) ? Math.max(0, Math.min(100, Math.round(snapshot.consistencyPercent))) : 0;
-          this.meta.weeklyNutritionHistory[weekKey].days[dayKey] = {
+          this.meta.weeklyNutritionHistory[calendarWeek].days[dayKey] = {
             proteinPercent,
             hydrationPercent,
             consistencyPercent
@@ -2881,104 +2832,98 @@ function soloLevelingApp() {
       this.save();
     },
 
-    trainingLoadTargetsForTier(tier = 0) {
-      const tiers = [
-        { pushups: 25, pullups: 5, squats: 100 },
-        { pushups: 30, pullups: 8, squats: 150 },
-        { pushups: 35, pullups: 10, squats: 180 }
-      ];
-      return tiers[Math.min(Math.max(0, tier), tiers.length - 1)];
+    ensureTrainingSettings() {
+      if (this.meta.questRulesVersion !== 2) {
+        // Preserve earned XP/stats. Old account-age routine numbers are not completed sessions.
+        const alreadyCleared = this.meta.lastFullClearBonusDate === this.todayDateKey();
+        this.meta.protocolDay = 1;
+        this.meta.questRotationDate = null;
+        this.meta.completedTrainingSessions = 0;
+        this.meta.trainingSessions = {};
+        this.meta.sessionRestDay = null;
+        this.meta.questRulesVersion = 2;
+        this.meta.progressSyncPending = true;
+        this.meta.gameStateUpdatedAt = new Date().toISOString();
+        this.meta.dailyMode = 'normal';
+        this.meta.dailyModeDayKey = this.todayDateKey();
+        this.meta.loadTier = 0;
+        this.meta.fatigueDebuffActive = false;
+        this.hiddenQuest.active = false;
+        this.quests = this.buildProtocolQuests(1).map(quest=>({...quest,done:alreadyCleared}));
+        this.meta.questRotationDate = this.todayDateKey();
+        if (alreadyCleared) this.meta.trainingSessions[this.todayDateKey()]={completed:true,type:'legacy',protocolDay:1};
+      }
+      if (!['beginner','regular','experienced'].includes(this.meta.trainingExperience)) this.meta.trainingExperience = 'beginner';
+      if (![15,20,25,30,40].includes(this.meta.sessionMinutes)) this.meta.sessionMinutes = 20;
+      if (!this.meta.trainingSessions || typeof this.meta.trainingSessions !== 'object') this.meta.trainingSessions = {};
+      this.meta.completedTrainingSessions = Math.max(0,Math.floor(Number(this.meta.completedTrainingSessions)||0));
+      if (!this.focusBuildProfiles[this.meta.focusBuild]) this.meta.focusBuild = 'monarch';
     },
 
-    trainingLoadTargets(mode = null) {
-      const base = this.trainingLoadTargetsForTier(this.meta.loadTier || 0);
-      const idx = this.modeIndex(mode);
-      return {
-        pushups: base.pushups + (idx * 5),
-        pullups: base.pullups + (idx * 2),
-        squats: base.squats + (idx * 20)
-      };
+    sessionStarted() {
+      return this.quests.some(quest=>quest.done) || this.meta.sessionRestDay === this.todayDateKey();
     },
+
+    updateTrainingSetting(key, value) {
+      this.applyDailyResets();
+      if (!this.accountReady || this.sessionStarted()) return;
+      if (key === 'trainingExperience' && ['beginner','regular','experienced'].includes(value)) this.meta[key] = value;
+      else if (key === 'sessionMinutes' && [15,20,25,30,40].includes(Number(value))) this.meta[key] = Number(value);
+      else return;
+      this.save();
+    },
+
+    weeklyTrainingRecords() {
+      const week = this.currentWeekKey();
+      return Object.entries(this.meta.trainingSessions || {}).filter(([day])=>day<=this.todayDateKey() && this.currentWeekKey(day)===week).map(([,record])=>record);
+    },
+
+    sessionEstimate() {
+      return this.currentProtocol().type === 'recovery' ? '5–10 min or full rest' : 'About ' + (this.meta.sessionMinutes || 20) + ' min including breaks';
+    },
+
+    trainingLoadTargetsForTier() {
+      const reps = {beginner:6, regular:8, experienced:10}[this.meta.trainingExperience] || 6;
+      return {pushups:reps, pullups:0, squats:reps};
+    },
+
+
+    trainingLoadTargets() {
+      return this.trainingLoadTargetsForTier();
+    },
+
 
     pushupTargetReps() {
       return this.trainingLoadTargets().pushups;
     },
 
     pushupQuestNote() {
-      return `Objective: ${this.pushupTargetReps()} Push-ups | Requirement: Minimum 4 sets | Stat Gain: +2 Strength`;
+      return this.questNoteForDisplay({key:'pushups_main'});
     },
+
 
     daysBetweenDateKeys(startKey, endKey) {
-      const start = new Date(`${startKey}T00:00:00`);
-      const end = new Date(`${endKey}T00:00:00`);
-      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
-      const dayMs = 24 * 60 * 60 * 1000;
-      return Math.floor((end.getTime() - start.getTime()) / dayMs);
+      const parse = key => /^\d{4}-\d{2}-\d{2}$/.test(key || '') ? Date.parse(key + 'T00:00:00Z') : NaN;
+      const difference = parse(endKey) - parse(startKey);
+      return Number.isFinite(difference) ? Math.round(difference / 86400000) : 0;
     },
 
-    evaluateBiweeklyLoadProgress(todayKey) {
-      const anchorKey = this.meta.loadCycleAnchorDate || todayKey;
-      const elapsedDays = this.daysBetweenDateKeys(anchorKey, todayKey);
-      if (elapsedDays < 14) return;
 
-      const currentTier = this.meta.loadTier || 0;
-      const nextTier = currentTier + 1;
-      const currentTargets = this.trainingLoadTargetsForTier(currentTier);
-      const nextTargets = this.trainingLoadTargetsForTier(nextTier);
-
-      const qualified = (this.meta.loadCycleFullClears || 0) >= 8;
-      if (qualified && nextTier !== currentTier) {
-        this.meta.loadTier = nextTier;
-        this.activeSystemNotification = {
-          id: Date.now(),
-          title: 'System Alert',
-          message: 'Growth Detected. Increasing Load.'
-        };
-        this.log('Growth Detected. Increasing Load.');
-        this.log(`Push-ups: ${currentTargets.pushups} -> ${nextTargets.pushups}`);
-        this.log(`Pull-ups: ${currentTargets.pullups} -> ${nextTargets.pullups}`);
-        this.log(`Squats: ${currentTargets.squats} -> ${nextTargets.squats}`);
-      } else if (!qualified) {
-        this.log('Bi-weekly review: load held. Complete more full clears to unlock progression.');
-      }
-
-      this.meta.loadCycleAnchorDate = todayKey;
-      this.meta.loadCycleFullClears = 0;
+    evaluateBiweeklyLoadProgress() {
+      // Workload is chosen by the user; elapsed time and XP do not increase it.
+      this.meta.loadTier = 0;
     },
 
-    protocolDayNumberFromDate(dateObj = new Date()) {
-      const anchorDateKey = this.meta.rotationAnchorDate || this.todayDateKey();
-      const anchorDate = new Date(`${anchorDateKey}T00:00:00`);
-      const targetDate = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
-      if (Number.isNaN(anchorDate.getTime()) || Number.isNaN(targetDate.getTime())) {
-        return 1;
-      }
-      const dayMs = 24 * 60 * 60 * 1000;
-      const diffDays = Math.floor((targetDate.getTime() - anchorDate.getTime()) / dayMs);
-      return ((diffDays % 7) + 7) % 7 + 1;
+
+    protocolDayNumberFromDate() {
+      return this.meta.protocolDay || 1;
     },
+
 
     currentProtocol() {
-      const day = this.meta.protocolDay || this.protocolDayNumberFromDate();
-      const protocol = this.weeklyProtocols.find((p) => p.day === day) || this.weeklyProtocols[0];
-      if (this.meta.reassignmentDayKey === this.todayDateKey() && this.meta.reassignmentProtocolDay === 3) {
-        return {
-          ...protocol,
-          banner: 'System Override - Lower Body Reassignment',
-          primaryFocus: 'Lower Body Recovery Priority',
-          targetMuscles: 'Quads / Glutes / Hamstrings / Calves'
-        };
-      }
-      if (protocol.day === 1) {
-        return {
-          ...protocol,
-          banner: '🟦 System Directive Issued',
-          primaryFocus: 'Upper Body Strength',
-          targetMuscles: 'Chest / Triceps'
-        };
-      }
-      return protocol;
+      return this.weeklyProtocols.find(plan => plan.day === this.meta.protocolDay) || this.weeklyProtocols[0];
     },
+
 
     buildProtocolQuests(day) {
       const protocol = this.weeklyProtocols.find((p) => p.day === day) || this.weeklyProtocols[0];
@@ -2993,34 +2938,12 @@ function soloLevelingApp() {
     },
 
     syncDailyQuestRotation(targetDateKey = this.todayDateKey()) {
-      const dayDate = new Date(`${targetDateKey}T00:00:00`);
-      const calendarDay = Number.isNaN(dayDate.getTime()) ? this.protocolDayNumberFromDate(new Date()) : this.protocolDayNumberFromDate(dayDate);
-      const day = this.meta.reassignmentDayKey === targetDateKey && Number.isFinite(this.meta.reassignmentProtocolDay)
-        ? this.meta.reassignmentProtocolDay
-        : calendarDay;
-      const isSameDay = this.meta.questRotationDate === targetDateKey;
-
-      if (isSameDay && Array.isArray(this.quests) && this.quests.length > 0 && this.meta.protocolDay === day) {
-        return;
-      }
-
-      const previousState = isSameDay
-        ? new Map(
-          (Array.isArray(this.quests) ? this.quests : []).map((quest) => [
-            `${quest.id}:${quest.title}`,
-            {
-              done: Boolean(quest.done)
-            }
-          ])
-        )
-        : new Map();
-      this.meta.protocolDay = day;
+      const day = this.meta.protocolDay || 1;
+      if (this.meta.questRotationDate === targetDateKey && this.quests.length) return;
+      this.quests = this.buildProtocolQuests(day);
       this.meta.questRotationDate = targetDateKey;
-      this.quests = this.buildProtocolQuests(day).map((quest) => ({
-        ...quest,
-        done: previousState.get(`${quest.id}:${quest.title}`)?.done || false
-      }));
     },
+
 
     triggerStatGainFx(text) {
       this.statGainFx.text = text;
@@ -3034,137 +2957,45 @@ function soloLevelingApp() {
     },
 
     syncStatUnlockQuests() {
-      if (!Array.isArray(this.quests)) this.quests = [];
-
-      const unlockables = [
-        {
-          id: 6,
-          unlocked: (this.profile.stats?.strength || 0) >= 10,
-          title: '🏋️ Weighted Push-ups Protocol',
-          note: 'Strength 10 unlocked | Objective: Weighted push-ups session',
-          xp: 480
-        },
-        {
-          id: 7,
-          unlocked: (this.profile.stats?.endurance || 0) >= 15,
-          title: '🏃 15k Steps Expedition',
-          note: 'Endurance 15 unlocked | Objective: Complete 15,000 steps',
-          xp: 430
-        }
-      ];
-
-      unlockables.forEach((entry) => {
-        const exists = this.quests.some((quest) => quest.id === entry.id);
-        if (entry.unlocked && !exists) {
-          this.quests.push({
-            id: entry.id,
-            title: entry.title,
-            note: entry.note,
-            xp: entry.xp,
-            done: false
-          });
-          this.log(`Stat Impact Unlock: ${entry.title}`);
-        }
-      });
+      // Earned game stats never silently add weighted exercise or a 15,000-step target.
     },
 
-    dungeonDefinitionForWeek(arcWeek = 1) {
-      if (arcWeek >= 6) {
-        return {
-          name: 'Shadow Commander',
-          phase: 'Week 6+',
-          descriptor: 'Abyss-Class',
-          tasks: [
-            { id: 1, title: 'Night training drills x4', xp: 460 },
-            { id: 2, title: 'Endurance run x3 sessions', xp: 420 },
-            { id: 3, title: 'No sugar for 6 days', xp: 520 }
-          ],
-          bonusXp: 900
-        };
-      }
-      if (arcWeek >= 3) {
-        return {
-          name: 'Orc Stronghold',
-          phase: 'Week 3-5',
-          descriptor: 'Warfront-Class',
-          tasks: [
-            { id: 1, title: 'Heavy strength blocks x3', xp: 380 },
-            { id: 2, title: 'Cardio assault x2', xp: 340 },
-            { id: 3, title: 'No junk food for 5 days', xp: 450 }
-          ],
-          bonusXp: 750
-        };
-      }
-      return {
-        name: 'Goblin Dungeon (Beginner)',
-        phase: 'Week 1-2',
-        descriptor: 'Starter-Class',
-        tasks: [
-          { id: 1, title: 'Bodyweight strength x3', xp: 280 },
-          { id: 2, title: 'Walk/Cardio x2', xp: 240 },
-          { id: 3, title: 'Clean food streak 4 days', xp: 330 }
-        ],
-        bonusXp: 600
-      };
+
+    dungeonDefinitionForWeek() {
+      return {name:'Weekly consistency bonus', phase:'This week', descriptor:'Optional · no extra workout',
+        tasks:[{id:1,title:'Complete 3 chosen sessions',xp:0},
+          {id:2,title:'Log a recovery session or planned rest day',xp:0},
+          {id:3,title:'Reflect on the week and plan your next session',xp:0}],bonusXp:300};
     },
+
 
     currentDungeon() {
       return this.dungeonDefinitionForWeek(this.meta.dungeonArcWeek || 1);
     },
 
     syncRaidTasksWithDungeon() {
-      const dungeon = this.currentDungeon();
-      this.raidBonusXp = dungeon.bonusXp;
-      const previousDoneByKey = new Map(
-        (Array.isArray(this.raidTasks) ? this.raidTasks : []).map((task) => [`${task.id}:${task.title}`, Boolean(task.done)])
-      );
-      this.raidTasks = dungeon.tasks.map((task, index) => ({
-        id: task.id || index + 1,
-        title: task.title,
-        xp: task.xp,
-        done: previousDoneByKey.get(`${task.id || index + 1}:${task.title}`) || false
-      }));
+      const records = this.weeklyTrainingRecords();
+      const definition = this.currentDungeon();
+      this.raidBonusXp = definition.bonusXp;
+      this.raidTasks = definition.tasks.map(task => ({...task, done:task.id === 1
+        ? records.filter(day => day.completed).length >= 3
+        : task.id === 2 ? records.some(day => day.rest || (day.completed && day.type === 'recovery'))
+        : this.meta.weeklyReviewWeek === this.currentWeekKey()}));
     },
+
 
     maybeTriggerHiddenQuest(dayKey) {
-      if (this.hiddenQuest.dayKey === dayKey) return;
-      this.hiddenQuest.dayKey = dayKey;
-      this.hiddenQuest.active = false;
-      this.hiddenQuest.completed = false;
-
-      if (Math.random() > 0.28) return;
-
-      this.hiddenQuest.active = true;
-      this.activeSystemNotification = {
-        id: Date.now(),
-        title: this.hiddenQuest.title,
-        message: `${this.hiddenQuest.objective} Reward: +${this.hiddenQuest.rewardXp} XP | Failure: -${this.hiddenQuest.penaltyXp} XP`
-      };
-      this.log(`Hidden Quest Detected: ${this.hiddenQuest.objective}`);
+      this.hiddenQuest = {...this.hiddenQuest, active:false, completed:false, dayKey, penaltyXp:0};
     },
 
-    resolveHiddenQuestOnDayChange(previousDayKey) {
-      if (!this.hiddenQuest.active) return;
-      if (this.hiddenQuest.dayKey !== previousDayKey) return;
 
-      if (this.hiddenQuest.completed) {
-        this.log('Hidden Quest archived: objective completed.');
-      } else {
-        this.addXp(-this.hiddenQuest.penaltyXp);
-        this.log(`Hidden Quest failed. -${this.hiddenQuest.penaltyXp} XP`);
-      }
-
+    resolveHiddenQuestOnDayChange() {
       this.hiddenQuest.active = false;
-      this.hiddenQuest.completed = false;
     },
+
 
     completeHiddenQuest() {
-      this.applyDailyResets();
-      if (!this.hiddenQuest.active || this.hiddenQuest.completed) return;
-      this.hiddenQuest.completed = true;
-      this.addXp(this.hiddenQuest.rewardXp);
-      this.log(`Hidden Quest complete! +${this.hiddenQuest.rewardXp} XP`);
-      this.save();
+      // Legacy hidden challenges no longer add unplanned work or rewards.
     },
 
     applyQuestStatRewards(quest) {
@@ -3172,10 +3003,18 @@ function soloLevelingApp() {
       const key = quest.key || '';
       const rewardsByQuestKey = {
         pushups_main: [{ stat: 'strength', amount: 2 }],
-        boss_pushups: [{ stat: 'strength', amount: 2 }],
-        sprint_intervals: [{ stat: 'endurance', amount: 1 }],
+        squats: [{ stat: 'strength', amount: 1 }],
+        prone_w: [{ stat: 'strength', amount: 1 }],
+        glute_bridge: [{ stat: 'strength', amount: 1 }],
+        lunges: [{ stat: 'strength', amount: 1 }],
+        dead_bug: [{ stat: 'agility', amount: 1 }],
+        bird_dog: [{ stat: 'agility', amount: 1 }],
+        balance: [{ stat: 'agility', amount: 1 }],
         light_cardio: [{ stat: 'endurance', amount: 1 }],
-        sleep_requirement: [{ stat: 'recovery', amount: 1 }]
+        mobility_work: [{ stat: 'recovery', amount: 1 }],
+        stretching: [{ stat: 'recovery', amount: 1 }],
+        recovery_check: [{ stat: 'recovery', amount: 1 }],
+        weekly_review: [{ stat: 'discipline', amount: 1 }]
       };
       const rewardsByQuestId = {
         21: [{ stat: 'discipline', amount: 1 }],
@@ -3203,36 +3042,33 @@ function soloLevelingApp() {
       return `${year}-${month}-${day}`;
     },
 
-    currentWeekKey() {
-      const now = new Date();
-      const jan1 = new Date(now.getFullYear(), 0, 1);
-      const dayMs = 24 * 60 * 60 * 1000;
-      const dayOfYear = Math.floor((now - jan1) / dayMs) + 1;
-      const week = Math.ceil(dayOfYear / 7);
-      return `${now.getFullYear()}-W${String(week).padStart(2, '0')}`;
+    currentWeekKey(dateKey = this.todayDateKey()) {
+      const date = new Date(dateKey + 'T00:00:00Z');
+      const offset = (date.getUTCDay() + 6) % 7;
+      date.setUTCDate(date.getUTCDate() - offset);
+      return date.toISOString().slice(0,10); // Monday, including weeks crossing New Year.
     },
+
 
     canEnterDungeonRaid() {
-      return this.directiveCompletionPercent() >= 75;
+      return this.weeklyTrainingRecords().filter(day => day.completed).length >= 3;
     },
+
 
     directiveCompletionProgress() {
-      const completed = this.meta.weeklyDirectiveTaskCompletions || 0;
-      const total = this.totalWeeklyDirectiveTasks();
-      return `${completed}/${total}`;
+      return Math.min(3, this.weeklyTrainingRecords().filter(day => day.completed).length) + '/3 sessions';
     },
+
 
     totalWeeklyDirectiveTasks() {
-      if (!Array.isArray(this.weeklyProtocols) || this.weeklyProtocols.length === 0) return 0;
-      return this.weeklyProtocols.reduce((sum, protocol) => sum + ((protocol.tasks && protocol.tasks.length) || 0), 0);
+      return 3;
     },
 
+
     directiveCompletionPercent() {
-      const total = this.totalWeeklyDirectiveTasks();
-      if (total <= 0) return 0;
-      const completed = this.meta.weeklyDirectiveTaskCompletions || 0;
-      return Math.round((completed / total) * 100);
+      return Math.min(100, Math.round(this.weeklyTrainingRecords().filter(day => day.completed).length / 3 * 100));
     },
+
 
     dungeonDifficultyRank() {
       const rankOrder = ['E-Rank', 'D-Rank', 'C-Rank', 'B-Rank', 'A-Rank', 'S-Rank', 'S++ Rank'];
@@ -3241,171 +3077,65 @@ function soloLevelingApp() {
     },
 
     estimatedSurvivalRate() {
-      const fixedByDungeonRank = {
-        'E-Rank': 88,
-        'D-Rank': 80,
-        'C-Rank': 72,
-        'B-Rank': 64,
-        'A-Rank': 56,
-        'S-Rank': 48,
-        'S++ Rank': 40
-      };
-      return fixedByDungeonRank[this.dungeonDifficultyRank()] ?? 64;
+      return null; // No invented fitness or survival estimate.
     },
+
 
     applyDailyResets() {
+      this.ensureTrainingSettings();
       const today = this.todayDateKey();
-      const currentWeek = this.currentWeekKey();
-      if (this.meta.dietTrackingDayKey !== today) {
-        if (this.meta.dietTrackingDayKey) {
-          this.recordDailyNutritionSnapshot(this.meta.dietTrackingDayKey);
+      const previous = this.meta.lastDailyResetDate;
+      // Do not grant another day when a device clock moves backwards.
+      if (previous && this.daysBetweenDateKeys(previous,today) <= 0) return;
+      if (previous) {
+        const prior = this.meta.trainingSessions[previous];
+        if (prior?.completed) this.meta.protocolDay = (this.meta.protocolDay % 7) + 1;
+        if (!prior?.completed && !prior?.rest || this.daysBetweenDateKeys(previous,today) > 1) {
+          this.meta.dailyStreak = 0;
+          this.meta.survivalStreak = 0;
         }
-        this.meta.dietTrackingDayKey = today;
-        this.dietPlan.forEach((meal) => {
-          meal.done = false;
-          this.meta.dietMealStatus[meal.key] = false;
-        });
-        this.meta.dietWaterLiters = 0;
+        this.recordDailyNutritionSnapshot(this.meta.dietTrackingDayKey || previous);
       }
-
-      if (this.meta.weeklyDirectiveWeek !== currentWeek) {
-        if (this.meta.weeklyDirectiveWeek) {
-          this.meta.dungeonArcWeek = (this.meta.dungeonArcWeek || 1) + 1;
-        }
-        this.meta.weeklyDirectiveWeek = currentWeek;
-        this.meta.weeklyDirectiveTaskCompletions = 0;
-        this.meta.lastRaidClaimWeek = null;
-        this.syncRaidTasksWithDungeon();
-      }
-
-      if (this.meta.lastDailyResetDate !== today) {
-        const previousDayKey = this.meta.lastDailyResetDate;
-        const previousMode = this.meta.dailyMode;
-        const previousProtocolDay = this.meta.protocolDay;
-        if (previousMode === 'extreme') {
-          this.meta.extremeModeStreak = (this.meta.extremeModeStreak || 0) + 1;
-        } else {
-          this.meta.extremeModeStreak = 0;
-        }
-        this.meta.reassignmentDayKey = null;
-        this.meta.reassignmentProtocolDay = null;
-        if (this.meta.lastDailyResetDate) {
-          const pushupQuestsToday = this.quests.filter((quest) => typeof quest.title === 'string' && quest.title.toLowerCase().includes('push-up'));
-          if (pushupQuestsToday.length > 0) {
-            if (pushupQuestsToday.every((quest) => quest.done)) {
-              this.meta.pushupConsistencyDays = (this.meta.pushupConsistencyDays || 0) + 1;
-            } else {
-              this.meta.pushupConsistencyDays = 0;
-            }
-          }
-          if (this.meta.pushupTier === 0 && this.meta.pushupConsistencyDays >= 5) {
-            this.meta.pushupTier = 1;
-            this.log('Growth detected. Increasing difficulty.');
-            this.log('Push-up discipline tier upgraded.');
-          }
-          this.resolveHiddenQuestOnDayChange(previousDayKey);
-          if (!this.allDailyQuestsComplete()) {
-            this.addXp(-this.dailyFailurePenaltyXp);
-            this.log(`Daily directive incomplete. -${this.dailyFailurePenaltyXp} XP penalty applied.`);
-            this.log('Rank reset warning: repeated failures can downgrade your standing.');
-            this.log('Streak broken.');
-            this.log('Fatigue Debuff applied.');
-            this.meta.dailyStreak = 0;
-            if ((this.meta.survivalStreak || 0) > 0) {
-              this.log('System disappointment detected.');
-            }
-            this.meta.survivalStreak = 0;
-            if (previousMode === 'extreme') {
-              this.addXp(-this.extremeModeFailurePenaltyXp);
-              this.log(`Extreme Mode failure penalty applied: -${this.extremeModeFailurePenaltyXp} XP.`);
-            }
-            this.meta.fatigueDebuffActive = true;
-          }
-          const lowerBodyProtocol = this.weeklyProtocols.find((protocol) => protocol.day === 3);
-          const lowerBodyKeys = new Set((lowerBodyProtocol?.tasks || []).map((task) => task.key));
-          const lowerBodyTasks = this.quests.filter((quest) => lowerBodyKeys.has(quest.key));
-          const lowerBodySkipped = previousProtocolDay === 3
-            && lowerBodyTasks.length > 0
-            && !lowerBodyTasks.every((quest) => quest.done);
-          if (lowerBodySkipped) {
-            this.meta.reassignmentDayKey = today;
-            this.meta.reassignmentProtocolDay = 3;
-            this.activeSystemNotification = {
-              id: Date.now(),
-              title: 'System Alert',
-              message: 'Lower body deficiency detected. Reassigning training.'
-            };
-            this.log('Lower body deficiency detected. Reassigning training.');
-          }
-        }
-        this.evaluateBiweeklyLoadProgress(today);
-        this.meta.lastDailyResetDate = today;
-        this.meta.dailyMode = null;
-        this.meta.dailyModeDayKey = null;
-        this.meta.focusBuild = null;
-        this.meta.focusBuildDayKey = null;
-        this.meta.lastFullClearBonusDate = null;
-        this.meta.lastDailyStreakCreditDate = null;
-        this.meta.lastIncompleteQuestReminderDayKey = null;
-        this.meta.lastIncompleteQuestReminderAt = null;
-        this.meta.dailyStartXp = this.profile.xp;
-        this.meta.dailyStartStats = {
-          strength: this.profile.stats.strength,
-          endurance: this.profile.stats.endurance,
-          agility: this.profile.stats.agility,
-          discipline: this.profile.stats.discipline,
-          aura: this.profile.stats.aura,
-          recovery: this.profile.stats.recovery
-        };
-        this.meta.dailyStartDietStatXp = {
-          strength: this.meta.dietStatXp.strength,
-          endurance: this.meta.dietStatXp.endurance,
-          recovery: this.meta.dietStatXp.recovery
-        };
-        this.meta.dailyStartDietWaterLiters = this.meta.dietWaterLiters;
-        this.syncDailyQuestRotation(today);
-        this.syncModeSpecificQuests();
-        this.maybeTriggerHiddenQuest(today);
-      }
-
+      this.meta.lastDailyResetDate = today;
+      this.meta.questRotationDate = null;
+      this.meta.dailyMode = 'normal';
+      this.meta.dailyModeDayKey = today;
+      this.meta.focusBuildDayKey = today;
+      this.meta.sessionRestDay = null;
+      this.meta.lastFullClearBonusDate = null;
+      this.meta.lastDailyStreakCreditDate = null;
+      this.meta.lastIncompleteQuestReminderDayKey = null;
+      this.meta.lastIncompleteQuestReminderAt = null;
+      this.meta.fatigueDebuffActive = false;
+      this.meta.reassignmentDayKey = null;
+      this.meta.reassignmentProtocolDay = null;
+      this.meta.dietTrackingDayKey = today;
+      this.meta.dietMealStatus = {};
+      this.meta.dietWaterLiters = 0;
+      this.dietPlan.forEach(meal => {meal.done=false;});
+      this.meta.dailyStartXp = this.profile.xp;
+      this.meta.dailyStartStats = {...this.profile.stats};
+      this.meta.dailyStartDietStatXp = {...this.meta.dietStatXp};
+      this.meta.dailyStartDietWaterLiters = 0;
+      this.meta.weeklyDirectiveWeek = this.currentWeekKey();
+      this.meta.lastRaidResetWeek = this.currentWeekKey();
+      this.syncDailyQuestRotation(today);
+      this.maybeTriggerHiddenQuest(today);
+      this.syncRaidTasksWithDungeon();
       this.applyDietMealTemplate();
-
-      const weekKey = this.currentWeekKey();
-      if (this.meta.lastRaidResetWeek !== weekKey) {
-        this.meta.lastRaidResetWeek = weekKey;
-      }
+      this.meta.progressSyncPending = true;
+      this.meta.gameStateUpdatedAt = new Date().toISOString();
     },
+
 
     isRaidBonusClaimedThisWeek() {
       return this.meta.lastRaidClaimWeek === this.currentWeekKey();
     },
 
     normalizeQuestAndRaidXp() {
-      const questXpById = { 6: 480, 7: 430, 21: 170, 22: 150, 23: 130 };
-
       if (!Array.isArray(this.quests)) this.quests = [];
       if (!Array.isArray(this.raidTasks)) this.raidTasks = [];
-
-      this.quests = this.quests.map((quest) => ({
-        ...quest,
-        title:
-          quest.id === 6 ? '🏋️ Weighted Push-ups Protocol' :
-          quest.id === 7 ? '🏃 15k Steps Expedition' :
-          quest.id === 21 ? '📵 Mind Discipline: Social Silence' :
-          quest.id === 22 ? '📖 Mind Discipline: Focus Reading' :
-          quest.id === 23 ? '🧘 Mind Discipline: Meditation Protocol' :
-          quest.title,
-        note:
-          quest.id === 6 ? 'Strength 10 unlocked | Objective: Weighted push-ups session' :
-          quest.id === 7 ? 'Endurance 15 unlocked | Objective: Complete 15,000 steps' :
-          quest.id === 21 ? this.questNoteForDisplay({ id: 21 }) :
-          quest.id === 22 ? this.questNoteForDisplay({ id: 22 }) :
-          quest.id === 23 ? this.questNoteForDisplay({ id: 23 }) :
-          quest.note,
-        xp: questXpById[quest.id] ?? quest.xp
-      }));
-
-      // Raid tasks are generated by the active dungeon definition.
+      // Versioned session templates own rewards; legacy bonus chores are not restored.
     },
 
     xpThresholdForLevel(level) {
@@ -3439,63 +3169,37 @@ function soloLevelingApp() {
     },
 
     completeQuest(id) {
+      if (!this.accountReady) return;
+      if (this.meta.lastDailyResetDate && this.todayDateKey() < this.meta.lastDailyResetDate) return;
       this.applyDailyResets();
-      if (!this.isFocusBuildSelected()) {
-        this.log('Select a build before starting directives.');
-        return;
-      }
-      if (!this.isDailyModeSelected()) {
-        this.log('Select a daily mode before starting directives.');
-        return;
-      }
-      const quest = this.quests.find((q) => q.id === id);
-      if (!quest) return;
-      const wasAllDailyComplete = this.allDailyQuestsComplete();
-      const couldEnterRaidBefore = this.canEnterDungeonRaid();
-      if (quest.done) {
-        this.log(`Quest already completed today: ${quest.title}`);
-        return;
-      }
-
+      if (this.meta.sessionRestDay === this.todayDateKey()) return;
+      const quest = this.quests.find(item => item.id === id);
+      if (!quest || quest.done) return;
       quest.done = true;
-      const gainedXp = this.questReward(quest);
-      this.addXp(gainedXp);
-      this.log(`Quest complete: ${quest.title} (+${gainedXp} XP, ${this.modeLabel()}).`);
+      quest.earnedXp = this.questReward(quest);
+      this.addXp(quest.earnedXp);
       this.applyQuestStatRewards(quest);
-      if (quest.key) {
-        this.meta.weeklyDirectiveTaskCompletions = Math.min(
-          this.totalWeeklyDirectiveTasks(),
-          (this.meta.weeklyDirectiveTaskCompletions || 0) + 1
-        );
-      }
-
-      if (!wasAllDailyComplete && this.allDailyQuestsComplete()) {
-        this.log('Daily directives cleared for today.');
-        this.meta.loadCycleFullClears = (this.meta.loadCycleFullClears || 0) + 1;
-        if (this.meta.lastDailyStreakCreditDate !== this.todayDateKey()) {
+      this.log('Completed: ' + quest.title + ' (+' + quest.earnedXp + ' XP).');
+      if (this.allDailyQuestsComplete() && this.meta.lastFullClearBonusDate !== this.todayDateKey()) {
+        const today = this.todayDateKey();
+        const prior = this.meta.trainingSessions[today];
+        if (!prior?.completed) {
+          this.meta.completedTrainingSessions += 1;
+          this.meta.trainingSessions[today] = {completed:true, type:this.currentProtocol().type, protocolDay:this.meta.protocolDay};
+          this.meta.trainingSessions = Object.fromEntries(Object.entries(this.meta.trainingSessions).sort().slice(-366));
           this.meta.dailyStreak = (this.meta.dailyStreak || 0) + 1;
-          this.meta.survivalStreak = (this.meta.survivalStreak || 0) + 1;
-          this.meta.lastDailyStreakCreditDate = this.todayDateKey();
-          this.log(`Streak increased: Day ${this.meta.dailyStreak}.`);
+          this.meta.survivalStreak = this.meta.dailyStreak;
         }
-        if (this.meta.lastFullClearBonusDate !== this.todayDateKey()) {
-          const clearBonusXp = Math.round(
-            this.quests.reduce((sum, dailyQuest) => sum + this.questReward(dailyQuest), 0) * 0.5
-          );
-          this.addXp(clearBonusXp);
-          this.meta.lastFullClearBonusDate = this.todayDateKey();
-          this.log(`Full Clear Bonus activated: +${clearBonusXp} XP (50% bonus).`);
-        }
-        if (this.meta.fatigueDebuffActive) {
-          this.meta.fatigueDebuffActive = false;
-          this.log('Fatigue Debuff removed.');
-        }
+        this.meta.lastDailyStreakCreditDate = today;
+        this.meta.lastFullClearBonusDate = today;
+        const bonus = Math.round(this.quests.reduce((sum,item)=>sum+(item.earnedXp || 0),0)*0.25);
+        this.addXp(bonus);
+        this.log('Session complete. +' + bonus + ' XP bonus. The next session opens tomorrow.');
       }
-      if (!couldEnterRaidBefore && this.canEnterDungeonRaid()) {
-        this.log('Weekly Dungeon Raid unlocked. Directive threshold reached (75%).');
-      }
+      this.syncRaidTasksWithDungeon();
       this.save();
     },
+
 
     toggleQuest(id) {
       this.completeQuest(id);
@@ -3503,53 +3207,24 @@ function soloLevelingApp() {
 
     toggleRaid(id) {
       this.applyDailyResets();
-      if (!this.canEnterDungeonRaid()) {
-        this.log('Weekly Dungeon Raid locked. Complete at least 75% of daily directive tasks this week.');
-        return;
-      }
-      if (this.isRaidBonusClaimedThisWeek()) {
-        this.log('Weekly Dungeon Raid already cleared this week. New raid opens next week.');
-        return;
-      }
-
-      const raid = this.raidTasks.find((r) => r.id === id);
-      if (!raid) return;
-      if (raid.done) {
-        this.log(`Raid task already completed this week: ${raid.title}`);
-        return;
-      }
-
-      raid.done = true;
-      this.addXp(raid.xp);
-      this.log(`Raid task done: ${raid.title} (+${raid.xp} XP)`);
+      if (id !== 3 || !this.canEnterDungeonRaid() || this.isRaidBonusClaimedThisWeek()) return;
+      this.meta.weeklyReviewWeek = this.currentWeekKey();
+      this.syncRaidTasksWithDungeon();
       this.save();
     },
+
 
     claimRaidBonus() {
       this.applyDailyResets();
-      if (!this.canEnterDungeonRaid()) {
-        this.log('Weekly Dungeon Raid locked. Complete at least 75% of daily directive tasks this week.');
-        return;
-      }
-      if (this.isRaidBonusClaimedThisWeek()) {
-        this.log('Raid bonus already claimed this week.');
-        return;
-      }
-
-      const allDone = this.raidTasks.every((task) => task.done);
-      if (!allDone) {
-        this.log('Raid bonus failed. Complete all weekly raid tasks first.');
-        return;
-      }
-
-      this.addXp(this.raidBonusXp);
-      this.raidTasks.forEach((task) => {
-        task.done = false;
-      });
+      if (!this.accountReady || this.todayDateKey() < this.meta.lastDailyResetDate) return;
+      this.syncRaidTasksWithDungeon();
+      if (!this.canEnterDungeonRaid() || this.isRaidBonusClaimedThisWeek() || !this.raidTasks.every(task=>task.done)) return;
       this.meta.lastRaidClaimWeek = this.currentWeekKey();
-      this.log(`Weekly Dungeon Raid cleared! Bonus claimed: +${this.raidBonusXp} XP`);
+      this.addXp(this.raidBonusXp);
+      this.log('Weekly consistency bonus: +' + this.raidBonusXp + ' XP.');
       this.save();
     },
+
 
     addXp(amount) {
       const delta = Number(amount);
@@ -3672,6 +3347,7 @@ function soloLevelingApp() {
     },
 
     shouldMaintainNativeQuestReminder() {
+      if (!this.accountReady || this.meta.sessionRestDay === this.todayDateKey()) return false;
       if (!this.isNativeApp()) return false;
       if (!this.isFocusBuildSelected() || !this.isDailyModeSelected()) return false;
       if (!Array.isArray(this.quests) || this.quests.length === 0) return false;
@@ -3807,6 +3483,7 @@ function soloLevelingApp() {
     },
 
     shouldSendIncompleteQuestReminder() {
+      if (!this.accountReady || this.meta.sessionRestDay === this.todayDateKey()) return false;
       if (this.allDailyQuestsComplete()) return false;
       const remainingMs = this.timeUntilDailyResetMs();
       if (remainingMs <= 0 || remainingMs > this.questReminderWindowMs) return false;
@@ -3860,6 +3537,7 @@ function soloLevelingApp() {
     },
 
     rollSystemNotification(force = false) {
+      if (!this.accountReady || this.meta.sessionRestDay === this.todayDateKey()) return;
       if (this.activeSystemNotification) return;
       if (this.dataStatus === 'loading') return;
       let message = null;
@@ -3901,58 +3579,17 @@ function soloLevelingApp() {
 
     confirmAbandonMission() {
       this.applyDailyResets();
-      const completedToday = this.quests.filter((quest) => quest.done).length;
-      const completedDirectiveTasks = this.quests.filter((quest) => quest.done && quest.key).length;
-      const abandonPenaltyXp = 500;
-      const resetXp = Number.isFinite(this.meta.dailyStartXp) ? Math.max(0, this.meta.dailyStartXp) : 0;
-      this.profile.xp = Math.max(0, resetXp - abandonPenaltyXp);
-      const resetStats = this.meta.dailyStartStats && typeof this.meta.dailyStartStats === 'object' ? this.meta.dailyStartStats : {};
-      this.profile.stats = {
-        strength: Number.isFinite(resetStats.strength) ? resetStats.strength : this.profile.stats.strength,
-        endurance: Number.isFinite(resetStats.endurance) ? resetStats.endurance : this.profile.stats.endurance,
-        agility: Number.isFinite(resetStats.agility) ? resetStats.agility : this.profile.stats.agility,
-        discipline: Number.isFinite(resetStats.discipline) ? resetStats.discipline : this.profile.stats.discipline,
-        aura: Number.isFinite(resetStats.aura) ? resetStats.aura : this.profile.stats.aura,
-        recovery: Number.isFinite(resetStats.recovery) ? resetStats.recovery : this.profile.stats.recovery
-      };
-      const resetDietStatXp = this.meta.dailyStartDietStatXp && typeof this.meta.dailyStartDietStatXp === 'object'
-        ? this.meta.dailyStartDietStatXp
-        : {};
-      this.meta.dietStatXp = {
-        strength: Number.isFinite(resetDietStatXp.strength) ? Math.max(0, Math.round(resetDietStatXp.strength)) : this.meta.dietStatXp.strength,
-        endurance: Number.isFinite(resetDietStatXp.endurance) ? Math.max(0, Math.round(resetDietStatXp.endurance)) : this.meta.dietStatXp.endurance,
-        recovery: Number.isFinite(resetDietStatXp.recovery) ? Math.max(0, Math.round(resetDietStatXp.recovery)) : this.meta.dietStatXp.recovery
-      };
-      this.meta.dietWaterLiters = Number.isFinite(this.meta.dailyStartDietWaterLiters)
-        ? Math.max(0, Math.min(this.waterGoalLiters, Math.round(this.meta.dailyStartDietWaterLiters)))
-        : this.meta.dietWaterLiters;
-      this.recomputeProgressFromCurrentXp();
-      this.quests.forEach((quest) => {
-        quest.done = false;
-      });
-      this.dietPlan.forEach((meal) => {
-        meal.done = false;
-        this.meta.dietMealStatus[meal.key] = false;
-      });
-      if (this.hiddenQuest.dayKey === this.todayDateKey()) {
-        this.hiddenQuest.completed = false;
-      }
-      this.meta.weeklyDirectiveTaskCompletions = Math.max(
-        0,
-        (this.meta.weeklyDirectiveTaskCompletions || 0) - completedDirectiveTasks
-      );
-      this.meta.dailyMode = null;
-      this.meta.dailyModeDayKey = null;
-      this.meta.focusBuild = null;
-      this.meta.focusBuildDayKey = null;
-      this.meta.lastFullClearBonusDate = null;
-      this.meta.lastDailyStreakCreditDate = null;
+      if (!this.accountReady || this.todayDateKey() < this.meta.lastDailyResetDate) return;
       this.showAbandonModal = false;
-      this.log('Mission abandoned. All XP gained today has been removed.');
-      this.log(`Mission abandoned penalty applied: -${abandonPenaltyXp} XP.`);
-      this.log('Mission abandoned. All stats gained today have been removed.');
+      if (this.allDailyQuestsComplete()) return;
+      const today = this.todayDateKey();
+      this.meta.sessionRestDay = today;
+      this.meta.trainingSessions[today] = {rest:true,completed:false,type:'recovery',protocolDay:this.meta.protocolDay};
+      this.syncRaidTasksWithDungeon();
+      this.log('Rest day recorded. Earned XP stays. Your routine will resume tomorrow.');
       this.save();
     },
+
 
     requestResetProgress() {
       this.showResetProgressModal = true;
@@ -4069,6 +3706,7 @@ function soloLevelingApp() {
       };
       this.quests = [];
       this.applyDietMealTemplate();
+      this.ensureTrainingSettings();
       this.syncDailyQuestRotation(this.todayDateKey());
       this.syncModeSpecificQuests();
       this.syncRaidTasksWithDungeon();
