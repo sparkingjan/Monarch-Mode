@@ -188,6 +188,8 @@
     }
     .btn-edit:hover { border-color: var(--ice); background: rgba(126,184,212,0.08); }
     .btn-premium {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; text-align: center; text-decoration: none;
       font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 600;
       letter-spacing: 0.2em; color: var(--gold); background: transparent;
       border: 1px solid rgba(201,169,110,0.4); padding: 10px 28px;
@@ -434,12 +436,21 @@
             <span x-show="meta.premiumMembershipSince" x-text="`since ${meta.premiumMembershipSince}`"></span>
           </p>
           <p x-show="hasPremiumMembership() && meta.premiumMembershipUntil" style="margin-top:4px;font-size:10px;color:rgba(200,216,232,0.35);letter-spacing:0.05em;" x-text="`Valid until: ${meta.premiumMembershipUntil}`"></p>
-          <button
-            x-show="!hasPremiumMembership()"
-            @click="startPremiumCheckout()"
-            class="btn-premium">
-            Buy Premium (Pay 99/month)
-          </button>
+          <div x-show="!hasPremiumMembership()">
+            <a
+              href="mailto:ishraqrather19@gmail.com?subject=Ascendra%20Premium%20subscription&amp;body=Hi%20Ishraq%2C%0D%0A%0D%0AI%20would%20like%20to%20subscribe%20to%20Ascendra%20Premium.%20Please%20send%20me%20the%20payment%20and%20activation%20instructions.%0D%0A%0D%0AMy%20Ascendra%20account%20email%3A%20"
+              class="btn-premium">
+              Email to subscribe
+            </a>
+            <p style="margin-top:12px;font-size:14px;line-height:1.6;color:rgba(200,216,232,0.75);">
+              Email <a href="mailto:ishraqrather19@gmail.com" style="color:var(--gold);overflow-wrap:anywhere;">ishraqrather19@gmail.com</a>
+              with your Ascendra account email to request payment and activation instructions.
+              Premium access starts after payment is confirmed and your subscription is activated.
+            </p>
+            <p style="margin-top:8px;font-size:13px;line-height:1.6;color:rgba(200,216,232,0.6);">
+              The button opens your email app. If it does not open, copy the address above into your email service.
+            </p>
+          </div>
         </div>
       </div>
 
