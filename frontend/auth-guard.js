@@ -1,8 +1,8 @@
 (function () {
-  const path = (window.location.pathname || '').split('/').pop() || 'index.html';
+  const path = ((window.location.pathname || '').split('/').pop() || 'index').replace(/\.html$/i, '');
   let token = localStorage.getItem('firebase-id-token');
-  const publicPages = new Set(['index.html', 'login.html', 'signup.html']);
-  const premiumPages = new Set(['diet.html', 'fitness.html']);
+  const publicPages = new Set(['index', 'login', 'signup']);
+  const premiumPages = new Set(['diet', 'fitness']);
 
   function activeUidFromToken(rawToken) {
     if (typeof rawToken !== 'string' || !rawToken.trim()) return null;
