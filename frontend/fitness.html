@@ -87,6 +87,7 @@
     @media(max-width:768px){.center-stage{padding:36px 20px 100px;}.features-preview{grid-template-columns:1fr 1fr;}.countdown-grid{flex-wrap:wrap;justify-content:center;}}
       @media(max-width:480px){.features-preview{grid-template-columns:1fr;}.countdown-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}.cd-unit{min-width:0;padding:18px;}.status-strip{padding:12px 20px;gap:12px;flex-wrap:wrap;}.status-text,.status-right{letter-spacing:0.15em;}}
   </style>
+<link rel="stylesheet" href="mobile.css" />
 </head>
 <body>
 <div class="bg-fixed"></div><div class="bg-grid"></div><div class="scanlines"></div><div class="vignette"></div>
@@ -169,7 +170,7 @@
 const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
 let mx=0,my=0,rx=0,ry=0;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx-4+'px';cursor.style.top=my-4+'px';});
-(function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx-16+'px';ring.style.top=ry-16+'px';requestAnimationFrame(animRing);})();
+(function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx-16+'px';ring.style.top=ry-16+'px';if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(animRing);})();
 document.querySelectorAll('a,button,.feat-card,.cd-unit').forEach(el=>{
   el.addEventListener('mouseenter',()=>{cursor.style.transform='scale(2)';ring.style.width='44px';ring.style.height='44px';ring.style.borderColor='rgba(126,184,212,0.8)';});
   el.addEventListener('mouseleave',()=>{cursor.style.transform='scale(1)';ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(126,184,212,0.5)';});

@@ -141,6 +141,7 @@
     a,button{cursor:none;}
     @media(max-width:768px){.page{padding:36px 20px 40px;}.macro-grid{grid-template-columns:repeat(2,1fr);}.hydro-row{grid-template-columns:1fr;}.xp-row{grid-template-columns:1fr;}}
   </style>
+<link rel="stylesheet" href="mobile.css" />
 </head>
 <body>
 
@@ -355,7 +356,7 @@
   const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
   let mx=0,my=0,rx=0,ry=0;
   document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx-4+'px';cursor.style.top=my-4+'px';});
-  function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx-16+'px';ring.style.top=ry-16+'px';requestAnimationFrame(animRing);}
+  function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx-16+'px';ring.style.top=ry-16+'px';if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(animRing);}
   animRing();
   document.querySelectorAll('a,button,.xp-card,.macro-card,.hydro-card,.cup,.meal-card').forEach(el=>{
     el.addEventListener('mouseenter',()=>{cursor.style.transform='scale(2)';ring.style.width='44px';ring.style.height='44px';ring.style.borderColor='rgba(126,184,212,0.8)';});

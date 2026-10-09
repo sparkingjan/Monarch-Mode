@@ -106,6 +106,7 @@
   a,button{cursor:none;}
   @media(max-width:480px){.card-logo,.card-header,.card-form,.card-footer{padding-left:20px;padding-right:20px;}.card-logo,.card-footer{flex-wrap:wrap;gap:12px;}.card-title{font-size:30px;}.input-field{min-width:0;font-size:16px;}.input-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}.goal-grid{grid-template-columns:1fr;}}
 </style>
+<link rel="stylesheet" href="mobile.css" />
 </head>
 <body>
 
@@ -339,7 +340,7 @@
       ry += (my - ry) * 0.12;
       ring.style.left = rx - 16 + 'px';
       ring.style.top  = ry - 16 + 'px';
-      requestAnimationFrame(animRing);
+      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(animRing);
     })();
     document.querySelectorAll('a,button,.input-field,.goal-btn').forEach(el => {
       el.addEventListener('mouseenter', () => { cursor.style.transform = 'scale(2)'; ring.style.width = '44px'; ring.style.height = '44px'; ring.style.borderColor = 'rgba(201,169,110,0.8)'; });

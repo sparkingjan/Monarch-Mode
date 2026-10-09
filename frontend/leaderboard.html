@@ -119,6 +119,7 @@
     @media(max-width:1024px){.stats-row{grid-template-columns:repeat(2,1fr);}.podium-grid{grid-template-columns:1fr;}}
     @media(max-width:768px){.page{padding:36px 20px 60px;}.lb-head,.lb-row{grid-template-columns:50px 1fr 100px;}.lb-rank-ghost,.lb-head > span:nth-child(3){display:none;}.lb-head,.lb-row{grid-template-columns:32px minmax(0,1fr) 80px;padding-left:12px;padding-right:12px;}.lb-hunter{min-width:0;}.lb-name{overflow-wrap:anywhere;}.lb-xp{font-size:12px;}}
   </style>
+<link rel="stylesheet" href="mobile.css" />
 </head>
 <body>
 <div class="bg-fixed"></div><div class="bg-grid"></div><div class="scanlines"></div><div class="vignette"></div>
@@ -242,7 +243,7 @@
   const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
   let mx=0,my=0,rx=0,ry=0;
   document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx-4+'px';cursor.style.top=my-4+'px';});
-  (function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx-16+'px';ring.style.top=ry-16+'px';requestAnimationFrame(animRing);})();
+  (function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx-16+'px';ring.style.top=ry-16+'px';if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(animRing);})();
   function refreshCursorHover(){document.querySelectorAll('a,button,.stat-card,.podium-card,.lb-row').forEach(el=>{el.addEventListener('mouseenter',()=>{cursor.style.transform='scale(2)';ring.style.width='44px';ring.style.height='44px';ring.style.borderColor='rgba(126,184,212,0.8)';});el.addEventListener('mouseleave',()=>{cursor.style.transform='scale(1)';ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(126,184,212,0.5)';});});}
   document.addEventListener('DOMContentLoaded',()=>{refreshCursorHover();setTimeout(refreshCursorHover,1500);setTimeout(refreshCursorHover,4000);});
   for(let i=0;i<30;i++){const p=document.createElement('div');p.className='particle';p.style.cssText=`left:${Math.random()*100}%;bottom:${Math.random()*30}%;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;background:var(--ice);--dur:${5+Math.random()*8}s;--delay:${Math.random()*8}s;--op:${0.1+Math.random()*0.3};`;document.body.appendChild(p);}

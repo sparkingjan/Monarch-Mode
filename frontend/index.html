@@ -361,6 +361,7 @@
     .orb-1, .orb-2 { display: none; }
   }
 </style>
+<link rel="stylesheet" href="mobile.css" />
 </head>
 <body>
 
@@ -561,7 +562,7 @@
     ry += (my - ry) * 0.12;
     ring.style.left = rx - 16 + 'px';
     ring.style.top  = ry - 16 + 'px';
-    requestAnimationFrame(animRing);
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(animRing);
   }
   animRing();
 

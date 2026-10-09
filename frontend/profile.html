@@ -235,6 +235,7 @@
 
     a, button { cursor: none; }
   </style>
+<link rel="stylesheet" href="mobile.css" />
 </head>
 <body class="bg-abyss text-slate-100 min-h-screen">
   <div class="bg-fixed" style="position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 20% 30%,#080e22 0%,#040715 50%,#01020a 100%);pointer-events:none;"></div>
@@ -490,7 +491,7 @@
     const cursor = document.getElementById('cursor'), ring = document.getElementById('cursorRing');
     let mx = 0, my = 0, rx = 0, ry = 0;
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx - 4 + 'px'; cursor.style.top = my - 4 + 'px'; });
-    (function animRing() { rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12; ring.style.left = rx - 16 + 'px'; ring.style.top = ry - 16 + 'px'; requestAnimationFrame(animRing); })();
+    (function animRing() { rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12; ring.style.left = rx - 16 + 'px'; ring.style.top = ry - 16 + 'px'; if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(animRing); })();
     document.querySelectorAll('a,button,.stat-cell,.themed-status-row,.plan-card').forEach(el => {
       el.addEventListener('mouseenter', () => { cursor.style.transform = 'scale(2)'; ring.style.width = '44px'; ring.style.height = '44px'; ring.style.borderColor = 'rgba(126,184,212,0.8)'; });
       el.addEventListener('mouseleave', () => { cursor.style.transform = 'scale(1)'; ring.style.width = '32px'; ring.style.height = '32px'; ring.style.borderColor = 'rgba(126,184,212,0.5)'; });

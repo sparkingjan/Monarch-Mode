@@ -116,6 +116,7 @@
     @media(max-width:1024px){.main-grid{grid-template-columns:1fr;}.summary-row{grid-template-columns:repeat(3,1fr);}.nstat-row{grid-template-columns:1fr;}}
     @media(max-width:768px){.page{padding:36px 20px 40px;}.summary-row{grid-template-columns:repeat(2,1fr);}.attr-row{grid-template-columns:70px 1fr 40px;gap:10px;}}
   </style>
+<link rel="stylesheet" href="mobile.css" />
 </head>
 <body>
 <div class="bg-fixed"></div><div class="bg-grid"></div><div class="scanlines"></div><div class="vignette"></div>
@@ -225,7 +226,7 @@
 const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
 let mx=0,my=0,rx=0,ry=0;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx-4+'px';cursor.style.top=my-4+'px';});
-(function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx-16+'px';ring.style.top=ry-16+'px';requestAnimationFrame(animRing);})();
+(function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx-16+'px';ring.style.top=ry-16+'px';if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(animRing);})();
 document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('a,button,.sum-card,.attr-row,.tl-item,.cal-day,.legend-item,.panel,.nstat-card').forEach(el=>{el.addEventListener('mouseenter',()=>{cursor.style.transform='scale(2)';ring.style.width='44px';ring.style.height='44px';ring.style.borderColor='rgba(126,184,212,0.8)';});el.addEventListener('mouseleave',()=>{cursor.style.transform='scale(1)';ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(126,184,212,0.5)';});});});
 
 function buildAllCharts(d){
