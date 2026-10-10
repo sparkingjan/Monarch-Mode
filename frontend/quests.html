@@ -87,7 +87,8 @@
     .quest-text.active-q{color:var(--white);}
     .quest-xp{font-family:'Cinzel',serif;font-size:11px;color:var(--ice-glow);letter-spacing:0.1em;}
     .quest-xp-gold{color:var(--gold);}
-    .quest-note{display:block;font-size:11px;color:rgba(200,216,232,0.35);margin-top:2px;}
+    .quest-note{display:block;font-size:14px;line-height:1.6;color:#a7bfce;margin-top:4px;}
+    .quest-item > div:nth-child(2){min-width:0;}
     .reset-timer{margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;}
     .timer-label{font-size:9px;letter-spacing:0.4em;color:rgba(200,216,232,0.25);text-transform:uppercase;}
     .timer-val{font-family:'Cinzel',serif;font-size:14px;color:var(--ice);letter-spacing:0.1em;}
@@ -118,6 +119,7 @@
     .mode-btn{padding:10px 20px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.15em;font-weight:600;border:1px solid var(--border);background:rgba(4,7,21,0.8);color:var(--silver);cursor:none;transition:all 0.3s;clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);}
     .mode-btn:hover:not(:disabled){border-color:var(--ice);background:rgba(126,184,212,0.06);}
     .mode-btn.selected{background:var(--ice-bright);color:var(--void);border-color:var(--ice-bright);}
+    .mode-btn.selected:hover:not(:disabled){background:var(--ice-bright);color:var(--void);}
     .mode-btn:disabled{opacity:0.4;cursor:not-allowed;}
     .raid-label{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid rgba(126,184,212,0.05);font-size:13px;}
     .raid-label:last-of-type{border-bottom:none;}
@@ -151,6 +153,7 @@
     @media(max-width:480px){.attr-grid{grid-template-columns:1fr;}}
     .training-settings {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px;}
   .training-settings label {display:grid;gap:6px;}
+  .training-settings select {width:100%;min-width:0;}
   .quest-item:disabled {cursor:default;}
   @media(max-width:480px){.training-settings{grid-template-columns:1fr;}}
 </style>
@@ -292,7 +295,7 @@
       <div class="q-panel">
         <div class="q-panel-header">
           <div class="q-panel-eyebrow">// Daily Assignments</div>
-          <div class="q-panel-title" style="justify-content:space-between;"><span>HUNTER GROWTH ASSIGNMENTS</span></div>
+          <div class="q-panel-title" style="justify-content:space-between;"><span>TODAY'S WORKOUT</span></div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
             <div class="q-panel-warning">Complete what you can. Missed tasks never remove earned XP.</div>
             <button @click="requestAbandonMission()" class="quit-btn" :disabled="!accountReady || allDailyQuestsComplete() || meta.sessionRestDay === todayDateKey()">REST TODAY</button>
@@ -311,10 +314,18 @@
           </div>
           <div class="info-box" x-show="meta.sessionRestDay === todayDateKey()"><p class="hl">Rest day recorded. Your XP is safe; this session resumes tomorrow.</p></div>
           <div class="info-box" x-show="allDailyQuestsComplete()"><p class="hl">Session complete. Recover now; the next session opens tomorrow.</p></div>
+          <div class="info-box" x-show="sessionStarted() && quests.some(quest => quest.trainingVersion !== 3)"><p>Your started session keeps its original tasks. The updated workout planner becomes available tomorrow; your XP stays.</p></div>
           <div class="info-box">
             <div class="info-box-title">Your training settings</div>
             <p>Choose what fits you. Settings are saved to your account and can be changed before the first task of a session.</p>
             <div class="training-settings">
+              <label>Training location
+                <select class="auth-input" :value="meta.trainingLocation" @change="updateTrainingSetting('trainingLocation', $event.target.value)" :disabled="sessionStarted() || !accountReady">
+                  <option value="gym">Gym · machines and free weights</option>
+                  <option value="home">Home · dumbbells</option>
+                  <option value="bodyweight">No equipment</option>
+                </select>
+              </label>
               <label>Experience
                 <select class="auth-input" :value="meta.trainingExperience" @change="updateTrainingSetting('trainingExperience', $event.target.value)" :disabled="sessionStarted() || !accountReady">
                   <option value="beginner">Starting out / returning</option><option value="regular">Some experience</option><option value="experienced">Experienced</option>
@@ -326,11 +337,17 @@
                 </select>
               </label>
             </div>
-            <p style="margin-top:10px;">Start with a few minutes of easy movement. Use the easier variation, fewer repetitions, or full rest when needed; stop an exercise if it hurts. There is no race or penalty.</p>
+            <p style="margin-top:10px;">Your location changes the exercises. Home workouts use dumbbells; no-equipment workouts need no weights, bar or bench. Change settings before your first completed task.</p>
+            <details style="margin-top:12px;">
+            <summary style="color:var(--ice);cursor:pointer;min-height:44px;padding:12px 0;">Warm-up and progression guidance</summary>
+            <p style="margin-top:10px;">For strength sessions, warm up with 3 minutes of easy movement and light practice reps. Take longer if needed and leave time to cool down. Choose a load you can control; stop if an exercise hurts.</p>
+            <p style="margin-top:10px;">Progress by reaching the top of the rep range with good form and the suggested reps left. When that feels repeatable, try the smallest available weight increase or a harder bodyweight variation in a later session. XP never raises your weights automatically.</p>
+            <p style="margin-top:10px;">These are general workout templates. <a href="https://acsm.org/resistance-training-guidelines-update-2026/" target="_blank" rel="noopener noreferrer" style="color:var(--ice);text-decoration:underline;">Read the ACSM training guidance</a>.</p>
+            </details>
           </div>
           <!-- BUILD FOCUS -->
-          <div class="info-box">
-            <div class="info-box-title">Optional Build Focus</div>
+          <details class="info-box">
+            <summary class="info-box-title" style="cursor:pointer;min-height:44px;padding:12px 0;">Optional Build Focus</summary>
             <p>Choose a theme for your goal. It does not multiply exercise targets or block training.</p>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
@@ -343,21 +360,22 @@
               <span x-show="!isFocusBuildSelected()">Build not selected. Daily mode lock is disabled.</span>
               <span x-show="isFocusBuildSelected()">Active: <span style="font-weight:700;" x-text="focusBuildLabel()"></span> - <span x-text="focusBuildSummary()"></span></span>
             </p>
-          </div>
+          </details>
           <!-- MODE SELECT -->
           <div class="info-box">
             <div class="info-box-title">Choose your effort</div>
             <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
               <button @click="selectDailyMode('normal')" :disabled="sessionStarted() || !accountReady" class="mode-btn" :class="meta.dailyMode==='normal'?'selected':''">Comfortable (1x XP)</button>
               <button @click="selectDailyMode('hard')" :disabled="sessionStarted() || !accountReady" class="mode-btn" :class="meta.dailyMode==='hard'?'selected':''">Steady (1.1x XP)</button>
-              <button @click="selectDailyMode('extreme')" :disabled="sessionStarted() || !accountReady" class="mode-btn" :class="meta.dailyMode==='extreme'?'selected':''">Challenging (1.2x XP)</button>
+              <button @click="selectDailyMode('extreme')" :disabled="sessionStarted() || !accountReady" class="mode-btn" :class="meta.dailyMode==='extreme'?'selected':''">Competitive (1.2x XP)</button>
             </div>
             <p style="margin-top:8px;font-size:11px;" :style="isDailyModeSelected()?'color:var(--ice-bright)':'color:var(--gold)'">
               <span x-show="!isDailyModeSelected()">Mode not selected. Quest clicks are locked.</span>
               <span x-show="isDailyModeSelected()">Active: <span style="font-weight:700;" x-text="modeLabel()"></span></span>
             </p>
             <p style="margin-top:6px;font-size:11px;color:rgba(200,216,232,0.45);">Streak Bonus: <span class="hl" x-text="`${streakMultiplier()}x`"></span> | Full Clear Bonus: <span style="color:var(--gold);font-weight:700;">+25% XP</span></p>
-            <p style="font-size:11px;color:rgba(200,216,232,0.3);margin-top:4px;">Effort adjusts the same tasks slightly. It never adds mandatory chores or scales sleep requirements.</p>
+            <p style="font-size:14px;line-height:1.6;color:var(--silver);margin-top:10px;" x-text="effortDescription()"></p>
+            <p style="font-size:13px;line-height:1.5;color:rgba(200,216,232,0.7);margin-top:8px;">Comfortable uses fewer sets; Steady builds volume; Competitive adds sets within your time budget and intervals on conditioning days. Recovery stays easy. Short sessions may cap the number of sets.</p>
           </div>
           <!-- QUEST LIST -->
           <div x-show="accountReady" x-transition.opacity.duration.180ms style="margin-top:16px;">

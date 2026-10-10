@@ -2099,7 +2099,19 @@ function soloLevelingApp() {
 
 
     modeLabel(mode = null) {
-      return ({normal: 'Comfortable', hard: 'Steady', extreme: 'Challenging'})[mode || this.meta.dailyMode] || 'Comfortable';
+      return ({normal: 'Comfortable', hard: 'Steady', extreme: 'Competitive'})[mode || this.meta.dailyMode] || 'Comfortable';
+    },
+
+    trainingLocationLabel() {
+      return ({gym:'Gym', home:'Home · dumbbells', bodyweight:'No equipment'})[this.meta.trainingLocation] || 'No equipment';
+    },
+
+    effortDescription(mode = this.meta.dailyMode) {
+      return ({
+        normal:'Lower volume, easy conditioning, and about 4 good reps left in each set.',
+        hard:'More working sets, steady conditioning, and about 3 good reps left in each set.',
+        extreme:'The most working sets that fit your time, controlled cardio intervals, and 2–3 good reps left. No max lifts or training to failure.'
+      })[mode] || '';
     },
 
 
@@ -2190,9 +2202,10 @@ function soloLevelingApp() {
 
     selectDailyMode(mode) {
       this.applyDailyResets();
-      if (!['normal','hard','extreme'].includes(mode) || this.sessionStarted()) return;
+      if (!this.accountReady || !['normal','hard','extreme'].includes(mode) || this.sessionStarted()) return;
       this.meta.dailyMode = mode;
       this.meta.dailyModeDayKey = this.todayDateKey();
+      this.quests = this.buildProtocolQuests(this.meta.protocolDay);
       this.log('Effort selected: ' + this.modeLabel(mode) + '.');
       this.save();
     },
@@ -2269,6 +2282,8 @@ function soloLevelingApp() {
 
     questNoteForDisplay(quest) {
       if (!quest) return '';
+      // Keep the prescription that was saved with a started/completed session.
+      if (quest.trainingVersion === 3) return quest.note;
       const minutes = this.meta.sessionMinutes || 20;
       const sets = minutes <= 20 ? 1 : minutes <= 30 ? 2 : 3;
       const base = {beginner:6, regular:8, experienced:10}[this.meta.trainingExperience] || 6;
@@ -2290,6 +2305,7 @@ function soloLevelingApp() {
 
     questTutorialQuery(quest) {
       if (!quest) return '';
+      if (quest.trainingVersion === 3) return `${quest.title} exercise technique tutorial`;
       const byKey = quest.key ? this.questTutorialQueries[quest.key] : '';
       const byId = Number.isFinite(quest.id) ? this.questTutorialQueriesById[quest.id] : '';
       if (byKey) return byKey;
@@ -2301,7 +2317,7 @@ function soloLevelingApp() {
     questTutorial(quest) {
       if (!quest) return null;
       const tutorialId =
-        (quest.key && this.questTutorialKeys[quest.key])
+        (quest.trainingVersion !== 3 && quest.key && this.questTutorialKeys[quest.key])
         || (Number.isFinite(quest.id) ? this.questTutorialIds[quest.id] : '');
       if (tutorialId && this.questTutorialLibrary[tutorialId]) {
         return this.questTutorialLibrary[tutorialId];
@@ -2833,6 +2849,9 @@ function soloLevelingApp() {
     },
 
     ensureTrainingSettings() {
+      if (!['gym','home','bodyweight'].includes(this.meta.trainingLocation)) this.meta.trainingLocation = 'bodyweight';
+      if (!['beginner','regular','experienced'].includes(this.meta.trainingExperience)) this.meta.trainingExperience = 'beginner';
+      if (![15,20,25,30,40].includes(this.meta.sessionMinutes)) this.meta.sessionMinutes = 20;
       if (this.meta.questRulesVersion !== 2) {
         // Preserve earned XP/stats. Old account-age routine numbers are not completed sessions.
         const alreadyCleared = this.meta.lastFullClearBonusDate === this.todayDateKey();
@@ -2858,6 +2877,12 @@ function soloLevelingApp() {
       if (!this.meta.trainingSessions || typeof this.meta.trainingSessions !== 'object') this.meta.trainingSessions = {};
       this.meta.completedTrainingSessions = Math.max(0,Math.floor(Number(this.meta.completedTrainingSessions)||0));
       if (!this.focusBuildProfiles[this.meta.focusBuild]) this.meta.focusBuild = 'monarch';
+      // Upgrade untouched sessions only. Never replace completed tasks or reset earned XP.
+      if (this.quests.some(quest => quest.trainingVersion !== 3) && !this.sessionStarted()) {
+        this.quests = this.buildProtocolQuests(this.meta.protocolDay);
+        this.meta.progressSyncPending = true;
+        this.meta.gameStateUpdatedAt = new Date().toISOString();
+      }
     },
 
     sessionStarted() {
@@ -2869,7 +2894,9 @@ function soloLevelingApp() {
       if (!this.accountReady || this.sessionStarted()) return;
       if (key === 'trainingExperience' && ['beginner','regular','experienced'].includes(value)) this.meta[key] = value;
       else if (key === 'sessionMinutes' && [15,20,25,30,40].includes(Number(value))) this.meta[key] = Number(value);
+      else if (key === 'trainingLocation' && ['gym','home','bodyweight'].includes(value)) this.meta[key] = value;
       else return;
+      this.quests = this.buildProtocolQuests(this.meta.protocolDay);
       this.save();
     },
 
@@ -2879,7 +2906,9 @@ function soloLevelingApp() {
     },
 
     sessionEstimate() {
-      return this.currentProtocol().type === 'recovery' ? '5–10 min or full rest' : 'About ' + (this.meta.sessionMinutes || 20) + ' min including breaks';
+      if (this.currentProtocol().type === 'recovery') return '5–10 min or full rest · recovery stays easy in every mode';
+      const sets = this.quests.reduce((sum, quest) => sum + (quest.prescription?.sets || 0), 0);
+      return `${this.trainingLocationLabel()} · ${this.modeLabel()} · ${this.meta.sessionMinutes || 20} min time budget${sets ? ` · ${sets} working sets` : ''}. Includes warm-up and breaks; equipment waits may take longer.`;
     },
 
     trainingLoadTargetsForTier() {
@@ -2921,19 +2950,105 @@ function soloLevelingApp() {
 
 
     currentProtocol() {
-      return this.weeklyProtocols.find(plan => plan.day === this.meta.protocolDay) || this.weeklyProtocols[0];
+      const plan = this.weeklyProtocols.find(plan => plan.day === this.meta.protocolDay) || this.weeklyProtocols[0];
+      const focus = {1:'Full body A · squat, press and row',3:'Full body B · hinge, pull and shoulders',5:'Full body C · single-leg, press and back'};
+      return {...plan, primaryFocus:focus[plan.day] || (plan.type === 'movement' ? 'Conditioning and trunk control' : 'Recovery')};
     },
 
+    strengthExercises(day) {
+      // Home assumes a pair of dumbbells; bodyweight does not require a bar, bench or band.
+      const catalog = {
+        squats: {gym:'Leg press', home:'Dumbbell goblet squat', bodyweight:'Bodyweight squat', easier:'Chair sit-to-stand', cue:'Keep your feet planted and use a controlled range.'},
+        pushups_main: {gym:'Machine chest press', home:'Dumbbell floor press', bodyweight:'Push-up', easier:'Wall push-up', cue:'Keep wrists comfortable and control the lowering phase.'},
+        prone_w: {gym:'Seated cable row', home:'One-arm dumbbell row', bodyweight:'Prone W raise', cue:'Move through the upper back without shrugging. For a dumbbell row, do both sides.', unilateralHome:true},
+        glute_bridge: {gym:'Dumbbell Romanian deadlift', home:'Dumbbell Romanian deadlift', bodyweight:'Glute bridge', easier:'Glute bridge', cue:'For a hinge, push hips back with a neutral back; use a glute bridge if the hinge is unfamiliar.'},
+        lat_pulldown: {gym:'Lat pulldown', home:'Dumbbell bent-over row', bodyweight:'Prone reverse snow angel', cue:'Use a controlled range; do not jerk or swing. Floor back work is not a substitute for loaded pulling strength.'},
+        shoulder_press: {gym:'Machine shoulder press', home:'Standing dumbbell shoulder press', bodyweight:'Pike push-up', easier:'Wall push-up', cue:'Keep your trunk steady; choose a pain-free overhead range or a wall push-up.'},
+        lunges: {gym:'Dumbbell split squat', home:'Dumbbell split squat', bodyweight:'Split squat', easier:'Supported split squat', cue:'Use a stable support for balance and complete both sides.', unilateral:true},
+        dead_bug: {gym:'Dead bug', home:'Dead bug', bodyweight:'Dead bug', cue:'Exhale as the opposite arm and leg extend; keep your back comfortable.', unilateral:true},
+        bird_dog: {gym:'Bird dog', home:'Bird dog', bodyweight:'Bird dog', cue:'Keep hips level while extending the opposite arm and leg.', unilateral:true},
+        calf_raises: {gym:'Calf raise machine', home:'Dumbbell calf raise', bodyweight:'Standing calf raise', cue:'Use support for balance and lower your heels slowly.'}
+      };
+      const sequence = {
+        1:['squats','pushups_main','prone_w','glute_bridge','dead_bug'],
+        3:['glute_bridge','lat_pulldown','shoulder_press','lunges','bird_dog'],
+        5:['lunges','pushups_main','prone_w','glute_bridge','calf_raises']
+      }[day] || [];
+      const location = this.meta.trainingLocation || 'bodyweight';
+      const beginner = this.meta.trainingExperience === 'beginner';
+      const count = this.meta.sessionMinutes <= 20 ? 3 : this.meta.sessionMinutes <= 30 ? 4 : 5;
+      return sequence.slice(0,count).map(key => {
+        const exercise = catalog[key];
+        let cue = exercise.cue;
+        if (key === 'prone_w') cue = 'Move through the upper back without shrugging.' + (location === 'home' ? ' Complete both sides.' : '');
+        if (key === 'lat_pulldown' && location !== 'bodyweight') cue = 'Use a controlled range; do not jerk or swing.';
+        if (key === 'glute_bridge' && location === 'bodyweight') cue = 'Press through your feet and raise your hips without arching your lower back.';
+        return {key, title:location === 'bodyweight' && beginner && exercise.easier ? exercise.easier : exercise[location],
+          cue, perSide:Boolean(exercise.unilateral || (location === 'home' && exercise.unilateralHome))};
+      });
+    },
+
+    strengthPrescriptions(exercises) {
+      const minutes = this.meta.sessionMinutes || 20;
+      const mode = this.meta.dailyMode || 'normal';
+      const beginner = this.meta.trainingExperience === 'beginner';
+      const target = mode === 'normal' ? (minutes >= 30 ? 2 : 1)
+        : mode === 'hard' ? (minutes >= 40 && !beginner ? 3 : 2)
+        : (minutes >= 40 && this.meta.trainingExperience === 'experienced' ? 4 : 3);
+      const restSeconds = 90;
+      const reps = beginner ? '6–10' : mode === 'extreme' && this.meta.trainingLocation !== 'bodyweight' ? '6–10' : '8–12';
+      const reserve = mode === 'normal' ? 4 : mode === 'hard' || beginner ? 3 : 2;
+      const plans = exercises.map(exercise => ({sets:1, reps, restSeconds, reserve, perSide:exercise.perSide,
+        // Per-side movements get twice the working time, not twice the reward.
+        workSeconds:exercise.perSide ? 80 : 40}));
+      const duration = () => 240 + plans.reduce((sum,p) => sum + p.sets*p.workSeconds + (p.sets-1)*p.restSeconds + 45, 0);
+      // Add whole sets within the chosen time budget; never shorten rest to squeeze them in.
+      for (let round=1; round<target; round++) {
+        for (const plan of plans) {
+          if (duration() + plan.workSeconds + plan.restSeconds <= minutes*60) plan.sets++;
+        }
+      }
+      return plans;
+    },
 
     buildProtocolQuests(day) {
       const protocol = this.weeklyProtocols.find((p) => p.day === day) || this.weeklyProtocols[0];
-      return protocol.tasks.map((task, index) => ({
+      let tasks = protocol.tasks;
+      if (protocol.type === 'strength') {
+        const exercises = this.strengthExercises(protocol.day);
+        const prescriptions = this.strengthPrescriptions(exercises);
+        tasks = exercises.map((exercise,index) => {
+          const p = prescriptions[index];
+          return {...exercise, xp:Math.round(540 / exercises.length), prescription:p,
+            note:`${p.sets} × ${p.reps} reps${p.perSide ? ' per side' : ''}. Rest ${p.restSeconds}s between sets. Finish with about ${p.reserve} good reps left. ${exercise.cue}`};
+        });
+      } else if (protocol.type === 'movement') {
+        const minutes = Math.max(5,(this.meta.sessionMinutes || 20)-8);
+        const competitive = this.meta.dailyMode === 'extreme';
+        const steady = this.meta.dailyMode === 'hard';
+        const equipment = this.meta.trainingLocation === 'gym' ? 'stationary bike or treadmill' : 'brisk walk or marching in place';
+        tasks = [
+          {key:'light_cardio', title:competitive ? 'Controlled cardio intervals' : steady ? 'Steady cardio' : 'Easy cardio', xp:180,
+            note:`${minutes} min total: ${equipment}. ` + (competitive
+              ? 'Start and finish with 2 easy minutes. In between, alternate 30s brisk with 60s easy; use any remaining time to cool down. Never sprint all-out.'
+              : steady ? 'Keep a steady pace where you can speak in sentences. Ease in and out for the first and last 2 minutes.'
+              : 'Use an easy pace where conversation feels effortless. Seated marching is an alternative.')},
+          {key:'dead_bug',title:'Core control · dead bug or seated march',xp:180,note:'2 × 6 controlled reps per side. Rest 45s. Keep breathing; choose seated marching if floor work is unsuitable.'},
+          {key:'mobility_work',title:'Mobility cool-down',xp:180,note:'2 min of gentle ankle, hip and shoulder movement. Stay within a comfortable range.'}
+        ];
+      } else {
+        // Recovery intentionally does not become a hard workout in Competitive mode.
+        tasks = tasks.map(task => ({...task,note:this.questNoteForDisplay(task)}));
+      }
+      return tasks.map((task, index) => ({
         id: (day * 100) + (index + 1),
         title: task.title,
         note: task.note,
         xp: task.xp,
         done: false,
-        key: task.key
+        key: task.key,
+        trainingVersion:3,
+        ...(task.prescription ? {prescription:task.prescription} : {})
       }));
     },
 
@@ -3005,6 +3120,9 @@ function soloLevelingApp() {
         pushups_main: [{ stat: 'strength', amount: 2 }],
         squats: [{ stat: 'strength', amount: 1 }],
         prone_w: [{ stat: 'strength', amount: 1 }],
+        lat_pulldown: [{ stat: 'strength', amount: 1 }],
+        shoulder_press: [{ stat: 'strength', amount: 1 }],
+        calf_raises: [{ stat: 'strength', amount: 1 }],
         glute_bridge: [{ stat: 'strength', amount: 1 }],
         lunges: [{ stat: 'strength', amount: 1 }],
         dead_bug: [{ stat: 'agility', amount: 1 }],
@@ -3098,7 +3216,7 @@ function soloLevelingApp() {
       }
       this.meta.lastDailyResetDate = today;
       this.meta.questRotationDate = null;
-      this.meta.dailyMode = 'normal';
+      if (!['normal','hard','extreme'].includes(this.meta.dailyMode)) this.meta.dailyMode = 'normal';
       this.meta.dailyModeDayKey = today;
       this.meta.focusBuildDayKey = today;
       this.meta.sessionRestDay = null;

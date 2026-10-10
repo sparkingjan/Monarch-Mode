@@ -61,13 +61,91 @@ test('personal settings are bounded, persist in game state, and lock after first
   const {app}=fixture();
   app.updateTrainingSetting('trainingExperience','regular');
   app.updateTrainingSetting('sessionMinutes','25');
-  assert.match(app.questNoteForDisplay(app.quests[0]),/2 × 8 reps/);
-  app.selectDailyMode('extreme');assert.equal(app.quests.length,3);
+  assert.match(app.questNoteForDisplay(app.quests[0]),/1 × 8–12 reps/);
+  app.selectDailyMode('extreme');assert.equal(app.quests.length,4);
   app.completeQuest(app.quests[0].id);
   app.updateTrainingSetting('sessionMinutes','40');app.selectDailyMode('normal');
   assert.equal(app.meta.sessionMinutes,25);assert.equal(app.meta.dailyMode,'extreme');
   assert.equal(app.localGameStatePayload().meta.trainingExperience,'regular');
-  assert.equal(app.quests.length,3);
+  assert.equal(app.quests.length,4);
+});
+
+test('location changes exercises immediately and cannot change a started workout',()=>{
+  const {app}=fixture();
+  app.updateTrainingSetting('trainingLocation','gym');
+  assert.deepEqual(Array.from(app.quests,q=>q.title),['Leg press','Machine chest press','Seated cable row']);
+  app.updateTrainingSetting('trainingLocation','home');
+  assert.match(app.quests[0].title,/Dumbbell/);
+  assert.equal(app.quests[2].prescription.perSide,true);
+  app.updateTrainingSetting('trainingLocation','bodyweight');
+  assert.ok(app.quests.every(q=>! /dumbbell|machine|cable|barbell/i.test(q.title)));
+  const before=JSON.stringify(app.quests);
+  app.updateTrainingSetting('trainingLocation','invalid');
+  app.updateTrainingSetting('sessionMinutes',999);
+  assert.equal(JSON.stringify(app.quests),before);
+  app.completeQuest(app.quests[0].id);
+  const started=JSON.stringify(app.quests), xp=app.profile.xp;
+  app.updateTrainingSetting('trainingLocation','gym');app.selectDailyMode('extreme');
+  assert.equal(JSON.stringify(app.quests),started);assert.equal(app.profile.xp,xp);
+});
+
+test('mode changes volume and conditioning while recovery stays unchanged',()=>{
+  const {app}=fixture();
+  app.updateTrainingSetting('trainingLocation','gym');app.updateTrainingSetting('sessionMinutes',30);
+  const totalSets=()=>app.quests.reduce((sum,q)=>sum+q.prescription.sets,0);
+  app.selectDailyMode('normal');const easy=totalSets();
+  app.selectDailyMode('extreme');assert.ok(totalSets()>easy);
+  assert.equal(app.quests[0].prescription.reserve,3); // Beginners retain more margin.
+  app.meta.protocolDay=2;app.selectDailyMode('normal');
+  const cardio=app.quests[0].note;
+  app.selectDailyMode('extreme');assert.notEqual(app.quests[0].note,cardio);
+  assert.match(app.quests[0].note,/30s brisk with 60s easy/);
+  app.meta.protocolDay=4;app.selectDailyMode('normal');const rest=JSON.stringify(app.quests);
+  app.selectDailyMode('extreme');assert.equal(JSON.stringify(app.quests),rest);
+});
+
+test('all equipment, experience, time and mode combinations fit the strength time budget',()=>{
+  const {app}=fixture();
+  for(const location of ['gym','home','bodyweight']) for(const experience of ['beginner','regular','experienced']) {
+    for(const minutes of [15,20,25,30,40]) for(const day of [1,3,5]) {
+      Object.assign(app.meta,{trainingLocation:location,trainingExperience:experience,sessionMinutes:minutes});
+      let previousSets=0;
+      for(const mode of ['normal','hard','extreme']) {
+        app.meta.dailyMode=mode;
+        const quests=app.buildProtocolQuests(day);
+        const seconds=240+quests.reduce((sum,q)=>sum+q.prescription.sets*q.prescription.workSeconds+(q.prescription.sets-1)*q.prescription.restSeconds+45,0);
+        const sets=quests.reduce((sum,q)=>sum+q.prescription.sets,0);
+        assert.ok(seconds<=minutes*60,`${location}/${experience}/${minutes}/${day}/${mode}`);
+        assert.ok(sets>=previousSets);previousSets=sets;
+        assert.equal(quests.reduce((sum,q)=>sum+q.xp,0),540);
+        assert.ok(quests.every(q=>q.prescription.sets>=1 && q.prescription.sets<=4));
+        assert.equal(new Set(quests.map(q=>q.id)).size,quests.length);
+      }
+    }
+  }
+});
+
+test('workout upgrade preserves partial legacy work and earned XP until the next day',()=>{
+  const {app,advance}=fixture();
+  app.quests=app.weeklyProtocols[0].tasks.map((q,i)=>({...q,id:101+i,done:i===0,earnedXp:i===0?180:undefined}));
+  app.profile.xp=1234;const saved=JSON.stringify(app.quests);
+  app.ensureTrainingSettings();assert.equal(JSON.stringify(app.quests),saved);assert.equal(app.profile.xp,1234);
+  advance('2026-10-09');assert.ok(app.quests.every(q=>q.trainingVersion===3 && !q.done));
+  assert.equal(app.profile.xp,1234);assert.equal(app.meta.protocolDay,1);
+});
+
+test('equipment, effort and prescription survive saved-state round trip and day rollover',async()=>{
+  const {app,advance}=fixture();
+  app.updateTrainingSetting('trainingLocation','gym');app.updateTrainingSetting('sessionMinutes',30);app.selectDailyMode('extreme');
+  const saved=JSON.parse(JSON.stringify(app.localGameStatePayload()));
+  const {app:restored}=fixture();restored.accountReady=false;restored.scheduleBackendSync=()=>{};
+  restored.backendRequest=async()=>({json:async()=>({xp:0,game_state:saved,game_state_updated_at:'2026-10-08T00:00:00Z'})});
+  await restored.syncFromBackend();
+  assert.equal(restored.meta.trainingLocation,'gym');assert.equal(restored.meta.dailyMode,'extreme');
+  assert.equal(JSON.stringify(restored.quests),JSON.stringify(app.quests));
+  finish(app);advance('2026-10-09');
+  assert.equal(app.meta.trainingLocation,'gym');assert.equal(app.meta.dailyMode,'extreme');
+  assert.match(app.quests[0].title,/intervals/);
 });
 test('calendar arithmetic handles DST, leap days, and Monday weeks over New Year',()=>{
   const {app}=fixture();
